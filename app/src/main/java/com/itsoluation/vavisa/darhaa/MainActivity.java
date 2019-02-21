@@ -1,0 +1,198 @@
+package com.itsoluation.vavisa.darhaa;
+
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
+import android.view.View;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.itsoluation.vavisa.darhaa.common.Common;
+import com.itsoluation.vavisa.darhaa.fargments.Category;
+import com.itsoluation.vavisa.darhaa.fargments.ContactSupport;
+import com.itsoluation.vavisa.darhaa.fargments.Favourite;
+import com.itsoluation.vavisa.darhaa.fargments.Home;
+import com.itsoluation.vavisa.darhaa.fargments.Profile;
+import com.itsoluation.vavisa.darhaa.profile_fragments.Orders;
+import com.mancj.materialsearchbar.MaterialSearchBar;
+
+import java.util.Locale;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import io.paperdb.Paper;
+
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
+
+ //   @OnClick(R.id.cart)
+ //   public void cart(){
+    //    startActivity(new Intent(this, Orders.class));
+//    }
+
+    Fragment fragment = null;
+    TextView titleTxt;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        loadLocal();
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        ButterKnife.bind(this);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("");
+        titleTxt = findViewById(R.id.title);
+        setSupportActionBar(toolbar);
+
+        //init paper
+        Paper.init(this);
+
+        chooseFragment(new Home());
+        titleTxt.setText(getResources().getText(R.string.home));
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+
+    public void setLanguage(String lang)
+    {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale= locale;
+        getBaseContext().getResources().updateConfiguration(config,getBaseContext().getResources().getDisplayMetrics());
+        Paper.book("DarHaa").write("language",lang);
+
+    }
+
+    public void loadLocal()
+    {
+        Paper.init(this);
+        String lan = Paper.book("DarHaa").read("language");
+        if (!TextUtils.isEmpty(lan)) {
+            setLanguage(lan);
+            if(lan.contentEquals("ar"))
+                Common.isArabic = true;
+
+            checkAuthontication();
+        }
+        else {
+            startActivity(new Intent(MainActivity.this, ChooseLanguage.class));
+            finish();
+        }
+    }
+    private void checkAuthontication() {
+        if(Paper.book("DarHaa").contains("currentUser")) {
+             Common.current_user = Paper.book("DarHaa").read("currentUser");
+            // startActivity(new Intent(this,MainActivity.class));
+        }else {
+            if (!Common.isSkip) {
+                startActivity(new Intent(MainActivity.this, RegisterLogin.class));
+                finish();
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+
+        MenuItem mSearch = menu.findItem(R.id.action_search);
+
+        SearchView mSearchView = (SearchView) mSearch.getActionView();
+        mSearchView.setQueryHint("Search");
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_cart) {
+            startActivity(new Intent(this, Orders.class));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_home) {
+            fragment = new  Home();
+        } else if (id == R.id.nav_category) {
+            fragment = new  Category();
+        } else if (id == R.id.nav_favourite) {
+            fragment = new Favourite();
+        } else if (id == R.id.nav_profile) {
+            fragment = new Profile();
+        }else if (id == R.id.nav_support) {
+            fragment = new ContactSupport();
+        }
+
+       // item.setChecked(true);
+
+        titleTxt.setText(item.getTitle());
+
+        chooseFragment(fragment);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    private void chooseFragment(Fragment fragment) {
+
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.content_frame, fragment);
+        transaction.commit();
+    }
+}

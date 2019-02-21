@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#25BDC1</color>
+    <color name="colorPrimaryDark">#25BDC1</color>
+    <color name="colorAccent"></color>
+
+    <color name="blue">#25BDC1</color>
+    <color name="blueLight">#60CED1</color>
+    <color name="blueHint">#A9E4E6</color>
+    <color name="brown">#764800</color>
+    <color name="brownLight">#CA9831</color>
+    <color name="brownHint">#EAD7AF</color>
+    <color name="grey">#D7D7D7</color>
+    <color name="overLayBackground">#D7FFFFFF</color>
+    <color name="overLayBackgroundgrey">#77000000</color>
+
+
+</resources>

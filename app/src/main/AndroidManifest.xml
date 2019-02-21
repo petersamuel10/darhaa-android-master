@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.itsoluation.vavisa.darhaa">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".ForgetPassword"
+            android:theme="@style/fragmentHeader"
+            android:windowSoftInputMode="adjustPan"/>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".Welcome"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashActivityWithBGImageBackground"
+            android:windowSoftInputMode="adjustResize|stateHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ChooseLanguage"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashActivityWithBGImageBackground" />
+        <activity
+            android:name=".RegisterLogin"
+            android:theme="@style/transparent" />
+        <activity
+            android:name=".Login"
+            android:theme="@style/fragmentHeader"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".Register"
+            android:theme="@style/fragmentHeader"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".profile_fragments.Addresses"
+            android:theme="@style/fragmentHeader" />
+        <activity
+            android:name=".profile_fragments.Orders"
+            android:theme="@style/fragmentHeader" />
+        <activity
+            android:name=".profile_fragments.Language"
+            android:theme="@style/fragmentHeader" />
+        <activity
+            android:name=".profile_fragments.Terms"
+            android:theme="@style/fragmentHeader" />
+        <activity
+            android:name=".view_setting.Sort"
+            android:theme="@style/fragmentHeader" />
+        <activity
+            android:name=".view_setting.Filter"
+            android:theme="@style/fragmentHeader" />
+        <activity
+            android:name=".CategoryProducts"
+            android:theme="@style/fragmentHeader" />
+        <activity
+            android:name=".ItemDetails"
+            android:theme="@style/transparent"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".Cart"
+            android:theme="@style/fragmentHeader" />
+        <activity
+            android:name=".profile_fragments.OrderDetails"
+            android:theme="@style/fragmentHeader" />
+        <activity
+            android:name=".profile_fragments.AddAddress"
+            android:theme="@style/fragmentHeader"
+            android:windowSoftInputMode="adjustPan" />
+    </application>
+
+</manifest>
