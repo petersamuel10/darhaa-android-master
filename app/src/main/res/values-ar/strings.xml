@@ -10,7 +10,7 @@
     <string name="skip">تخطى</string>
     <string name="dont_have_account">ليس لديك حساب ؟قم بالتسجيل هنا</string>
     <string name="already_havr_account">بالفعل قمت بالتسجسل من قبل؟ قم بتسجيل الدخول من هنا</string>
-    <string name="name">اسم المستخدم</string>
+    <string name="address_name">الاسم</string>
     <string name="email">البريد الالكترونى</string>
     <string name="password">كلمة المرور</string>
     <string name="confirm_password">تاكيد كلمة المرور</string>
@@ -23,7 +23,7 @@
     <string name="forget_password">نسيت كلمة المرور؟</string>
     <string name="have_not_account">ليس لديك حساب ؟ قم بالتسجل هنا</string>
     <string name="offers">العروض</string>
-    <string name="user_name">اسم الكامل</string>
+    <string name="user_name">اسم المستخدم</string>
     <string name="error_invalid_email">البريد الالكترونى غير صالح</string>
     <string name="error_invalid_password">الرقم السرى قصير للغايه</string>
     <string name="error_incorrect_password">الرقم السرى غير صحيح</string>
@@ -44,7 +44,7 @@
     <string name="save">حفظ</string>
     <string name="addressName">اسم العنوان</string>
     <string name="phone">رقم الهاتف</string>
-    <string name="city">مدينتك</string>
+    <string name="city"> المدينة :</string>
     <string name="governorate">محافظتك</string>
     <string name="Block">المنطقة</string>
     <string name="building">المبنى</string>
@@ -142,4 +142,14 @@
     <string name="price_high_low">السعر (عالى - منخفض)</string>
     <string name="price_low_high">السعر (منخفض - عالى)</string>
     <string name="login_no_match">من فضلك تاكد من بريدك الالكترونى وكلمة المرور</string>
+    <string name="country">الدولة:</string>
+    <string name="area">المنطقة :</string>
+    <string name="postcode">رقم البريد :</string>
+    <string name="address_description">تفاصيل العنوان :</string>
+    <string name="set_as_default">اختياره كعنوان افتراضى</string>
+    <string name="select_country_first">قم باختيار الدولة اولا</string>
+    <string name="select_area_first">قم باختيار المنطقة اولا</string>
+    <string name="enter_address_desc">"رجاء ادخال تفاصيل العنوان "</string>
+    <string name="title">العنوان :</string>
+    <string name="enter_title">الرجاء ادخال العنوان .</string>
 </resources>

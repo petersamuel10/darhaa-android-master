@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.itsoluation.vavisa.darhaa.CategoryProducts;
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerViewItemClickListener;
 import com.itsoluation.vavisa.darhaa.R;
-import com.itsoluation.vavisa.darhaa.model.favorite.FavoritesData;
 import com.itsoluation.vavisa.darhaa.model.favorite.Products;
 import com.squareup.picasso.Picasso;
 

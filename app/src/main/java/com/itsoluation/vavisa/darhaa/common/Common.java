@@ -1,14 +1,12 @@
 package com.itsoluation.vavisa.darhaa.common;
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AlertDialog;
 
-import com.itsoluation.vavisa.darhaa.Login;
 import com.itsoluation.vavisa.darhaa.R;
-import com.itsoluation.vavisa.darhaa.model.CustomerInfo;
 import com.itsoluation.vavisa.darhaa.model.User;
 import com.itsoluation.vavisa.darhaa.web_service.ApiInterface;
 import com.itsoluation.vavisa.darhaa.web_service.Controller;
@@ -90,6 +88,7 @@ public class Common {
 
     public static ApiInterface getAPI2(){ return new  Controller2().getAPI();}
 
+
     public static void errorConnectionMess(Context context){
 
         AlertDialog.Builder error = new AlertDialog.Builder(context);
@@ -97,6 +96,23 @@ public class Common {
         AlertDialog dialog = error.create();
         dialog.show();
 
+    }
+
+    public static void showAlert(Context context, int title, int msg) {
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+        builder1.setMessage(msg);
+        builder1.setTitle(title);
+        builder1.setCancelable(true);
+        builder1.setPositiveButton(
+                R.string.ok,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
     }
 
 }

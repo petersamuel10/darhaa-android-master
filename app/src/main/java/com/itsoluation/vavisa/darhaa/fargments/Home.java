@@ -78,7 +78,7 @@ public class Home extends Fragment {
                                        categories.add(0,home.getRecent_category());
                                        homeAdapter.addCategory(categories);
                                        homeAdapter.notifyDataSetChanged();
-                                       Toast.makeText(getContext(), "/RRR/"+categories.size(), Toast.LENGTH_SHORT).show();
+                                   //    Toast.makeText(getContext(), "/RRR/"+categories.size(), Toast.LENGTH_SHORT).show();
                                        progressDialog.dismiss();
 
                                    }
@@ -110,16 +110,11 @@ public class Home extends Fragment {
 
         home_rec.setLayoutManager(mLayoutManager);
 
-
-        final LayoutAnimationController controller =
-                AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_fall_down);
-
+        LayoutAnimationController controller = AnimationUtils.loadLayoutAnimation(home_rec.getContext(),R.anim.layout_fall_down);
         home_rec.setLayoutAnimation(controller);
-        home_rec.scheduleLayoutAnimation();
 
-
-          homeAdapter = new HomeAdapter();
-          home_rec.setAdapter(homeAdapter);
+        homeAdapter = new HomeAdapter();
+        home_rec.setAdapter(homeAdapter);
     }
 
     private void setUpSwipeRefreshLayout() {

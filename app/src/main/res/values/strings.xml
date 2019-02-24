@@ -15,7 +15,7 @@
     <string name="skip">Skip</string>
     <string name="dont_have_account">Don\'t have account? Register here</string>
     <string name="already_havr_account">Already registered ? Login</string>
-    <string name="name">Full name</string>
+    <string name="address_name">Name</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
@@ -51,7 +51,7 @@
     <string name="save">Save</string>
     <string name="addressName">Address name</string>
     <string name="phone">Phone number</string>
-    <string name="city">City</string>
+    <string name="city">City :</string>
     <string name="governorate">governorate</string>
     <string name="Block">Block</string>
     <string name="building">Building</string>
@@ -168,4 +168,14 @@
     <string name="no_product_details_found">No details found. Please choose another product.</string>
     <string name="price_high_low">Price (High-low)</string>
     <string name="price_low_high">Price (low-High)</string>
+    <string name="country">Country :</string>
+    <string name="area">Area :</string>
+    <string name="postcode">Postcode :</string>
+    <string name="address_description">Address description :</string>
+    <string name="set_as_default">Set as default</string>
+    <string name="select_country_first">Please select country</string>
+    <string name="select_area_first">Please select area</string>
+    <string name="enter_address_desc">Please enter address description</string>
+    <string name="title">Title :</string>
+    <string name="enter_title">Please enter title</string>
 </resources>

@@ -1,6 +1,10 @@
 package com.itsoluation.vavisa.darhaa.web_service;
 
-import com.itsoluation.vavisa.darhaa.model.favorite.FavoritesData;
+import com.google.gson.JsonElement;
+import com.itsoluation.vavisa.darhaa.model.address.address.AddressAdd;
+import com.itsoluation.vavisa.darhaa.model.address.address.AddressGet;
+import com.itsoluation.vavisa.darhaa.model.address.address.Countries;
+import com.itsoluation.vavisa.darhaa.model.address.address.areaAndCity.AreaAndCities;
 import com.itsoluation.vavisa.darhaa.model.Home.Home;
 import com.itsoluation.vavisa.darhaa.model.ProfileData;
 import com.itsoluation.vavisa.darhaa.model.Status;
@@ -9,6 +13,7 @@ import com.itsoluation.vavisa.darhaa.model.User;
 import java.util.ArrayList;
 
 import io.reactivex.Observable;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -42,6 +47,21 @@ public interface ApiInterface {
     Observable<ProfileData> getProfile(@Query("user_id") Integer user_id);
 
     @GET("index.php?route=restapi/product/getWishlist")
-    Observable<FavoritesData> getWishList(@Query("user_id") Integer user_id);
+    Observable<JsonElement> getWishList(@Query("user_id") Integer user_id);
+
+    @GET("index.php?route=restapi/address")
+    Observable<ArrayList<AddressGet>> addressBook(@Query("user_id") Integer user_id );
+
+    @POST("index.php?route=restapi/address/addAddress")
+    Observable<Status> addAddress(@Body AddressAdd address);
+
+    @POST("index.php?route=restapi/common/getCountries")
+    Observable<ArrayList<Countries>> getCountries();
+
+    @GET("index.php?route=restapi/common/getAreaCities")
+    Observable<AreaAndCities> getAreaAndCities(@Query("country_id") String country_id, @Query("country_code") String country_code);
+
+
+
 
 }

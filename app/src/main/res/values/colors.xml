@@ -13,6 +13,6 @@
     <color name="grey">#D7D7D7</color>
     <color name="overLayBackground">#D7FFFFFF</color>
     <color name="overLayBackgroundgrey">#77000000</color>
-
+    <color name="black">#000</color>
 
 </resources>

@@ -41,6 +41,8 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class Profile extends Fragment implements View.OnClickListener {
 
+    @BindView(R.id.view)
+    LinearLayout contentView;
     @BindView(R.id.headerLN)
     LinearLayout headerLN;
     @BindView(R.id.addressesLN)
@@ -94,8 +96,10 @@ public class Profile extends Fragment implements View.OnClickListener {
         orderLN.setOnClickListener(this);
         languageLN.setOnClickListener(this);
         termsLN.setOnClickListener(this);
-        if(Paper.book("DarHaa").contains("currentUser"))
+        if(Paper.book("DarHaa").contains("currentUser")) {
+            contentView.setVisibility(View.GONE);
             requestData();
+        }
         else
             newView();
         return view;
@@ -112,6 +116,7 @@ public class Profile extends Fragment implements View.OnClickListener {
                         @Override
                         public void accept(ProfileData profileData) throws Exception {
                             progressDialog.dismiss();
+                            contentView.setVisibility(View.VISIBLE);
                             if (profileData.getStatus() != null) {
 
                                 AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());

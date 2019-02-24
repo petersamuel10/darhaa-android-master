@@ -119,8 +119,7 @@ public class Category extends Fragment {
         sl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                /*
-
+              /*
                 if (homeAdapter != null) {
                     setupRecyclerView();
                     requestData();
@@ -233,6 +232,9 @@ public class Category extends Fragment {
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                     adapter = new CategoryAdapter(getContext(), category_ids_array, category_images_array, category_names_array, category_isSub_array, category_isProds_array);
 //                    adapter.setClickListener(this); // to allow on click events
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                    LayoutAnimationController controller = AnimationUtils.loadLayoutAnimation(recyclerView.getContext(),R.anim.layout_fall_down);
+                    recyclerView.setLayoutAnimation(controller);
                     recyclerView.setAdapter(adapter);
                 } catch (JSONException e) {
                     e.printStackTrace();

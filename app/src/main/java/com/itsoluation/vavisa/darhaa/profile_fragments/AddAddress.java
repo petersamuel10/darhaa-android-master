@@ -1,21 +1,31 @@
 package com.itsoluation.vavisa.darhaa.profile_fragments;
 
 import android.app.ProgressDialog;
-import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.Common;
+import com.itsoluation.vavisa.darhaa.model.Status;
+import com.itsoluation.vavisa.darhaa.model.address.address.AddressAdd;
+import com.itsoluation.vavisa.darhaa.model.address.address.Countries;
+import com.itsoluation.vavisa.darhaa.model.address.address.areaAndCity.Area;
+import com.itsoluation.vavisa.darhaa.model.address.address.areaAndCity.AreaAndCities;
+import com.itsoluation.vavisa.darhaa.model.address.address.areaAndCity.City;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,47 +33,51 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class AddAddress extends AppCompatActivity implements AdapterView.OnItemSelectedListener,View.OnClickListener {
 
     @BindView(R.id.address_name)
-    EditText address_name;
-    @BindView(R.id.address_phone)
-    EditText address_phone;
-    @BindView(R.id.govenorate)
-    Spinner governorate;
+    EditText title_ed;
+    @BindView(R.id.country)
+    Spinner country_spinner;
+    @BindView(R.id.area)
+    Spinner area_spinner;
     @BindView(R.id.city)
-    Spinner city;
-    @BindView(R.id.address_block)
-    EditText address_block;
-    @BindView(R.id.address_street)
-    EditText address_street;
-    @BindView(R.id.address_building)
-    EditText address_building;
-    @BindView(R.id.address_floor)
-    EditText address_floor;
-    @BindView(R.id.address_apartment)
-    EditText address_apartment;
+    Spinner city_spinner;
+    @BindView(R.id.postcode)
+    EditText postcode_ed;
+    @BindView(R.id.address_description)
+    EditText address_desc_ed;
+    @BindView(R.id.default_address)
+    CheckBox default_address_ck;
     @BindView(R.id.back_arrow)
     ImageView back_arrow;
-    @BindView(R.id.save_address)
-    Button save_address;
+  //  @BindView(R.id.save_ad_bn)
+  //  Button save_address;
 
     @OnClick(R.id.back_arrow)
     public void setBack(){onBackPressed();}
 
 
-    List<String> governorateList = new ArrayList<>() ;
-    List<String> citiesList;
-  //  List<City> allCitiesList;
+    ArrayList<Countries> countryArrayList;
+    ArrayList<Area> areasArrayList;
+    ArrayList<City> cityArrayList;
+    List<String> area_name_list;
+    List<String> cities_name_list;
 
     CompositeDisposable compositeDisposable = new CompositeDisposable();
-    String name,phone,block,street,building,floor,apartment;
+    String first_name,title,postcode,address_desc,city_name,country_id,zone_id,userId,default_;
 
-    int userId,cityId;
-   // Address address,editAddress;
+    AddressAdd address,editAddress;
     ProgressDialog progressDialog;
+    Button save;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,81 +85,132 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
         setContentView(R.layout.profile_add_address);
 
         ButterKnife.bind(this);
-        progressDialog = new ProgressDialog(getBaseContext());
+        progressDialog = new ProgressDialog(AddAddress.this);
         progressDialog.setCancelable(false);
 
+        save = findViewById(R.id.save_ad_bn);
         if(Common.isArabic){ back_arrow.setRotation(180); }
         if(Common.isConnectToTheInternet(this))
         {
-            getGovernorates();
-            getAllCities();
+            getCountries();
         }
         else
             Common.errorConnectionMess(AddAddress.this);
 
-        governorate.setOnItemSelectedListener(this);
-        save_address.setOnClickListener(this);
-
+        country_spinner.setOnItemSelectedListener(this);
+        area_spinner.setOnItemSelectedListener(this);
+        city_spinner.setOnItemSelectedListener(this);
+        Log.i("access",Common.current_user.getUserAccessToken());
     }
 
+    private void getCountries() {
+        progressDialog.show();
+        countryArrayList = new ArrayList<>() ;
+        Observable<ArrayList<Countries>> apiCountry  = Common.getAPI().getCountries().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        apiCountry.subscribe(new Observer<ArrayList<Countries>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
 
+            }
 
-    private void getGovernorates() {
+            @Override
+            public void onNext(ArrayList<Countries> countries) {
+                countryArrayList.addAll(countries);
+            }
 
+            @Override
+            public void onError(Throwable e) {
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(AddAddress.this);
+                builder1.setMessage(e.getMessage());
+                builder1.setTitle(R.string.error);
+                builder1.setCancelable(true);
+                builder1.setPositiveButton(
+                        R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
+            }
+
+            @Override
+            public void onComplete() {
+                progressDialog.dismiss();
+                List<String> countries_name_list = new ArrayList<>() ;
+                for (Countries country:countryArrayList) {
+                    countries_name_list.add(country.getName());
+                }
+                ArrayAdapter<String> country_adapter = new ArrayAdapter<String>(getBaseContext(),android.R.layout.simple_spinner_item, countries_name_list);
+                country_adapter.setDropDownViewResource(R.layout.spinner_item);
+                country_adapter.notifyDataSetChanged();
+                country_spinner.setAdapter(country_adapter);
+            }
+        });
     }
 
-    private void getAllCities() {
-
-    }
-
-
-
-    @OnClick(R.id.save_address)
+    @OnClick(R.id.save_ad_bn)
     public void saveNewAddress(){
 
-      //  userId = Common.currentUser.getId();
-        name = address_name.getText().toString();
-        phone = address_phone.getText().toString();
-        block = address_block.getText().toString();
-        street = address_street.getText().toString();
-        building = address_building.getText().toString();
-        floor = address_floor.getText().toString();
-        apartment = address_apartment.getText().toString();
+        userId = String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id());
+        first_name = Common.current_user.getCustomerInfo().getFirstname();
+        title = title_ed.getText().toString();
+        postcode = postcode_ed.getText().toString();
+        address_desc = address_desc_ed.getText().toString();
 
         //getCityId();
 
-        if (validation(name, phone, block, street, building)) {
+        if (validation(title, postcode, address_desc)) {
+            if(default_address_ck.isChecked()){
+                default_ = "1";
+                address = new AddressAdd(userId,first_name,address_desc,city_name,country_id,postcode,zone_id,title,default_);
+            }else
+                address = new AddressAdd(userId,first_name,address_desc,city_name,country_id,postcode,zone_id,title);
+            compositeDisposable.add(Common.getAPI().addAddress(address)
+                               .subscribeOn(Schedulers.io())
+                               .observeOn(AndroidSchedulers.mainThread())
+                               .subscribe(new Consumer<Status>() {
+                                   @Override
+                                   public void accept(Status status) throws Exception {
+                                       AlertDialog.Builder builder1 = new AlertDialog.Builder(AddAddress.this);
+                                       builder1.setMessage(status.getMessage());
+                                       builder1.setTitle(status.getStatus());
+                                       builder1.setCancelable(false);
+                                       builder1.setPositiveButton(
+                                               R.string.ok,
+                                               new DialogInterface.OnClickListener() {
+                                                   public void onClick(DialogInterface dialog, int id) {
+                                                       dialog.cancel();
+                                                   }
+                                               });
 
+                                       AlertDialog alert11 = builder1.create();
+                                       alert11.show();
+                                   }
+                               }));
         }
     }
 
-    private boolean validation(String name, String phone, String block, String street, String building) {
+    private boolean validation(String title, String postcode_, String address_desc) {
 
-        if(TextUtils.isEmpty(name))
+        if(TextUtils.isEmpty(title))
         {
-            Toast.makeText(this, R.string.enterName, Toast.LENGTH_SHORT).show();
+            Common.showAlert(AddAddress.this,R.string.error,R.string.enter_title);
             return false;
-        }else if(TextUtils.isEmpty(phone))
+        }else if(TextUtils.isEmpty(address_desc))
         {
-            Toast.makeText(this, R.string.enterPhone, Toast.LENGTH_SHORT).show();
+            Common.showAlert(AddAddress.this,R.string.error,R.string.enter_address_desc);
             return false;
-        }else if(TextUtils.isEmpty(block))
+        }else if(TextUtils.isEmpty(postcode_))
         {
-            Toast.makeText(this, R.string.enterBlock, Toast.LENGTH_SHORT).show();
-            return false;
-        } else if(TextUtils.isEmpty(street))
-        {
-            Toast.makeText(this, R.string.enterStreet, Toast.LENGTH_SHORT).show();
-            return false;
-        } else if(TextUtils.isEmpty(building))
-        {
-            Toast.makeText(this, R.string.enterBuilding, Toast.LENGTH_SHORT).show();
+            postcode = null;
             return false;
         }
 
         return true;
     }
-
 
     @Override
     public void onBackPressed() {
@@ -153,9 +218,68 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
         finish();
     }
 
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        ((TextView)view).setTextColor(Color.BLACK);
+        switch (parent.getId()){
+            case R.id.country:
+                Countries country  = countryArrayList.get(position);
+                country_id = country.getCountry_id();
+                if(Common.isConnectToTheInternet(this))
+                {
+                    getArea(country.getCountry_id(),country.getCountry_code());
+                }
+                else
+                    Common.errorConnectionMess(AddAddress.this);
+                break;
+            case R.id.area:
+                Area area = areasArrayList.get(position);
+                zone_id = area.getZone_id();
+                break;
+            case R.id.city:
+                city_name = cities_name_list.get(position);
+        }
+
+    }
+
+    private void getArea(String country_id, String country_code) {
+        progressDialog.show();
+        area_name_list = new ArrayList<>();
+        cities_name_list = new ArrayList<>();
+        areasArrayList = new ArrayList<>();
+        cityArrayList = new ArrayList<>();
+        try {
+            compositeDisposable.add(Common.getAPI().getAreaAndCities(country_id, country_code)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<AreaAndCities>() {
+                        @Override
+                        public void accept(AreaAndCities areaAndCities) throws Exception {
+                            progressDialog.dismiss();
+                            areasArrayList.addAll(areaAndCities.getAreas());
+                            cityArrayList.addAll(areaAndCities.getCities());
+                            for (Area area : areasArrayList) {
+                                area_name_list.add(area.getName());
+                            }
+                            for (City city : cityArrayList) {
+                                cities_name_list.add(city.getCityName());
+                            }
+                            ArrayAdapter<String> area_adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_item, area_name_list);
+                            area_adapter.setDropDownViewResource(R.layout.spinner_item);
+                            area_adapter.notifyDataSetChanged();
+                            area_spinner.setAdapter(area_adapter);
+
+                            ArrayAdapter<String> city_adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_item, cities_name_list);
+                            city_adapter.setDropDownViewResource(R.layout.spinner_item);
+                            city_adapter.notifyDataSetChanged();
+                            city_spinner.setAdapter(city_adapter);
+
+                        }
+                    }));
+        }catch (Exception e)
+        {
+            Log.i("error",e.getMessage());
+        }
 
     }
 
@@ -166,6 +290,14 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
 
     @Override
     public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.area:
+                Common.showAlert(AddAddress.this,R.string.select_country_first,R.string.error);
+                break;
+            case R.id.city:
+                Common.showAlert(AddAddress.this,R.string.select_area_first,R.string.error);
+                break;
+        }
 
     }
 }
