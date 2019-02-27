@@ -202,7 +202,10 @@
                     android:gravity="center_vertical"
                     android:hint="@string/apartment"
                     android:inputType="textMultiLine"
-                    android:lines="3"
+                    android:lines="5"
+                    android:overScrollMode="always"
+                    android:scrollbarStyle="insideInset"
+                    android:scrollbars="vertical"
                     android:textColor="@color/black"
                     android:padding="5dp" />
 

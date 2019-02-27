@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
+import com.itsoluation.vavisa.darhaa.EditProfile;
 import com.itsoluation.vavisa.darhaa.Login;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.Common;
@@ -73,6 +74,8 @@ public class Profile extends Fragment implements View.OnClickListener {
     public void logout_() {
         logout();
     }
+    @OnClick(R.id.editBtn)
+    public void editProfile(){getContext().startActivity(new Intent(getContext(), EditProfile.class));}
     @OnClick(R.id.loginLN)
     public void login(){startActivity(new Intent(getContext(),Login.class));}
 
@@ -105,6 +108,12 @@ public class Profile extends Fragment implements View.OnClickListener {
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        requestData();
+    }
+
     private void requestData() {
         if (Common.isConnectToTheInternet(getActivity())) {
             this.progressDialog.setMessage(getString(R.string.loading));
@@ -134,7 +143,6 @@ public class Profile extends Fragment implements View.OnClickListener {
                                 AlertDialog alert11 = builder1.create();
                                 alert11.show();
                             } else {
-
                                 first_name = profileData.getFirstname();
                                 last_name = profileData.getLastname();
                                 email = profileData.getEmail();

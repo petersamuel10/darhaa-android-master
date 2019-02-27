@@ -8,6 +8,8 @@ import android.support.v7.app.AlertDialog;
 
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.model.User;
+import com.itsoluation.vavisa.darhaa.model.address.address.AddressDetails;
+import com.itsoluation.vavisa.darhaa.model.address.address.AddressGet;
 import com.itsoluation.vavisa.darhaa.web_service.ApiInterface;
 import com.itsoluation.vavisa.darhaa.web_service.Controller;
 import com.itsoluation.vavisa.darhaa.web_service.Controller2;
@@ -22,6 +24,10 @@ public class Common {
     public static boolean isArabic = false;
     public static boolean isSkip = false;
     public static User current_user;
+    public static AddressDetails currentAddress;
+    public static boolean isEditAddress = false;
+    public static String address_id = null;
+    public static boolean showAddrDetails = false;
 
 
     public static Boolean isConnectToTheInternet (Context context) {
@@ -94,6 +100,7 @@ public class Common {
         AlertDialog.Builder error = new AlertDialog.Builder(context);
         error.setMessage(R.string.error_connection);
         AlertDialog dialog = error.create();
+        dialog.setCancelable(false);
         dialog.show();
 
     }
@@ -102,7 +109,23 @@ public class Common {
         AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setMessage(msg);
         builder1.setTitle(title);
-        builder1.setCancelable(true);
+        builder1.setCancelable(false);
+        builder1.setPositiveButton(
+                R.string.ok,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+    public static void showAlert2(Context context, String title, String msg) {
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+        builder1.setMessage(msg);
+        builder1.setTitle(title);
+        builder1.setCancelable(false);
         builder1.setPositiveButton(
                 R.string.ok,
                 new DialogInterface.OnClickListener() {

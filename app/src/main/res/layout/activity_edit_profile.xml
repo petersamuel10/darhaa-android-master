@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background2"
+    tools:context=".EditProfile">
+
+    <ImageView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:src="@drawable/header" />
+
+    <ScrollView
+        android:layout_below="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center_horizontal"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"
+                android:src="@drawable/logo" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/edName"
+                    android:hint="@string/user_name"
+                    android:textSize="24sp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:inputType="textEmailAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_person"
+                    android:drawablePadding="4dp"
+                    app:met_baseColor="@color/brownLight"
+                    app:met_floatingLabel="highlight"
+                    app:met_primaryColor="@color/brownHint"
+                    app:met_singleLineEllipsis="true"/>
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/edEmail"
+                    android:hint="@string/email"
+                    android:textSize="24sp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:inputType="textEmailAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_email"
+                    android:drawablePadding="4dp"
+                    app:met_baseColor="@color/brownLight"
+                    app:met_floatingLabel="highlight"
+                    app:met_primaryColor="@color/brownHint"
+                    app:met_singleLineEllipsis="true"/>
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/edPhone"
+                    android:hint="@string/mobile"
+                    android:textSize="24sp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:inputType="textEmailAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_phone"
+                    android:drawablePadding="4dp"
+                    app:met_baseColor="@color/brownLight"
+                    app:met_floatingLabel="highlight"
+                    app:met_primaryColor="@color/brownHint"
+                    app:met_singleLineEllipsis="true"/>
+
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/update"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="10dp"
+                android:padding="18dp"
+                android:text="@string/update"
+                android:background="@drawable/big_button_blue"
+                android:textColor="@android:color/white"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:src="@drawable/footer" />
+
+</RelativeLayout>

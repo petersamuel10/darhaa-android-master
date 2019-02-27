@@ -1,8 +1,6 @@
 package com.itsoluation.vavisa.darhaa.adapter;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,10 +9,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chauthai.swipereveallayout.SwipeRevealLayout;
+import com.itsoluation.vavisa.darhaa.Interface.EditDeleteAddrInterface;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.address.address.AddressGet;
-import com.itsoluation.vavisa.darhaa.model.favorite.Products;
 
 import java.util.ArrayList;
 
@@ -23,8 +21,8 @@ import butterknife.ButterKnife;
 
 public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHolder> {
 
-    Context context;
     ArrayList<AddressGet> addressArrayList;
+    private EditDeleteAddrInterface listener = null;
 
     public AddressAdapter() {
         addressArrayList = new ArrayList<>();
@@ -53,10 +51,13 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHold
         return addressArrayList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         @BindView(R.id.sw)
         SwipeRevealLayout sw;
+        @BindView(R.id.address_item)
+        LinearLayout address_item;
         @BindView(R.id.address_name)
         TextView address_name;
         @BindView(R.id.country)
@@ -65,6 +66,10 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHold
         TextView address_desc;
         @BindView(R.id.areaAndCity)
         TextView areaAndCity;
+        @BindView(R.id.tv_edit)
+        TextView tv_edit;
+        @BindView(R.id.tv_delete)
+        TextView tv_delete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -75,10 +80,45 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHold
             else
                 sw.setDragEdge(2);
 
+            address_item.setOnClickListener(this);
+            tv_edit.setOnClickListener(this);
+            tv_delete.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+
+            if (v == tv_edit) {
+                if (listener != null) {
+                    listener.onItemClick(getAdapterPosition(), 1, v);
+                    sw.close(true);
+                }
+            } else if (v == tv_delete){
+                //  Toast.makeText(Common.mActivity, "//////1111111111111///////////////", Toast.LENGTH_SHORT).show();
+                if (listener != null) {
+                    listener.onItemClick(getAdapterPosition(), 0, v);
+                    sw.close(true);
+                }
+
+            }else if(v == address_item  ){
+                if (listener != null) {
+                    listener.onItemClick(getAdapterPosition(), 2, v);
+                    sw.close(true);
+                }
+            }
         }
     }
 
     public void addAddress(ArrayList<AddressGet> addressList){
        addressArrayList.addAll(addressList);
+    }
+
+    public void removeAddresses(int position)
+    {
+        addressArrayList.remove(position);
+    }
+
+    public void setListener(EditDeleteAddrInterface listener) {
+        this.listener = listener;
     }
 }
