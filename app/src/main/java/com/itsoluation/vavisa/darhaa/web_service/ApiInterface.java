@@ -1,7 +1,7 @@
 package com.itsoluation.vavisa.darhaa.web_service;
 
 import com.google.gson.JsonElement;
-import com.itsoluation.vavisa.darhaa.model.Home.Home;
+import com.itsoluation.vavisa.darhaa.model.home.Home;
 import com.itsoluation.vavisa.darhaa.model.ProfileData;
 import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.model.User;
@@ -9,6 +9,7 @@ import com.itsoluation.vavisa.darhaa.model.address.address.AddressDetails;
 import com.itsoluation.vavisa.darhaa.model.address.address.AddressGet;
 import com.itsoluation.vavisa.darhaa.model.address.address.Countries;
 import com.itsoluation.vavisa.darhaa.model.address.address.areaAndCity.AreaAndCities;
+import com.itsoluation.vavisa.darhaa.model.orders.OrdersData;
 
 import java.util.ArrayList;
 
@@ -82,5 +83,17 @@ public interface ApiInterface {
     @POST("index.php?route=restapi/profile/edit")
     Observable<Status> editProfile(@Field("firstname") String firstname, @Field("email") String email,
                                    @Field("telephone") String telephone, @Field("user_id") String user_id);
+
+    @GET("index.php?route=restapi/order")
+    Observable<OrdersData> getOrders(@Query("user_id") String user_id);
+
+    @FormUrlEncoded
+    @POST("index.php?route=restapi/product/addToWishlist")
+    Observable<Status> addFavorte(@Field("product_id") String product_id, @Field("user_id") Integer user_id);
+
+    @FormUrlEncoded
+    @POST("index.php?route=restapi/product/deleteWishlist")
+    Observable<Status> removeFavorte(@Field("product_id") String product_id, @Field("user_id") Integer user_id);
+
 
 }

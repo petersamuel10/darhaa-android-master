@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.itsoluation.vavisa.darhaa.R;
 import com.squareup.picasso.Picasso;
@@ -37,13 +36,13 @@ public class ViewPagerAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, final int position) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.item_top, container, false);
+        View view = inflater.inflate(R.layout.item_product, container, false);
         container.addView(view);
 
         ImageView imageView = view.findViewById(R.id.item_image);
         Picasso.with(context).load(contents.get(position).getImages()).into(imageView);
 
-        TextView name = view.findViewById(R.id.item_desc);
+        TextView name = view.findViewById(R.id.item_name);
         name.setText(contents.get(position).getNames());
 
         TextView price = view.findViewById(R.id.item_price);

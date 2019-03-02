@@ -17,7 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
-import com.itsoluation.vavisa.darhaa.EditProfile;
+import com.itsoluation.vavisa.darhaa.profile_fragments.ChangePassword;
+import com.itsoluation.vavisa.darhaa.profile_fragments.EditProfile;
 import com.itsoluation.vavisa.darhaa.Login;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.Common;
@@ -52,6 +53,8 @@ public class Profile extends Fragment implements View.OnClickListener {
     LinearLayout orderLN;
     @BindView(R.id.languageLN)
     LinearLayout languageLN;
+    @BindView(R.id.changePassLN)
+    LinearLayout changePasswordLN;
     @BindView(R.id.termsLN)
     LinearLayout termsLN;
     @BindView(R.id.loginLN)
@@ -98,6 +101,7 @@ public class Profile extends Fragment implements View.OnClickListener {
         addressLN.setOnClickListener(this);
         orderLN.setOnClickListener(this);
         languageLN.setOnClickListener(this);
+        changePasswordLN.setOnClickListener(this);
         termsLN.setOnClickListener(this);
         if(Paper.book("DarHaa").contains("currentUser")) {
             contentView.setVisibility(View.GONE);
@@ -111,7 +115,12 @@ public class Profile extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
-        requestData();
+        if(Paper.book("DarHaa").contains("currentUser")) {
+            contentView.setVisibility(View.GONE);
+            requestData();
+        }
+        else
+            newView();
     }
 
     private void requestData() {
@@ -180,6 +189,8 @@ public class Profile extends Fragment implements View.OnClickListener {
             getActivity().startActivity(new Intent(getContext(), Orders.class));
         } else if (v == languageLN) {
             getActivity().startActivity(new Intent(getContext(), Language.class));
+        } else if(v == changePasswordLN){
+            getContext().startActivity(new Intent(getContext(), ChangePassword.class));
         } else if (v == termsLN) {
             getActivity().startActivity(new Intent(getContext(), Terms.class));
         }
@@ -232,6 +243,7 @@ public class Profile extends Fragment implements View.OnClickListener {
                             alert11.show();
 
                             Paper.book("DarHaa").delete("currentUser");
+                            Common.current_user = null;
                             newView();
                         }
 
@@ -244,6 +256,7 @@ public class Profile extends Fragment implements View.OnClickListener {
         headerLN.setVisibility(View.GONE);
         addressLN.setVisibility(View.GONE);
         orderLN.setVisibility(View.GONE);
+        changePasswordLN.setVisibility(View.GONE);
         loginLN.setVisibility(View.VISIBLE);
     }
 

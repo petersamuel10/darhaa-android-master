@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background2"
-    tools:context=".ItemDetails">
+    tools:context=".Product">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -33,38 +33,126 @@
                 android:layout_height="350dp"
                 android:adjustViewBounds="true"
                 android:scaleType="fitXY"
-                app:slider_loopSlides="true"
-                app:slider_interval="3000" />
+                app:slider_interval="3000"
+                app:slider_loopSlides="true" />
 
             <!-- price and name-->
             <LinearLayout
+                android:id="@+id/header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="6dp">
 
                 <TextView
-                    android:id="@+id/item_price"
+                    android:id="@+id/item_manf"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="8dp"
-                    android:gravity="start"
+                    android:layout_marginEnd="8dp"
+                    android:layout_gravity="end"
                     android:text="37.00 kd"
-                    android:textColor="@android:color/black"
+                    android:textColor="@android:color/white"
+                    android:background="@drawable/corner_manf"
+                    android:padding="12dp"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/item_desc"
+                    android:id="@+id/item_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="8dp"
                     android:gravity="start"
                     android:text="White cotton shirt"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/item_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_gravity="start|center_vertical"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="2dp"
+                        android:text="37.00 kd"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <LinearLayout
+                        android:layout_alignParentEnd="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="20dp">
+
+                        <ImageView
+                            android:id="@+id/ic_add"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_add_black"
+                            android:layout_gravity="center_vertical"/>
+
+                        <TextView
+                            android:id="@+id/item_amount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:text="1"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <ImageView
+                            android:id="@+id/ic_remove"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_remove"
+                            android:layout_gravity="center_vertical"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/item_price_special"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="37.00 kd"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="16sp"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/item_sku"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="37.00 kd"
                     android:textColor="@color/grey"
-                    android:textSize="14sp" />
+                    android:textSize="16sp"
+                    android:visibility="gone"/>
+
             </LinearLayout>
+
             <!-- expandable size and color -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -222,7 +310,7 @@
                         android:layout_gravity="center_horizontal"
                         android:adjustViewBounds="true"
                         android:scaleType="fitXY"
-                        android:src="@drawable/ic_fav" />
+                        android:src="@drawable/ic_fav_border" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -312,39 +400,16 @@
 
             </LinearLayout>
 
-            <!--<LinearLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:orientation="horizontal"-->
-                <!--android:weightSum="2">-->
-
-                <!--&lt;!&ndash;<include&ndash;&gt;-->
-                    <!--&lt;!&ndash;layout="@layout/item_top"&ndash;&gt;-->
-                    <!--&lt;!&ndash;android:layout_width="0dp"&ndash;&gt;-->
-                    <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
-                    <!--&lt;!&ndash;android:layout_margin="10dp"&ndash;&gt;-->
-                    <!--&lt;!&ndash;android:layout_weight="1" />&ndash;&gt;-->
-
-                <!--&lt;!&ndash;<include&ndash;&gt;-->
-                    <!--&lt;!&ndash;layout="@layout/item_top"&ndash;&gt;-->
-                    <!--&lt;!&ndash;android:layout_width="0dp"&ndash;&gt;-->
-                    <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
-                    <!--&lt;!&ndash;android:layout_margin="10dp"&ndash;&gt;-->
-                    <!--&lt;!&ndash;android:layout_weight="1" />&ndash;&gt;-->
-
-
-            <!--</LinearLayout>-->
-
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewpager"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/details_rec"
+                android:id="@+id/related_rec"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="3dp" />
+                android:layout_margin="8dp" />
 
         </LinearLayout>
 

@@ -4,13 +4,12 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
 
 import com.itsoluation.vavisa.darhaa.adapter.CategoryProductAdapter;
@@ -38,10 +37,13 @@ public class CategoryProducts extends AppCompatActivity {
 
     CategoryProductAdapter adapter;
     ArrayList<String> product_ids, thumbs, names, prices, specials, minimums;
+    ArrayList<Boolean>wishLists,stocks;
     RecyclerView recyclerView;
 
     @BindView(R.id.back_arrow)
     ImageView back_arrow;
+    @BindView(R.id.sl)
+    SwipeRefreshLayout sl;
 
     public static String filter_type, filter_value, category_price_min_value, category_price_max_value, sort_type;
 
@@ -63,13 +65,13 @@ public class CategoryProducts extends AppCompatActivity {
 
 //    @OnClick(R.id.item)
 //    public void ff(){
-//        startActivity(new Intent(this, ItemDetails.class));
+//        startActivity(new Intent(this, Product.class));
 //    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tops);
+        setContentView(R.layout.activity_category_products);
 
         ButterKnife.bind(this);
         if(Common.isArabic) {
@@ -82,9 +84,39 @@ public class CategoryProducts extends AppCompatActivity {
         prices = new ArrayList<>();
         specials = new ArrayList<>();
         minimums = new ArrayList<>();
+        wishLists = new ArrayList<>();
+        stocks = new ArrayList<>();
 
         recyclerView = findViewById(R.id.rvNumbers);
-        new GetCategoryProductsBackgroundTask(this).execute();
+        setUpSwipeRefreshLayout();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(Common.isConnectToTheInternet(CategoryProducts.this))
+            new GetCategoryProductsBackgroundTask(CategoryProducts.this).execute();
+        else
+            Common.errorConnectionMess(CategoryProducts.this);
+    }
+
+    private void setUpSwipeRefreshLayout() {
+        sl.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
+        sl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                if (adapter != null) {
+                    if(Common.isConnectToTheInternet(CategoryProducts.this))
+                        new GetCategoryProductsBackgroundTask(CategoryProducts.this).execute();
+                    else
+                        Common.errorConnectionMess(CategoryProducts.this);
+                }
+
+                sl.setRefreshing(false);
+            }
+        });
     }
 
     /** Get Category Items **/
@@ -105,7 +137,16 @@ public class CategoryProducts extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            String get_products_url = getString(R.string.category_products_api) + "&category_id=" + CurrentCategoryDetails.category_id;
+            String get_products_url;
+            Integer user_id = null;
+            if(Common.current_user !=null) {
+                user_id = Common.current_user.getCustomerInfo().getCustomer_id();
+                get_products_url = getString(R.string.category_products_api)
+                        + "&category_id=" + CurrentCategoryDetails.category_id + "&user_id=" + user_id;
+            } else
+                    get_products_url = getString(R.string.category_products_api)
+                            + "&category_id=" + CurrentCategoryDetails.category_id;
+
             try {
                 URL url = new URL(get_products_url);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -146,6 +187,7 @@ public class CategoryProducts extends AppCompatActivity {
         protected void onPostExecute(String result) {
             if (dialog != null && dialog.isShowing())
                 dialog.dismiss();
+            Log.i("vvvv",result.toString());
 
             JSONObject firstJsonObject = null;
             try {
@@ -160,6 +202,8 @@ public class CategoryProducts extends AppCompatActivity {
             prices.clear();
             specials.clear();
             minimums.clear();
+            wishLists.clear();
+            stocks.clear();
 
             try {
                 JSONArray products = firstJsonObject.getJSONArray("products");
@@ -182,8 +226,8 @@ public class CategoryProducts extends AppCompatActivity {
                         prices.add(price);
                         specials.add(special);
                         minimums.add(minimum);
-//                        wishLists.add(wishList); // TODO: add these to adapter, too
-//                        stocks.add(stock);
+                        wishLists.add(wishList); // TODO: add these to adapter, too
+                        stocks.add(stock);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -205,16 +249,19 @@ public class CategoryProducts extends AppCompatActivity {
                 String[] prices_array = prices.toArray(new String[prices.size()]);
                 String[] specials_array = specials.toArray(new String[specials.size()]);
                 String[] minimums_array = minimums.toArray(new String[minimums.size()]);
+             //   String[] stocks_array =  minimums.toArray(new String[stocks.size()]);
+/*
+                for(int i=0;i<wishLists.size();i++){
+                    wishList_array[i] = wishLists.get(i).toString();
+                }
+*/
 
                 // set up the RecyclerView
                 int numberOfColumns = 2;
                 recyclerView.setLayoutManager(new GridLayoutManager(CategoryProducts.this, numberOfColumns));
-                final LayoutAnimationController controller =
-                        AnimationUtils.loadLayoutAnimation(getBaseContext(), R.anim.layout_fall_down);
-
-                recyclerView.setLayoutAnimation(controller);
                 recyclerView.scheduleLayoutAnimation();
-                adapter = new CategoryProductAdapter(CategoryProducts.this, product_ids_array, thumbs_array, names_array, prices_array, specials_array, minimums_array);
+                adapter = new CategoryProductAdapter(CategoryProducts.this, product_ids_array, thumbs_array, names_array, prices_array, specials_array,
+                        minimums_array, wishLists, stocks,false);
                 recyclerView.setAdapter(adapter);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -319,8 +366,8 @@ public class CategoryProducts extends AppCompatActivity {
                         prices.add(price);
                         specials.add(special);
                         minimums.add(minimum);
-//                        wishLists.add(wishList); // TODO: add these to adapter, too
-//                        stocks.add(stock);
+                        wishLists.add(wishList);
+                        stocks.add(stock);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -338,11 +385,14 @@ public class CategoryProducts extends AppCompatActivity {
                 String[] prices_array = prices.toArray(new String[prices.size()]);
                 String[] specials_array = specials.toArray(new String[specials.size()]);
                 String[] minimums_array = minimums.toArray(new String[minimums.size()]);
+               // String[] wishList_array = minimums.toArray(new String[wishLists.size()]);
+               // String[] stocks_array = minimums.toArray(new String[stocks.size()]);
 
                 // set up the RecyclerView
                 int numberOfColumns = 2;
                 recyclerView.setLayoutManager(new GridLayoutManager(CategoryProducts.this, numberOfColumns));
-                adapter = new CategoryProductAdapter(CategoryProducts.this, product_ids_array, thumbs_array, names_array, prices_array, specials_array, minimums_array);
+                adapter = new CategoryProductAdapter(CategoryProducts.this, product_ids_array, thumbs_array, names_array, prices_array, specials_array,
+                        minimums_array, wishLists, stocks, false);
                 recyclerView.setAdapter(adapter);
             } catch (JSONException e) {
                 e.printStackTrace();

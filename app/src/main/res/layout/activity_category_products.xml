@@ -82,82 +82,25 @@
 
     </LinearLayout>
 
-    <!--  content
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/sl"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ss"
+            android:weightSum="2"
             android:visibility="visible">
-
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingBottom="250dp"
-                android:layout_below="@+id/views">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/tops_rec"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
-
-
-                </LinearLayout>
-            </ScrollView>
-        </android.support.v4.widget.SwipeRefreshLayout>
-
-        <TextView
-            android:id="@+id/notFound"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="@string/no_category_found"
-            android:textStyle="bold"
-            android:visibility="gone"/>
-
-    </LinearLayout>
--->
-    <LinearLayout
-        android:layout_below="@+id/ss"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="2">
-
-        <!--<include-->
-            <!--layout="@layout/item_top"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"/>-->
-
-        <!--<include-->
-            <!--layout="@layout/item_top"-->
-            <!--android:layout_margin="10dp"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"/>-->
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rvNumbers"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="1dp"
+            android:layout_margin="2dp"
             android:paddingBottom="50dp"
             android:clipToPadding="false"/>
 
+        </android.support.v4.widget.SwipeRefreshLayout>
 
-    </LinearLayout>
 
     <ImageView
         android:layout_width="match_parent"

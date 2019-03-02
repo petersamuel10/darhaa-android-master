@@ -12,12 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
-import android.widget.Toast;
 
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.adapter.HomeAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
-import com.itsoluation.vavisa.darhaa.model.Home.Catecory;
+import com.itsoluation.vavisa.darhaa.model.home.Catecory;
 
 import java.util.ArrayList;
 
@@ -64,15 +63,17 @@ public class Home extends Fragment {
 
     private void requestData() {
         if(Common.isConnectToTheInternet(getActivity())) {
-            this.progressDialog.setMessage(getString(R.string.loading));
-            this.progressDialog.show();
+            progressDialog.setMessage(getString(R.string.loading));
+            progressDialog.show();
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+           // this.progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
             compositeDisposable.add(Common.getAPI().home()
                                .subscribeOn(Schedulers.io())
                                .observeOn(AndroidSchedulers.mainThread())
-                               .subscribe(new Consumer<com.itsoluation.vavisa.darhaa.model.Home.Home>() {
+                               .subscribe(new Consumer<com.itsoluation.vavisa.darhaa.model.home.Home>() {
                                    @Override
-                                   public void accept(com.itsoluation.vavisa.darhaa.model.Home.Home home) throws Exception {
+                                   public void accept(com.itsoluation.vavisa.darhaa.model.home.Home home) throws Exception {
                                        categories = new ArrayList<>();
                                        categories.addAll(home.getCategories());
                                        categories.add(0,home.getRecent_category());
@@ -109,10 +110,6 @@ public class Home extends Fragment {
         });
 
         home_rec.setLayoutManager(mLayoutManager);
-
-        LayoutAnimationController controller = AnimationUtils.loadLayoutAnimation(home_rec.getContext(),R.anim.layout_fall_down);
-        home_rec.setLayoutAnimation(controller);
-
         homeAdapter = new HomeAdapter();
         home_rec.setAdapter(homeAdapter);
     }

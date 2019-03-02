@@ -64,7 +64,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            item_price = itemView.findViewById(R.id.item_price);
+            item_price = itemView.findViewById(R.id.item_name);
             item_name = itemView.findViewById(R.id.item_name);
             fav_image = itemView.findViewById(R.id.com_photo);
             itemView.setOnClickListener(this);

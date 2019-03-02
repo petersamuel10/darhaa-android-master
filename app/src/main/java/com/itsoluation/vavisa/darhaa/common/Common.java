@@ -28,6 +28,7 @@ public class Common {
     public static boolean isEditAddress = false;
     public static String address_id = null;
     public static boolean showAddrDetails = false;
+    public static boolean isBooking = false;
 
 
     public static Boolean isConnectToTheInternet (Context context) {
@@ -100,7 +101,7 @@ public class Common {
         AlertDialog.Builder error = new AlertDialog.Builder(context);
         error.setMessage(R.string.error_connection);
         AlertDialog dialog = error.create();
-        dialog.setCancelable(false);
+        dialog.setCancelable(true);
         dialog.show();
 
     }
@@ -121,6 +122,7 @@ public class Common {
         AlertDialog alert11 = builder1.create();
         alert11.show();
     }
+
     public static void showAlert2(Context context, String title, String msg) {
         AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setMessage(msg);

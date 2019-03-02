@@ -76,33 +76,19 @@ public class Category extends Fragment {
 
         //setup recycler
         setupRecyclerView();
-        //get Data
-        requestData();
 
-        category_ids = new ArrayList<>();
-        category_names = new ArrayList<>();
-        category_images = new ArrayList<>();
-        isSubCats = new ArrayList<>();
-        isProds = new ArrayList<>();
-
-        new GetCategoryItemsBackgroundTask(getActivity()).execute();
+        if(Common.isConnectToTheInternet(getActivity()))
+            new GetCategoryItemsBackgroundTask(getActivity()).execute();
+        else
+            Common.errorConnectionMess(getContext());
 
         return view;
     }
 
-    private void requestData() {
-        if(Common.isConnectToTheInternet(getActivity())) {
-           // progressDialog.show();
-
-        }else
-            errorConnectionMess();
-    }
     private void setupRecyclerView() {
 
         category_rec.setHasFixedSize(false);
         category_rec.setLayoutManager(new LinearLayoutManager(getContext()));
-        LayoutAnimationController controller = AnimationUtils.loadLayoutAnimation(category_rec.getContext(),R.anim.layout_fall_down);
-        category_rec.setLayoutAnimation(controller);
         /*
         home_recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),
                 DividerItemDecoration.HORIZONTAL));
@@ -116,29 +102,20 @@ public class Category extends Fragment {
 
     private void setUpSwipeRefreshLayout() {
         sl.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
+
         sl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-              /*
-                if (homeAdapter != null) {
-                    setupRecyclerView();
-                    requestData();
-                }
-                */
+                if(Common.isConnectToTheInternet(getActivity()))
+                    new GetCategoryItemsBackgroundTask(getActivity()).execute();
+                else
+                    Common.errorConnectionMess(getContext());
 
                 sl.setRefreshing(false);
             }
         });
     }
 
-    public void errorConnectionMess(){
-
-        AlertDialog.Builder error = new AlertDialog.Builder(getContext());
-        error.setMessage(R.string.error_connection);
-        AlertDialog dialog = error.create();
-        dialog.show();
-        sl.setRefreshing(false);
-    }
 
     /** Get Home Items **/
     private class GetCategoryItemsBackgroundTask extends AsyncTask<String, Void, String> {
@@ -147,6 +124,12 @@ public class Category extends Fragment {
 
         GetCategoryItemsBackgroundTask(Activity activity) {
             this.dialog = new ProgressDialog(activity);
+
+            category_ids = new ArrayList<>();
+            category_names = new ArrayList<>();
+            category_images = new ArrayList<>();
+            isSubCats = new ArrayList<>();
+            isProds = new ArrayList<>();
         }
 
         @Override
@@ -233,8 +216,6 @@ public class Category extends Fragment {
                     adapter = new CategoryAdapter(getContext(), category_ids_array, category_images_array, category_names_array, category_isSub_array, category_isProds_array);
 //                    adapter.setClickListener(this); // to allow on click events
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    LayoutAnimationController controller = AnimationUtils.loadLayoutAnimation(recyclerView.getContext(),R.anim.layout_fall_down);
-                    recyclerView.setLayoutAnimation(controller);
                     recyclerView.setAdapter(adapter);
                 } catch (JSONException e) {
                     e.printStackTrace();

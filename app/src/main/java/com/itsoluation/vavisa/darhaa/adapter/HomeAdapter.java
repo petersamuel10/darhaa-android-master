@@ -14,9 +14,7 @@ import com.itsoluation.vavisa.darhaa.CategoryProducts;
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerViewItemClickListener;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.CurrentCategoryDetails;
-import com.itsoluation.vavisa.darhaa.fargments.Category;
-import com.itsoluation.vavisa.darhaa.model.Home.Catecory;
-import com.itsoluation.vavisa.darhaa.model.Home.Home;
+import com.itsoluation.vavisa.darhaa.model.home.Catecory;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -58,7 +56,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     
     // binds the data to the TextView in each cell
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
 
         holder.category_name.setText(categories_.get(position).getName());
         Picasso.with(context).load(categories_.get(position).getImage()).into(holder.category_image);
@@ -68,8 +66,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         holder.setmClickListener(new RecyclerViewItemClickListener() {
             @Override
             public void onClick(View view, int position) {
-               // CurrentCategoryDetails.category_name = [position];
-               // CurrentCategoryDetails.category_id = category_ids[position];
+                //CurrentCategoryDetails.category_name = [position];
+                CurrentCategoryDetails.category_id = categories_.get(position).getCategory_id();
                 context.startActivity(new Intent(context, CategoryProducts.class));
             }
         });

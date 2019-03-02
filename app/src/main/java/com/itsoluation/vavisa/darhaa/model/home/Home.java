@@ -1,4 +1,4 @@
-package com.itsoluation.vavisa.darhaa.model.Home;
+package com.itsoluation.vavisa.darhaa.model.home;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

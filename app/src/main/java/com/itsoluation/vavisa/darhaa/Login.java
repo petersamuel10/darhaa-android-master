@@ -141,12 +141,18 @@ public class Login extends AppCompatActivity {
                                        AlertDialog alert11 = builder1.create();
                                        alert11.show();
                                    }else {
-                                       Common.current_user = user;
-                                       Log.d("idddd",Common.current_user.getUserAccessToken());
-                                       Log.d("idddd", String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()));
-                                       Paper.book("DarHaa").write("currentUser",Common.current_user);
-                                       startActivity(new Intent(Login.this,MainActivity.class));
-                                       finish();
+                                       if(Common.isBooking) {
+                                           Common.isBooking =false;
+                                           onBackPressed();
+                                           finish();
+                                       }
+                                       else {
+                                           Common.current_user = user;
+                                           Paper.book("DarHaa").write("currentUser", Common.current_user);
+                                           startActivity(new Intent(Login.this, MainActivity.class));
+                                           progressDialog.dismiss();
+                                           finish();
+                                       }
                                    }
                                }
                            }));

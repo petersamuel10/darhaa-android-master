@@ -201,10 +201,11 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
                             city_adapter.notifyDataSetChanged();
                             city_spinner.setAdapter(city_adapter);
 
-                            if(Common.isEditAddress){
+                            if(Common.isEditAddress ){
                                 city_spinner.setSelection(cities_name_list.indexOf(currentAddress.getCity()));
                                 area_spinner.setSelection(area_name_list.indexOf(currentAddress.getZone()));
                                 Common.isEditAddress = false;
+                                Common.showAddrDetails = false;
                                 save.setText(R.string.update);
                             }
 
@@ -218,8 +219,6 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
 
     private void setAddressData() {
         if(Common.showAddrDetails){
-            Common.showAddrDetails = false;
-            Common.isEditAddress = false;
             title_ed.setEnabled(false);
             country_spinner.setEnabled(false);
             area_spinner.setEnabled(false);
@@ -318,7 +317,6 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
         ((TextView) view).setTextColor(Color.BLACK);
         switch (parent.getId()) {
             case R.id.country:
-                Log.i("tttrr","nnn,mnnnndf");
                 Countries country = countryArrayList.get(position);
                 country_id = country.getCountry_id();
                 if (Common.isConnectToTheInternet(this)) {

@@ -128,7 +128,7 @@
     <string name="sort">Sort</string>
     <string name="filter">Filter</string>
     <string name="price">Price</string>
-    <string name="tops">Tops</string>
+    <string name="tops">Products</string>
     <string name="add_cart">Add to cart</string>
     <string name="wishList">Wish List</string>
     <string name="share">Share</string>
@@ -142,7 +142,7 @@
     <string name="enterBlock">Please enter block</string>
     <string name="enterStreet">Please enter street</string>
     <string name="enterBuilding">Please enter building</string>
-    <string name="fill_fields_to_continue">Please fill in all fields to continue.</string>
+    <string name="fill_fields_to_continue" translatable="false">Please fill in all fields to continue.</string>
     <string name="error">Error</string>
     <string name="warning">Warning</string>
     <string name="email_already_registered">E-Mail Address is already registered! Please choose another one.</string>
@@ -163,9 +163,9 @@
     <string name="product_details_api" translatable="false">http://templates.vavisa-kw.com/darhaa/index.php?route=restapi/product/productdetails</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="login_no_match">No match for E-Mail Address and/or Password.</string>
-    <string name="no_product_details_found">No details found. Please choose another product.</string>
+    <string name="no_product_details_found" translatable="false">No details found. Please choose another product.</string>
     <string name="price_high_low">Price (High-low)</string>
     <string name="price_low_high">Price (low-High)</string>
     <string name="country">Country :</string>
@@ -178,4 +178,7 @@
     <string name="enter_address_desc">Please enter address description</string>
     <string name="title">Title :</string>
     <string name="enter_title">Please enter title</string>
+    <string name="items">items</string>
+    <string name="minimum_number">This is minimum number</string>
+    <string name="out_of_stock">!Out of stock</string>
 </resources>

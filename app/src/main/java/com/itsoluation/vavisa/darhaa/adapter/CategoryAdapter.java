@@ -46,7 +46,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.category_name.setText(category_names[position]);
-        holder.category_prods.setText(isProds[position]);
+        holder.category_prods.setText(isProds[position]+" "+ context.getResources().getString(R.string.items));
         Picasso.with(context).load(category_images[position]).into(holder.category_image);
 
         holder.setItemClickListener(new RecyclerViewItemClickListener() {

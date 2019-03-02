@@ -152,4 +152,7 @@
     <string name="enter_address_desc">"رجاء ادخال تفاصيل العنوان "</string>
     <string name="title">العنوان :</string>
     <string name="enter_title">الرجاء ادخال العنوان .</string>
+    <string name="items">"عناصر "</string>
+    <string name="minimum_number">"هذا اقل عدد "</string>
+    <string name="out_of_stock">قد نفذت الكمية</string>
 </resources>
