@@ -9,11 +9,11 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolBar"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        android:padding="10dp"
-        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:padding="10dp"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -23,53 +23,33 @@
                 android:id="@+id/back_arrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 android:layout_alignParentStart="true"
-                android:scaleType="fitXY"
+                android:layout_margin="5dp"
                 android:adjustViewBounds="true"
+                android:scaleType="fitXY"
                 android:src="@drawable/ic_arrow" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
                 android:layout_centerInParent="true"
                 android:text="@string/cart"
-                android:textStyle="bold"
-                android:textSize="20sp"/>
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
         </RelativeLayout>
 
     </android.support.v7.widget.Toolbar>
 
-    <ScrollView
-        android:layout_below="@+id/toolBar"
-        android:layout_above="@+id/cartBtn"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="3dp">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/cart_rec"
+                android:layout_below="@+id/toolBar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="3dp"/>
 
-        </LinearLayout>
-
-    </ScrollView>
-
-    <include
-        layout="@layout/item_cart"
-        android:layout_margin="10dp"
-        android:layout_below="@+id/toolBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
 
     <Button
         android:id="@+id/cartBtn"

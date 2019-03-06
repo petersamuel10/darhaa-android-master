@@ -2,29 +2,33 @@ package com.itsoluation.vavisa.darhaa;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.itsoluation.vavisa.darhaa.adapter.CategoryProductAdapter;
 import com.itsoluation.vavisa.darhaa.adapter.MainSliderAdapter;
-import com.itsoluation.vavisa.darhaa.adapter.ViewPagerAdapter;
-import com.itsoluation.vavisa.darhaa.adapter.ViewPagerModel;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.common.CurrentProductDetails;
-import com.itsoluation.vavisa.darhaa.model.Expandable;
+import com.itsoluation.vavisa.darhaa.expandableAdapter.ExpandableListAdapter;
 import com.itsoluation.vavisa.darhaa.model.Status;
+import com.itsoluation.vavisa.darhaa.model.addToCart.AddToCardData;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,13 +40,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import iammert.com.expandablelib.ExpandableLayout;
-import iammert.com.expandablelib.Section;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
@@ -55,6 +58,8 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
     ImageView back_arrow;
     @BindView(R.id.ic_fav)
     ImageView ic_fav;
+    @BindView(R.id.ic_share)
+    ImageView ic_share;
     @BindView(R.id.ic_add)
     ImageView ic_add;
     @BindView(R.id.ic_remove)
@@ -69,24 +74,18 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
     TextView item_sku;
     @BindView(R.id.related_rec)
     RecyclerView related_rec;
-    @BindView(R.id.expand_size)
-    ExpandableLayout expand_size;
-    @BindView(R.id.expand_color)
-    ExpandableLayout expand_color;
-    @BindView(R.id.print_color)
-    ExpandableLayout expand_print_color;
-
-    private ViewPagerAdapter mAdapter;
+    @BindView(R.id.product_options)
+    LinearLayout product_options;
 
     TextView item_price, item_name, item_desc_details;
     Slider slider;
-    ViewPager mViewpager;
-    CategoryProductAdapter adapter;
 
-    private ArrayList<ViewPagerModel> mContents;
+    CategoryProductAdapter adapter;
 
     static String current_product_id;
     private int amount = 1;
+
+    com.itsoluation.vavisa.darhaa.expandableAdapter.ExpandableListAdapter expandable_adapter;
 
     ArrayList<String> related_product_ids, related_images, related_names, related_prices,
             related_specials, related_minimums;
@@ -104,7 +103,18 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
     @OnClick(R.id.addCardBtn)
     public void addOrder(){
-        startActivity(new Intent(this,Cart.class));
+        addToCart();
+    }
+
+    private void addToCart() {
+        AddToCardData addCard = new AddToCardData();
+
+        addCard.setUser_id(String.valueOf(user_id));
+        addCard.setQuantity(item_amount.getText().toString());
+        addCard.setProduct_id(product_id);
+        addCard.setDevice_id(Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
+
+
     }
 
     @Override
@@ -116,10 +126,6 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
         if(Common.isArabic){
             back_arrow.setRotation(180);
         }
-        
-        setSize();
-        setColor();
-        setPrintColor();
 
         user_id = (Common.current_user != null) ? Common.current_user.getCustomerInfo().getCustomer_id() : null;
 
@@ -136,6 +142,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
         ic_add.setOnClickListener(this);
         ic_remove.setOnClickListener(this);
         ic_fav.setOnClickListener(this);
+        ic_share.setOnClickListener(this);
 
 //        product_image = findViewById(R.id.product_image);
         item_price = findViewById(R.id.item_price);
@@ -143,126 +150,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
         item_desc_details = findViewById(R.id.item_desc_details);
         slider = findViewById(R.id.banner_slider1);
 
-        mViewpager = findViewById(R.id.viewpager);
-        mContents = new ArrayList<>();
-        mAdapter = new ViewPagerAdapter(mContents, this);
-
         new GetItemDetailsBackgroundTask(this).execute();
-    }
-
-    private void setPrintColor() {
-
-      expand_print_color.setRenderer(new ExpandableLayout.Renderer<Expandable,Expandable>() {
-            @Override
-            public void renderParent(View view, Expandable expandable, boolean b, int i) {
-
-                ((TextView)view.findViewById(R.id.listTitle)).setText(expandable.name);
-            }
-
-            @Override
-            public void renderChild(View view, Expandable expandable, int i, int i1) {
-
-                ((TextView)view.findViewById(R.id.expandedListItem)).setText(expandable.name);
-            }
-        });
-        expand_print_color.addSection(setSectionPrintColor());
-
-    }
-    private Section<Expandable,Expandable> setSectionPrintColor() {
-
-        Section<Expandable,Expandable> section = new Section<>();
-        Expandable parent = new Expandable("Color");
-        List<Expandable> list = new ArrayList<>();
-        list.add(new Expandable("Red"));
-        list.add(new Expandable("Blue"));
-        list.add(new Expandable("Black"));
-        section.parent = parent;
-        section.children.addAll(list);
-        return section;
-    }
-
-    private void setColor() {
-
-        expand_color.setRenderer(new ExpandableLayout.Renderer<Expandable,Expandable>() {
-            @Override
-            public void renderParent(View view, Expandable expandable, boolean b, int i) {
-
-                ((TextView)view.findViewById(R.id.listTitle)).setText(expandable.name);
-            }
-
-            @Override
-            public void renderChild(View view, Expandable expandable, int i, int i1) {
-
-                ((TextView)view.findViewById(R.id.expandedListItem)).setText(expandable.name);
-            }
-        });
-        expand_color.addSection(setSectionColor());
-
-
-        /*
-        listDataHeader = new ArrayList<String>();
-        listDataChild = new HashMap<String, List<String>>();
-
-        listDataHeader.add("Color");
-
-        List<String> color = new ArrayList<String>();
-
-        color.add("Red");
-        color.add("Blue");
-        color.add("Yellow");
-        color.add("Black");
-
-        listDataChild.put(listDataHeader.get(0), color);
-
-        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
-
-        // setting list adapter
-        expand_color.setAdapter(listAdapter);
-        */
-    }
-
-    private Section<Expandable,Expandable> setSectionColor() {
-
-        Section<Expandable,Expandable> section = new Section<>();
-        Expandable parent = new Expandable("Color");
-        List<Expandable> list = new ArrayList<>();
-        list.add(new Expandable("Red"));
-        list.add(new Expandable("Black"));
-        list.add(new Expandable("White"));
-        section.parent = parent;
-        section.children.addAll(list);
-        return section;
-    }
-
-    private void setSize() {
-
-        expand_size.setRenderer(new ExpandableLayout.Renderer<Expandable,Expandable>() {
-            @Override
-            public void renderParent(View view, Expandable expandable, boolean b, int i) {
-
-                ((TextView)view.findViewById(R.id.listTitle)).setText(expandable.name);
-            }
-
-            @Override
-            public void renderChild(View view, Expandable expandable, int i, int i1) {
-
-                ((TextView)view.findViewById(R.id.expandedListItem)).setText(expandable.name);
-            }
-        });
-        expand_size.addSection(setSectionSize());
-
-    }
-    private Section<Expandable,Expandable> setSectionSize() {
-
-        Section<Expandable,Expandable> section = new Section<>();
-        Expandable parent = new Expandable("Size");
-        List<Expandable> list = new ArrayList<>();
-        list.add(new Expandable("Small"));
-        list.add(new Expandable("Medium"));
-        list.add(new Expandable("Large"));
-        section.parent = parent;
-        section.children.addAll(list);
-        return section;
     }
 
     private void share() {
@@ -314,9 +202,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
         else
             addFav();
     }
-
     private void addFav() {
-
         compositeDisposable.add(Common.getAPI().addFavorte(product_id,user_id)
                            .subscribeOn(Schedulers.io())
                            .observeOn(AndroidSchedulers.mainThread())
@@ -334,7 +220,6 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                            }));
 
     }
-
     private void removeFav() {
         compositeDisposable.add(Common.getAPI().removeFavorte(product_id,user_id)
                 .subscribeOn(Schedulers.io())
@@ -507,8 +392,24 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 try {
                     // TODO: ask what can options array contain so that you can know what to add for strings
                     for (int i = 0; i < options.length(); i++) {
+                        JSONObject option_product = options.getJSONObject(i);
+                        String option_type = option_product.getString("type");
+                        String option_name = option_product.getString("name");
+                        Boolean option_required = (option_product.getString("required").equals("1"))? true : false ;
 
+                        if(option_type.equals("text")){
+                            createEditText(option_name,option_required);
+                        }
+                        if (option_type.equals("select")){
+                            JSONArray opt = option_product.getJSONArray("product_option_value");
+                            //createRatioButton(option_name,opt);
+                            createCheck(option_name,opt,false,option_required);
+                        }
 
+                        if (option_type.equals("checkbox")){
+                            JSONArray opt = option_product.getJSONArray("product_option_value");
+                            createCheck(option_name,opt,true,option_required);
+                        }
                     }
                } catch (Exception e) {
                     e.printStackTrace();
@@ -526,57 +427,168 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 //                    e.printStackTrace();
 //                }
 
+                // related products
                 JSONArray relatedProducts = firstJsonObject.getJSONArray("relatedProducts");
-                related_product_ids.clear();
-                related_images.clear();
-                related_names.clear();
-                related_prices.clear();
-                related_specials.clear();
-                related_minimums.clear();
-                related_wishLists.clear();
-                related_stocks.clear();
+                setRelatedProduct(relatedProducts);
+
+
+            } catch (JSONException e) {
+                // This means no product details are found
                 try {
-                    for (int i = 0; i < relatedProducts.length(); i++) {
-                        JSONObject related_product = relatedProducts.getJSONObject(i);
-                        String related_product_id = related_product.getString("product_id");
-                        String related_image = related_product.getString("image");
-                        String related_name = related_product.getString("name");
-                        String related_price = related_product.getString("price");
-                        String related_special = related_product.getString("special");
-                        String related_minimum = related_product.getString("minimum");
-                        Boolean related_wishList = related_product.getBoolean("wishList");
-                        Boolean related_stock = related_product.getBoolean("stock");
+                    Log.i("mmmm",e.getMessage());
+                    String status = firstJsonObject.getString("status");
+                    String message = firstJsonObject.getString("message");
 
-                        related_product_ids.add(related_product_id);
-                        related_images.add(related_image);
-                        related_names.add(related_name);
-                        related_prices.add(related_price);
-                        related_specials.add(related_special);
-                        related_minimums.add(related_minimum);
-                        related_wishLists.add(related_wishList);
-                        related_stocks.add(related_stock);
+                    if (status.equals("error")) {
+                        Common.showAlert2(Product.this,status,message);
                     }
-                    String[] related_product_ids_array, related_images_array, related_names_array, related_prices_array,
-                            related_specials_array, related_minimums_array, related_wishLists_array ,related_stocks_array;
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                    Common.showAlert2(Product.this,"error",e1.getMessage());
+                }
+            }
+        }
 
-                    related_product_ids_array = related_product_ids.toArray(new String[related_product_ids.size()]);
-                    related_images_array = related_images.toArray(new String[related_images.size()]);
-                    related_names_array = related_names.toArray(new String[related_names.size()]);
-                    related_prices_array = related_prices.toArray(new String[related_prices.size()]);
-                    related_specials_array = related_specials.toArray(new String[related_specials.size()]);
-                    related_minimums_array = related_minimums.toArray(new String[related_minimums.size()]);
-                   // related_wishLists_array = related_wishLists.toArray(new String[related_wishLists.size()]);
-                  //  related_stocks_array = related_stocks.toArray(new String[related_stocks.size()]);
+        private void createCheck(String option_name, JSONArray opt, boolean isCK, Boolean isRequired) {
 
-                    related_rec.setHasFixedSize(false);
+            RelativeLayout.LayoutParams linear = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+            linear.setMargins(0,0,0,12);
 
-                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(Product.this,LinearLayoutManager.HORIZONTAL,false);
-                    related_rec.setLayoutManager(linearLayoutManager);
+            final ExpandableListView expandableListView  = new ExpandableListView(Product.this);
+            expandableListView.setLayoutParams(linear);
+            expandableListView.setBackground(getResources().getDrawable(R.drawable.border_blue));
 
-                    adapter = new CategoryProductAdapter(Product.this, related_product_ids_array, related_images_array, related_names_array,
-                            related_prices_array, related_specials_array, related_minimums_array, related_wishLists, related_stocks,true);
+            final List<String> expandableListTitle = new ArrayList<>();
+            List<String> childList = new ArrayList<>();
+            final HashMap<String, List<String>> expandableListDetail = new HashMap<String, List<String>>();
 
-                    related_rec.setAdapter(adapter);
+            expandableListTitle.add(option_name);
+
+            try {
+                for (int x = 0; x < opt.length(); x++) {
+                    JSONObject option_p = opt.getJSONObject(x);
+                    String name = option_p.getString("name");
+                    childList.add(name);
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            expandableListDetail.put(expandableListTitle.get(0),childList);
+
+            expandable_adapter = new ExpandableListAdapter(Product.this,expandableListTitle,expandableListDetail,isCK);
+
+            Log.i("ssssszzz", String.valueOf(childList.size()));
+            expandableListView.setAdapter(expandable_adapter);
+
+            product_options.addView(expandableListView);
+
+            expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+                @Override
+                public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                    setListViewHeight(parent, groupPosition);
+                    return false;
+                }
+            });
+
+            expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+                @Override
+                public void onGroupExpand(int groupPosition) {
+
+                    Toast.makeText(getApplicationContext(),
+                            expandableListTitle.get(groupPosition) + " List Expanded.",
+                            Toast.LENGTH_SHORT).show();
+
+                }
+            });
+
+
+
+
+
+            expandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+
+                @Override
+                public void onGroupCollapse(int groupPosition) {
+                    Toast.makeText(getApplicationContext(),
+                            expandableListTitle.get(groupPosition) + " List Collapsed.",
+                            Toast.LENGTH_SHORT).show();
+
+                }
+            });
+
+            expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                @Override
+                public boolean onChildClick(ExpandableListView parent, View v,
+                                            int groupPosition, int childPosition, long id) {
+                    Toast.makeText(
+                            getApplicationContext(),
+                            expandableListTitle.get(groupPosition)
+                                    + " -> "
+                                    + expandableListDetail.get(
+                                    expandableListTitle.get(groupPosition)).get(
+                                    childPosition), Toast.LENGTH_SHORT
+                    ).show();
+                    return false;
+                }
+            });
+
+        }
+
+        private void setRelatedProduct(JSONArray relatedProducts) {
+
+            related_product_ids.clear();
+            related_images.clear();
+            related_names.clear();
+            related_prices.clear();
+            related_specials.clear();
+            related_minimums.clear();
+            related_wishLists.clear();
+            related_stocks.clear();
+            try {
+                for (int i = 0; i < relatedProducts.length(); i++) {
+                    JSONObject related_product = relatedProducts.getJSONObject(i);
+                    String related_product_id = related_product.getString("product_id");
+                    String related_image = related_product.getString("image");
+                    String related_name = related_product.getString("name");
+                    String related_price = related_product.getString("price");
+                    String related_special = related_product.getString("special");
+                    String related_minimum = related_product.getString("minimum");
+                    Boolean related_wishList = related_product.getBoolean("wishList");
+                    Boolean related_stock = related_product.getBoolean("stock");
+
+                    related_product_ids.add(related_product_id);
+                    related_images.add(related_image);
+                    related_names.add(related_name);
+                    related_prices.add(related_price);
+                    related_specials.add(related_special);
+                    related_minimums.add(related_minimum);
+                    related_wishLists.add(related_wishList);
+                    related_stocks.add(related_stock);
+                }
+                String[] related_product_ids_array, related_images_array, related_names_array, related_prices_array,
+                        related_specials_array, related_minimums_array, related_wishLists_array ,related_stocks_array;
+
+                related_product_ids_array = related_product_ids.toArray(new String[related_product_ids.size()]);
+                related_images_array = related_images.toArray(new String[related_images.size()]);
+                related_names_array = related_names.toArray(new String[related_names.size()]);
+                related_prices_array = related_prices.toArray(new String[related_prices.size()]);
+                related_specials_array = related_specials.toArray(new String[related_specials.size()]);
+                related_minimums_array = related_minimums.toArray(new String[related_minimums.size()]);
+                // related_wishLists_array = related_wishLists.toArray(new String[related_wishLists.size()]);
+                //  related_stocks_array = related_stocks.toArray(new String[related_stocks.size()]);
+
+                related_rec.setHasFixedSize(false);
+
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(Product.this,LinearLayoutManager.HORIZONTAL,false);
+                related_rec.setLayoutManager(linearLayoutManager);
+
+                adapter = new CategoryProductAdapter(Product.this, related_product_ids_array, related_images_array, related_names_array,
+                        related_prices_array, related_specials_array, related_minimums_array, related_wishLists, related_stocks,true);
+
+                related_rec.setAdapter(adapter);
 
                     /*
                     if (related_product_ids != null) {
@@ -607,34 +619,74 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                         mViewpager.setAdapter(new ViewPagerAdapter(mContents, Product.this));
                     }
                     */
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
             } catch (JSONException e) {
-                // This means no product details are found
-                try {
-                    Log.i("mmmm",e.getMessage());
-                    String status = firstJsonObject.getString("status");
-                    if (status.equals("error")) {
-                        AlertDialog.Builder builder1 = new AlertDialog.Builder(Product.this);
-                        builder1.setMessage(R.string.no_product_details_found);
-                        builder1.setCancelable(true);
-                        builder1.setPositiveButton(
-                                R.string.ok,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                    }
-                                });
-                        AlertDialog alert11 = builder1.create();
-                        alert11.show();
-                    }
-                } catch (JSONException e1) {
-                    e1.printStackTrace();
-                }
+                e.printStackTrace();
             }
         }
+
+        private void createEditText(String option_name, Boolean required) {
+
+            RelativeLayout.LayoutParams linear = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+            linear.setMargins(0,0,0,12);
+            EditText note = new EditText(Product.this);
+            note.setBackground(getResources().getDrawable(R.drawable.border_blue));
+            note.setGravity(Gravity.CENTER_HORIZONTAL);
+            note.setPadding(4,30,4,30);
+           // note.setLayoutParams(linear);
+            note.setHint(option_name);
+            note.setTextSize(20);
+            note.setLayoutParams(linear);
+            note.setHintTextColor(Product.this.getResources().getColor(R.color.grey));
+            note.setTextColor(Product.this.getResources().getColor(R.color.black));
+            note.setLines(1);
+
+
+            if (required){
+                note.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_star,0,0,0);
+                note.setCompoundDrawablePadding(18);
+            }
+
+
+            product_options.addView(note);
+
+        }
+
+        private void setListViewHeight(ExpandableListView listView,
+                                       int group) {
+            ExpandableListAdapter listAdapter = (ExpandableListAdapter) listView.getExpandableListAdapter();
+            int totalHeight = 0;
+            int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(),
+                    View.MeasureSpec.EXACTLY);
+            for (int i = 0; i < listAdapter.getGroupCount(); i++) {
+                View groupItem = listAdapter.getGroupView(i, false, null, listView);
+                groupItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+
+                totalHeight += groupItem.getMeasuredHeight();
+
+                if (((listView.isGroupExpanded(i)) && (i != group))
+                        || ((!listView.isGroupExpanded(i)) && (i == group))) {
+                    for (int j = 0; j < listAdapter.getChildrenCount(i); j++) {
+                        View listItem = listAdapter.getChildView(i, j, false, null,
+                                listView);
+                        listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+
+                        totalHeight += listItem.getMeasuredHeight();
+
+                    }
+                }
+            }
+
+            ViewGroup.LayoutParams params = listView.getLayoutParams();
+            int height = totalHeight
+                    + (listView.getDividerHeight() * (listAdapter.getGroupCount() - 1));
+            if (height < 10)
+                height = 200;
+            params.height = height;
+            listView.setLayoutParams(params);
+            listView.requestLayout();
+
+        }
+
     }
 }

@@ -13,7 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".profile_fragments.ChangePassword"></activity>
+        <activity android:name=".profile_fragments.ChangePassword"
+            android:theme="@style/fragmentHeader"
+            android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".profile_fragments.EditProfile"
             android:theme="@style/fragmentHeader"

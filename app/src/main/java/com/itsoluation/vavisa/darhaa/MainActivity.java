@@ -43,13 +43,13 @@ import io.paperdb.Paper;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
- //   @OnClick(R.id.cart)
- //   public void cart(){
-    //    startActivity(new Intent(this, Orders.class));
-//    }
+    //@BindView(R.id.action_search)
+   // ImageView ic_search;
+
 
     Fragment fragment = null;
     TextView titleTxt;
+    MenuItem mSearch,mCart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity
         toolbar.setTitle("");
         titleTxt = findViewById(R.id.title);
         setSupportActionBar(toolbar);
+
+
 
         //init paper
         Paper.init(this);
@@ -135,7 +137,9 @@ public class MainActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
 
-        MenuItem mSearch = menu.findItem(R.id.action_search);
+        mSearch = menu.findItem(R.id.action_search);
+
+        mCart = menu.findItem(R.id.action_cart);
 
         SearchView mSearchView = (SearchView) mSearch.getActionView();
         mSearchView.setQueryHint("Search");
@@ -152,7 +156,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_cart) {
-            startActivity(new Intent(this, Orders.class));
+            startActivity(new Intent(this,Cart.class));
             return true;
         }
 
@@ -167,14 +171,19 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_home) {
             fragment = new  Home();
+            mSearch.setVisible(false);
         } else if (id == R.id.nav_category) {
             fragment = new  Category();
+            mSearch.setVisible(true);
         } else if (id == R.id.nav_favourite) {
             fragment = new Favourite();
+            mSearch.setVisible(false);
         } else if (id == R.id.nav_profile) {
             fragment = new Profile();
+            mSearch.setVisible(false);
         }else if (id == R.id.nav_support) {
             fragment = new ContactSupport();
+            mSearch.setVisible(false);
         }
 
        // item.setChecked(true);

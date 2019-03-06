@@ -109,8 +109,6 @@ public class Addresses extends AppCompatActivity implements EditDeleteAddrInterf
         address_rec.setLayoutManager(new LinearLayoutManager(this));
         adapter = new AddressAdapter();
         adapter.setListener(this);
-        LayoutAnimationController controller = AnimationUtils.loadLayoutAnimation(address_rec.getContext(),R.anim.layout_fall_down);
-        address_rec.setLayoutAnimation(controller);
         address_rec.setAdapter(adapter);
     }
 
@@ -197,6 +195,5 @@ public class Addresses extends AppCompatActivity implements EditDeleteAddrInterf
                                }
                            }));
     }
-
 
 }

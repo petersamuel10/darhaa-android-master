@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:paddingBottom="10dp">
 
-    <RadioButton
+    <CheckBox
         android:id="@+id/Child_ch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -12,6 +12,5 @@
         android:layout_marginStart="20dp"
         android:buttonTint="@color/blue"
         android:textColor="@android:color/black"/>
-
 
 </LinearLayout>

@@ -153,13 +153,14 @@
 
             </LinearLayout>
 
-            <!-- expandable size and color -->
+            <!--
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!--
+
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
@@ -172,20 +173,20 @@
                                     android:textSize="14sp"
                                     android:background="@drawable/border_blue"
                                     android:textStyle="bold" />
-                -->
+
                 <iammert.com.expandablelib.ExpandableLayout
                     android:id="@+id/expand_size"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/white"
                     app:parentLayout="@layout/list_group"
-                    app:childLayout="@layout/list_item"/>
+                    app:childLayout="@layout/list_item_ch"/>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
                     android:background="@color/blueLight" />
-                <!--
+
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
@@ -198,17 +199,16 @@
                                     android:background="@drawable/border_blue"
                                     android:textSize="14sp"
                                     android:textStyle="bold" />
-               -->
+
                 <iammert.com.expandablelib.ExpandableLayout
                     android:id="@+id/expand_color"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/white"
                     app:parentLayout="@layout/list_group"
-                    app:childLayout="@layout/list_item" />
+                    app:childLayout="@layout/list_item_ch" />
             </LinearLayout>
 
-            <!-- add print-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -250,7 +250,7 @@
                         android:padding="4dp"
                         android:textColor="@android:color/black"
                         android:textColorHint="@color/grey" />
-                    <!--
+
                                         <TextView
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
@@ -259,7 +259,7 @@
                                             android:textColor="@android:color/black"
                                             android:textSize="18sp"
                                             android:textStyle="bold" />
-                    -->
+
 
                     <iammert.com.expandablelib.ExpandableLayout
                         android:id="@+id/print_color"
@@ -268,11 +268,21 @@
                         android:layout_weight="1"
                         android:background="@android:color/white"
                         app:parentLayout="@layout/list_group"
-                        app:childLayout="@layout/list_item" />
+                        app:childLayout="@layout/list_item_ch" />
+
 
 
                 </LinearLayout>
 
+            </LinearLayout>
+
+            -->
+
+            <LinearLayout
+                android:id="@+id/product_options"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
             </LinearLayout>
 
             <Button

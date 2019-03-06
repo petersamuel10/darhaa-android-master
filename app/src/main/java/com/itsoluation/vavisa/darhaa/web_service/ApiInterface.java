@@ -1,6 +1,7 @@
 package com.itsoluation.vavisa.darhaa.web_service;
 
 import com.google.gson.JsonElement;
+import com.itsoluation.vavisa.darhaa.model.cartData.CartData;
 import com.itsoluation.vavisa.darhaa.model.home.Home;
 import com.itsoluation.vavisa.darhaa.model.ProfileData;
 import com.itsoluation.vavisa.darhaa.model.Status;
@@ -96,4 +97,20 @@ public interface ApiInterface {
     Observable<Status> removeFavorte(@Field("product_id") String product_id, @Field("user_id") Integer user_id);
 
 
+    @FormUrlEncoded
+    @POST("index.php?route=restapi/password")
+    Observable<Status> changePassword(@Field("password") String password, @Field("confirm") String confirm,
+                                      @Field("user_id") Integer user_id,@Field("oldpassword") String oldpassword);
+
+    @FormUrlEncoded
+    @POST("index.php?route=restapi/cart/add")
+    Observable<Status> addToCart(@Field("password") String password, @Field("confirm") String confirm,
+                                      @Field("user_id") Integer user_id,@Field("oldpassword") String oldpassword);
+
+    @GET("index.php?route=restapi/cart")
+    Observable<CartData> viewCart(@Query("user_id") String user_id, @Query("device_id") String device_id);
+
+    @FormUrlEncoded
+    @POST("index.php?route=restapi/cart/remove")
+    Observable<Status> deleteCart(@Query("cart_id") String cart_id,@Query("user_id") String user_id, @Query("device_id") String device_id);
 }

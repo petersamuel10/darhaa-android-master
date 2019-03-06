@@ -155,4 +155,6 @@
     <string name="items">"عناصر "</string>
     <string name="minimum_number">"هذا اقل عدد "</string>
     <string name="out_of_stock">قد نفذت الكمية</string>
+    <string name="password_less">كلمة المرور قصيره.</string>
+    <string name="max_number">الكمية غير متوفره.</string>
 </resources>

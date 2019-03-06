@@ -181,4 +181,6 @@
     <string name="items">items</string>
     <string name="minimum_number">This is minimum number</string>
     <string name="out_of_stock">!Out of stock</string>
+    <string name="password_less">Password less than 6 letter</string>
+    <string name="max_number">This is max number</string>
 </resources>

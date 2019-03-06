@@ -118,7 +118,9 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHold
         addressArrayList.remove(position);
     }
 
+
     public void setListener(EditDeleteAddrInterface listener) {
         this.listener = listener;
     }
+
 }
