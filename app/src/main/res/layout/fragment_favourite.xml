@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/rootLayout"
     android:background="@drawable/background2"
     tools:context=".fargments.Favourite">
 
@@ -21,7 +22,9 @@
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/fav_rec"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:paddingBottom="50dp"
+                    android:clipToPadding="false"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

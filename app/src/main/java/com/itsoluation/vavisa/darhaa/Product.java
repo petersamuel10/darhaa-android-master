@@ -22,13 +22,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.itsoluation.vavisa.darhaa.adapter.CategoryProductAdapter;
 import com.itsoluation.vavisa.darhaa.adapter.MainSliderAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.common.CurrentProductDetails;
+import com.itsoluation.vavisa.darhaa.common.OptionsSelection;
 import com.itsoluation.vavisa.darhaa.expandableAdapter.ExpandableListAdapter;
 import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.model.addToCart.AddToCardData;
+import com.itsoluation.vavisa.darhaa.model.addToCart.Options;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,10 +46,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
@@ -91,13 +98,18 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
             related_specials, related_minimums;
 
     ArrayList<Boolean>related_wishLists, related_stocks;
+    List<EditText> editTexts = new ArrayList<>();
+    List<ExpandableListView> expandableListViews = new ArrayList<>();
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    String product_id, minimum;
+    String product_id, minimum,maximum;
     Integer user_id;
     Boolean wishList;
+    Double price ,totalPrice;
+    AddToCardData addCard;
 
+    ArrayList<Options> cartOptions;
     @OnClick(R.id.back_arrow)
     public void setBack(){onBackPressed();}
 
@@ -107,14 +119,67 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
     }
 
     private void addToCart() {
-        AddToCardData addCard = new AddToCardData();
 
-        addCard.setUser_id(String.valueOf(user_id));
-        addCard.setQuantity(item_amount.getText().toString());
-        addCard.setProduct_id(product_id);
-        addCard.setDevice_id(Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
+        cartOptions = new ArrayList<>();
+        addCard = new AddToCardData();
+        if(getCartOPtions()) {
+            addCard.setOptions(cartOptions);
 
+            addCard.setUser_id(String.valueOf(user_id));
+            addCard.setQuantity(item_amount.getText().toString());
+            addCard.setProduct_id(product_id);
+            addCard.setDevice_id(Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
 
+            compositeDisposable.add(Common.getAPI().addToCart(addCard).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Status>() {
+                        @Override
+                        public void accept(Status status) throws Exception {
+                            Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
+                        }
+                    }));
+        }
+
+    }
+
+    private boolean getCartOPtions() {
+
+        for (EditText ed: editTexts) {
+            if(ed.getText().toString().equals("")){
+                if(Boolean.parseBoolean(ed.getTag(R.string.required).toString())){
+                    Toast.makeText(this, getResources().getString(R.string.warning)+" : "+getResources().getString(R.string.please_enter) +" "+ ed.getHint().toString(), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            }else{
+                Options option = new Options();
+                option.setId(ed.getTag(R.string.option_id).toString());
+                option.setValue(ed.getText().toString());
+                cartOptions.add(option);
+            }
+        }
+
+        for (Map.Entry<String, List<String>> entry : OptionsSelection.optionsSelection.entrySet()) {
+            String key = entry.getKey();
+            List<String> value = entry.getValue();
+            if(value.get(0).equals("true")){
+                if(value.size()>2){
+
+                    Options option = new Options();
+                    option.setId(key);
+                    option.setValue(value.get(2));
+                    cartOptions.add(option);
+
+                }else
+                {
+                    Toast.makeText(this, getResources().getString(R.string.warning)+" : "+
+                            getResources().getString(R.string.please_enter) +" "+ value.get(1),
+                            Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -122,7 +187,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_details);
         ButterKnife.bind(this);
-
+        OptionsSelection.optionsSelection.clear();
         if(Common.isArabic){
             back_arrow.setRotation(180);
         }
@@ -175,14 +240,17 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                break;
            case R.id.ic_add:
                amount++;
+               totalPrice +=price;
+               item_price.setText(String.format(Locale.US, "%.3f", totalPrice));
                item_amount.setText(String.valueOf(amount));
                break;
            case R.id.ic_remove:
                if(amount == Integer.parseInt(minimum)) {
-                   Log.i("minnnn", minimum);
                    Common.showAlert(this, R.string.warning, R.string.minimum_number);
                }else {
                    amount--;
+                   totalPrice -=price;
+                   item_price.setText(String.format(Locale.US, "%.3f", totalPrice));
                    item_amount.setText(String.valueOf(amount));
                }
                break;
@@ -244,8 +312,13 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
         public ProgressDialog dialog;
         Boolean is_arabic = Common.isArabic;
 
+        RelativeLayout.LayoutParams linear;
+
         GetItemDetailsBackgroundTask(Activity activity) {
             this.dialog = new ProgressDialog(activity);
+            linear = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+            linear.setMargins(0,0,0,12);
         }
 
         @Override
@@ -327,7 +400,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 JSONArray images = firstJsonObject.getJSONArray("images");
                 minimum = firstJsonObject.getString("minimum");
                 wishList = firstJsonObject.getBoolean("wishList");
-                String price = firstJsonObject.getString("price");
+                price = Double.parseDouble(firstJsonObject.getString("price"));
                 String sku = firstJsonObject.getString("sku");
 
                 if(manufacturer.equals("null")) {
@@ -338,7 +411,8 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 if(wishList)
                     ic_fav.setImageResource(R.drawable.ic_fav);
                 item_name.setText(name);
-                item_price.setText(price+" "+getResources().getString(R.string.kd));
+                item_price.setText(String.format(Locale.US, "%.3f", price));
+                totalPrice = price;
 
                 if(!special.equals("false")){
                     item_price.setPaintFlags(item_price.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -353,7 +427,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
                 if(!sku.equals("")){
                     item_sku.setVisibility(View.VISIBLE);
-                    item_sku.setText(sku);
+                    item_sku.setText(getResources().getString(R.string.sku) +": "+sku);
                 }
 
                 item_amount.setText(minimum);
@@ -392,24 +466,23 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 try {
                     // TODO: ask what can options array contain so that you can know what to add for strings
                     for (int i = 0; i < options.length(); i++) {
+
                         JSONObject option_product = options.getJSONObject(i);
                         String option_type = option_product.getString("type");
                         String option_name = option_product.getString("name");
+                        String option_id = option_product.getString("product_option_id");
                         Boolean option_required = (option_product.getString("required").equals("1"))? true : false ;
+                        JSONArray option_options = option_product.getJSONArray("product_option_value");
 
-                        if(option_type.equals("text")){
-                            createEditText(option_name,option_required);
-                        }
-                        if (option_type.equals("select")){
-                            JSONArray opt = option_product.getJSONArray("product_option_value");
-                            //createRatioButton(option_name,opt);
-                            createCheck(option_name,opt,false,option_required);
-                        }
+                        if(option_type.equals("text"))
+                            createEditText(option_name,option_required,option_id);
 
-                        if (option_type.equals("checkbox")){
-                            JSONArray opt = option_product.getJSONArray("product_option_value");
-                            createCheck(option_name,opt,true,option_required);
-                        }
+                        if (option_type.equals("select"))
+                            createCheck(option_name,option_options,false,option_required,option_id);
+
+                        if (option_type.equals("checkbox"))
+                            createCheck(option_name,option_options,true,option_required,option_id);
+
                     }
                } catch (Exception e) {
                     e.printStackTrace();
@@ -449,27 +522,30 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
             }
         }
 
-        private void createCheck(String option_name, JSONArray opt, boolean isCK, Boolean isRequired) {
-
-            RelativeLayout.LayoutParams linear = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
-            linear.setMargins(0,0,0,12);
+        private void createCheck(String option_name, final JSONArray option_options, boolean isCK, Boolean isRequired, final String option_id) {
 
             final ExpandableListView expandableListView  = new ExpandableListView(Product.this);
             expandableListView.setLayoutParams(linear);
+
             expandableListView.setBackground(getResources().getDrawable(R.drawable.border_blue));
+
+            expandableListView.setSelected(true);
 
             final List<String> expandableListTitle = new ArrayList<>();
             List<String> childList = new ArrayList<>();
+            final List<String> childListId = new ArrayList<>();
+
             final HashMap<String, List<String>> expandableListDetail = new HashMap<String, List<String>>();
 
             expandableListTitle.add(option_name);
 
             try {
-                for (int x = 0; x < opt.length(); x++) {
-                    JSONObject option_p = opt.getJSONObject(x);
-                    String name = option_p.getString("name");
+                for (int x = 0; x < option_options.length(); x++) {
+                    JSONObject option_child = option_options.getJSONObject(x);
+                    String name = option_child.getString("name");
+                    String id = option_child.getString("product_option_value_id");
                     childList.add(name);
+                    childListId.add(id);
 
                 }
             } catch (JSONException e) {
@@ -478,12 +554,12 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
             expandableListDetail.put(expandableListTitle.get(0),childList);
 
-            expandable_adapter = new ExpandableListAdapter(Product.this,expandableListTitle,expandableListDetail,isCK);
+            expandable_adapter = new ExpandableListAdapter(Product.this,expandableListTitle,expandableListDetail,isCK ,isRequired,option_id,childListId);
 
-            Log.i("ssssszzz", String.valueOf(childList.size()));
             expandableListView.setAdapter(expandable_adapter);
 
             product_options.addView(expandableListView);
+            expandableListViews.add(expandableListView);
 
             expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
                 @Override
@@ -504,10 +580,6 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 }
             });
 
-
-
-
-
             expandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
 
                 @Override
@@ -519,10 +591,19 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 }
             });
 
+
             expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v,
                                             int groupPosition, int childPosition, long id) {
+
+                    /*
+                    Options option = new Options();
+                    option.setId(option_id);
+                    option.setValue(childListId.get(childPosition));
+                    Log.i("nnn1",option.getId());
+                    Log.i("nnn2222",option.getValue());
+                    */
                     Toast.makeText(
                             getApplicationContext(),
                             expandableListTitle.get(groupPosition)
@@ -624,7 +705,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
             }
         }
 
-        private void createEditText(String option_name, Boolean required) {
+        private void createEditText(String option_name, Boolean required, String option_id) {
 
             RelativeLayout.LayoutParams linear = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
                     RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -644,12 +725,15 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
             if (required){
                 note.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_star,0,0,0);
-                note.setCompoundDrawablePadding(18);
+                note.setCompoundDrawablePadding(24);
             }
 
 
             product_options.addView(note);
+            editTexts.add(note);
 
+            note.setTag(R.string.required,required);
+            note.setTag(R.string.option_id,option_id);
         }
 
         private void setListViewHeight(ExpandableListView listView,

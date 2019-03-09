@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class AddToCardData {
 
-    public ArrayList<Options> options;
+    public ArrayList<Options> option;
     public String user_id;
     public String quantity;
     public String product_id;
@@ -22,7 +22,7 @@ public class AddToCardData {
     }
 
     public AddToCardData(ArrayList<Options> options, String user_id, String quantity, String product_id, String device_id) {
-        this.options = options;
+        this.option = options;
         this.user_id = user_id;
         this.quantity = quantity;
         this.product_id = product_id;
@@ -30,11 +30,11 @@ public class AddToCardData {
     }
 
     public ArrayList<Options> getOptions() {
-        return options;
+        return option;
     }
 
     public void setOptions(ArrayList<Options> options) {
-        this.options = options;
+        this.option = options;
     }
 
     public String getUser_id() {

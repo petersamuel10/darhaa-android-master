@@ -11,8 +11,8 @@
     <color name="brownLight">#CA9831</color>
     <color name="brownHint">#EAD7AF</color>
     <color name="grey">#D7D7D7</color>
-    <color name="overLayBackground">#D7FFFFFF</color>
+    <color name="overLayBackground">#F0FFFFFF</color>
     <color name="overLayBackgroundgrey">#77000000</color>
-    <color name="black">#000</color>
+    <color name="black">#000000</color>
 
 </resources>

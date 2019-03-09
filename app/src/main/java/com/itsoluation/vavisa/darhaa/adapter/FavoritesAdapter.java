@@ -8,11 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.itsoluation.vavisa.darhaa.CategoryProducts;
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerViewItemClickListener;
+import com.itsoluation.vavisa.darhaa.Product;
 import com.itsoluation.vavisa.darhaa.R;
+import com.itsoluation.vavisa.darhaa.common.CurrentProductDetails;
 import com.itsoluation.vavisa.darhaa.model.favorite.Products;
 import com.squareup.picasso.Picasso;
 
@@ -47,7 +49,8 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
         holder.setItemClickListener(new RecyclerViewItemClickListener() {
             @Override
             public void onClick(View view, int position) {
-                mContext.startActivity(new Intent(mContext, CategoryProducts.class));
+                CurrentProductDetails.product_id = String.valueOf(favoritesList.get(position).getProduct_id());
+                mContext.startActivity(new Intent(mContext, Product.class));
             }
         });
     }
@@ -58,15 +61,21 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        public LinearLayout background,foreground;
         TextView item_price,item_name;
         ImageView fav_image;
+
         private RecyclerViewItemClickListener mClickListener;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             item_price = itemView.findViewById(R.id.item_name);
             item_name = itemView.findViewById(R.id.item_name);
             fav_image = itemView.findViewById(R.id.com_photo);
+            background = itemView.findViewById(R.id.background);
+            foreground = itemView.findViewById(R.id.foreground);
             itemView.setOnClickListener(this);
         }
 
@@ -83,5 +92,10 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
 
     public void addFavList(ArrayList<Products> favoritesData){
         favoritesList.addAll(favoritesData);
+    }
+
+    public void deleteItem(int position)
+    {
+        favoritesList.remove(position);
     }
 }

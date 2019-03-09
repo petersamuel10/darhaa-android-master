@@ -8,11 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.itsoluation.vavisa.darhaa.R;
+import com.itsoluation.vavisa.darhaa.common.OptionsSelection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,19 +23,37 @@ import java.util.List;
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
-    private List<String> expandableListTitle;
+    private List<String> expandableListTitle,childId;
     private HashMap<String, List<String>> expandableListDetail;
     private int id=-1;
+    private String option_id;
     private boolean isCheckBox;
+    private boolean isRequired;
+    final List<String> child;
 
     private List<RadioButton> radioButtons = new ArrayList<>();
 
     public ExpandableListAdapter(Context context, List<String> expandableListTitle,
-                                 HashMap<String, List<String>> expandableListDetail, boolean isCK) {
+                                 HashMap<String, List<String>> expandableListDetail, boolean isCK,
+                                 Boolean isRequired, String option_id, List<String> childListId) {
         this.context = context;
         this.expandableListTitle = expandableListTitle;
         this.expandableListDetail = expandableListDetail;
         this.isCheckBox = isCK;
+        this.isRequired = isRequired;
+        this.option_id = option_id;
+        this.childId = childListId;
+
+        Log.i("xxxxxx","hihioh");
+
+        child = new ArrayList<>();
+
+        if(isRequired)
+            child.add("true");
+        else
+            child.add("false");
+        OptionsSelection.optionsSelection.put(option_id,child);
+        child.add(expandableListTitle.get(0));
     }
 
     @Override
@@ -49,7 +69,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int listPosition, final int expandedListPosition,
-                             boolean isLastChild, View convertView, ViewGroup parent) {
+                             final boolean isLastChild, View convertView, ViewGroup parent) {
 
 
         final String item_txt = (String) getChild(listPosition, expandedListPosition);
@@ -69,6 +89,25 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             item.setTag(expandedListPosition);
             item.setText(item_txt);
 
+            item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                   // OptionsSelection.optionsSelection.remove(option_id);
+
+                    if(((CheckBox)v).isChecked()){
+                        child.add(childId.get(expandedListPosition));
+                        child.add(item_txt);
+                    }else{
+                        if(OptionsSelection.optionsSelection.containsValue(child)){
+                            child.remove(childId.get(expandedListPosition));
+                            child.remove(item_txt);
+                        }
+                    }
+                }
+            });
+
+            OptionsSelection.optionsSelection.put(option_id,child);
+
         }else{
             RadioButton item = convertView.findViewById(R.id.Child_ch);
             item.setTag(expandedListPosition);
@@ -84,13 +123,21 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                         id = p;
                         for ( RadioButton radioButton: radioButtons) {
                             radioButton.setChecked(false);
+                            if(child.size()>2) {
+                                child.remove(2);
+                                child.remove(2);
+                            }
                         }
+                       // OptionsSelection.optionsSelection.remove(option_id);
                         ((RadioButton)v).setChecked(true);
+                        child.add(childId.get(expandedListPosition));
+                        child.add(item_txt);
+
                     }
                 }
             });
+            OptionsSelection.optionsSelection.put(option_id,child);
         }
-
 
         return convertView;
     }
@@ -129,8 +176,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
         TextView title_txt = (TextView) convertView
                 .findViewById(R.id.listTitle);
+
         title_txt.setTypeface(null, Typeface.BOLD);
         title_txt.setText(listTitle);
+
+        ImageView item_required = (ImageView) convertView
+                .findViewById(R.id.item_required);
+
+        if(isRequired)
+            item_required.setVisibility(View.VISIBLE);
 
         if(isExpanded)
             title_txt.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.ic_arrow_up,0);
@@ -146,6 +200,6 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public boolean isChildSelectable(int listPosition, int expandedListPosition) {
-        return true;
+        return false;
     }
 }

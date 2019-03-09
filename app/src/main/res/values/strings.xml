@@ -120,7 +120,7 @@
     <string name="apply">Apply</string>
     <string name="select_language">Choose language</string>
     <string name="delete">Delete</string>
-    <string name="deleteAddress_success">Address deleted successfully</string>
+    <string name="delete_success">Deleted successfully</string>
     <string name="update_address_successfully">Update address successfully</string>
     <string name="no_category_found">No catergory list found</string>
     <string name="az">Alphabetically (A - Z)</string>
@@ -183,4 +183,8 @@
     <string name="out_of_stock">!Out of stock</string>
     <string name="password_less">Password less than 6 letter</string>
     <string name="max_number">This is max number</string>
+    <string name="required" translatable="false">required</string>
+    <string name="option_id" translatable="false">option_id</string>
+    <string name="please_enter">Please enter</string>
+    <string name="sku">SKU</string>
 </resources>

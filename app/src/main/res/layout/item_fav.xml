@@ -1,20 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/sw"
+    android:id="@+id/item_fav"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:background="@drawable/border_blue"
-    android:orientation="vertical"
-    android:weightSum="6"
     app:mode="same_level">
 
     <LinearLayout
-        android:id="@+id/item_fav"
+        android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:background="@drawable/delete_background">
+
+            <TextView
+                android:id="@+id/item_delete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="20dp"
+                android:text="@string/delete"
+                android:gravity="end"
+                android:layout_gravity="center_vertical"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/foreground"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border_blue">
 
         <ImageView
             android:id="@+id/com_photo"
@@ -25,19 +44,13 @@
             android:adjustViewBounds="true"
             android:scaleType="fitXY" />
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="4"
-            android:gravity="start"
+            android:gravity="center_vertical|center_horizontal"
             android:orientation="vertical"
             android:padding="5dp">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/item_name"
@@ -49,9 +62,8 @@
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
                     android:textStyle="bold" />
-
                 <TextView
-                    android:id="@+id/item_name"
+                    android:id="@+id/item_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
@@ -60,23 +72,6 @@
                     android:textColor="@color/grey"
                     android:textSize="16sp" />
             </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/remove_fav"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="12dp">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_add" />
-            </LinearLayout>
-
-
-        </RelativeLayout>
-
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>

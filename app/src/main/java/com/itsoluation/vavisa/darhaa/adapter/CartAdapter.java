@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chauthai.swipereveallayout.SwipeRevealLayout;
@@ -38,7 +39,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     @NonNull
     @Override
     public CartAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cart,null);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cart,parent,false);
         context = parent.getContext();
         return new ViewHolder(view);
     }
@@ -60,60 +61,42 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        @BindView(R.id.sw)
-        SwipeRevealLayout sw;
         @BindView(R.id.item_name)
         TextView item_name;
         @BindView(R.id.item_price)
         TextView item_price;
+        @BindView(R.id.item_image)
+        ImageView item_image;
         @BindView(R.id.item_option)
         TextView item_option;
         @BindView(R.id.item_count)
         TextView item_amount;
-        @BindView(R.id.item_image)
-        ImageView item_image;
         @BindView(R.id.item_add)
         ImageView item_add;
         @BindView(R.id.item_min)
         ImageView item_remove;
-        @BindView(R.id.tv_edit)
-        TextView tv_edit;
-        @BindView(R.id.tv_delete)
-        TextView tv_delete;
+
+        @BindView(R.id.foreground)
+        public LinearLayout foreground;
+        @BindView(R.id.background)
+        public LinearLayout background;
+
 
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
 
-            if (Common.isArabic)
-                sw.setDragEdge(1);
-            else
-                sw.setDragEdge(2);
-
             item_add.setOnClickListener(this);
             item_remove.setOnClickListener(this);
-            tv_edit.setOnClickListener(this);
-            tv_delete.setOnClickListener(this);
 
         }
+
 
         @Override
         public void onClick(View v) {
 
-            if (v == tv_edit) {
-                if (listener != null) {
-                    listener.onItemClick(getAdapterPosition(), 1, item_amount,item_price);
-                    sw.close(true);
-                }
-            } else if (v == tv_delete) {
-                //  Toast.makeText(Common.mActivity, "//////1111111111111///////////////", Toast.LENGTH_SHORT).show();
-                if (listener != null) {
-                    listener.onItemClick(getAdapterPosition(), 0, item_amount,item_price);
-                    sw.close(true);
-                }
-
-            } else if (v == item_add) {
+            if (v == item_add) {
                 if (listener != null) {
                     listener.onItemClick(getAdapterPosition(), 2, item_amount,item_price);
                 }
@@ -123,7 +106,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     listener.onItemClick(getAdapterPosition(), 3, item_amount, item_price);
                 }
             }
+
         }
+
 
     }
 

@@ -1,6 +1,7 @@
 package com.itsoluation.vavisa.darhaa.web_service;
 
 import com.google.gson.JsonElement;
+import com.itsoluation.vavisa.darhaa.model.addToCart.AddToCardData;
 import com.itsoluation.vavisa.darhaa.model.cartData.CartData;
 import com.itsoluation.vavisa.darhaa.model.home.Home;
 import com.itsoluation.vavisa.darhaa.model.ProfileData;
@@ -15,6 +16,7 @@ import com.itsoluation.vavisa.darhaa.model.orders.OrdersData;
 import java.util.ArrayList;
 
 import io.reactivex.Observable;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -102,15 +104,13 @@ public interface ApiInterface {
     Observable<Status> changePassword(@Field("password") String password, @Field("confirm") String confirm,
                                       @Field("user_id") Integer user_id,@Field("oldpassword") String oldpassword);
 
-    @FormUrlEncoded
     @POST("index.php?route=restapi/cart/add")
-    Observable<Status> addToCart(@Field("password") String password, @Field("confirm") String confirm,
-                                      @Field("user_id") Integer user_id,@Field("oldpassword") String oldpassword);
+    Observable<Status> addToCart(@Body AddToCardData json);
 
     @GET("index.php?route=restapi/cart")
     Observable<CartData> viewCart(@Query("user_id") String user_id, @Query("device_id") String device_id);
 
     @FormUrlEncoded
     @POST("index.php?route=restapi/cart/remove")
-    Observable<Status> deleteCart(@Query("cart_id") String cart_id,@Query("user_id") String user_id, @Query("device_id") String device_id);
+    Observable<Status> deleteCart(@Field("cart_id") String cart_id,@Field("user_id") String user_id, @Field("device_id") String device_id);
 }
