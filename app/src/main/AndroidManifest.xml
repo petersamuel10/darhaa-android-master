@@ -13,9 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".profile_fragments.ChangePassword"
+        <activity android:name=".payment.Checkout"
+            android:theme="@style/fragmentHeader"/>
+        <activity
+            android:name=".profile_fragments.ChangePassword"
             android:theme="@style/fragmentHeader"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".profile_fragments.EditProfile"
             android:theme="@style/fragmentHeader"
@@ -82,7 +85,8 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".Cart"
-            android:theme="@style/fragmentHeader" />
+            android:theme="@style/fragmentHeader"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".profile_fragments.OrderDetails"
             android:theme="@style/fragmentHeader" />

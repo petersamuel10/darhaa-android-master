@@ -9,15 +9,15 @@ import android.view.View;
 
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerItemTouchHelperListner;
 import com.itsoluation.vavisa.darhaa.adapter.CartAdapter;
-import com.itsoluation.vavisa.darhaa.adapter.FavoritesAdapter;
 
 public class RecyclerViewItemTouchHelperCart extends ItemTouchHelper.SimpleCallback {
 
-    private RecyclerItemTouchHelperListner listener;
+    private RecyclerItemTouchHelperListner listenerCart;
 
-    public RecyclerViewItemTouchHelperCart(int dragDirs, int swipeDirs , RecyclerItemTouchHelperListner listener) {
+    public RecyclerViewItemTouchHelperCart(int dragDirs, int swipeDirs ,RecyclerItemTouchHelperListner listenerCart) {
         super(dragDirs, swipeDirs);
-        this.listener = listener;
+
+        this.listenerCart = listenerCart;
     }
 
     @Override
@@ -28,13 +28,20 @@ public class RecyclerViewItemTouchHelperCart extends ItemTouchHelper.SimpleCallb
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
 
-        listener.onSwiped(viewHolder,direction,viewHolder.getAdapterPosition());
+        if(listenerCart != null)
+            listenerCart.onSwiped(viewHolder,direction,viewHolder.getAdapterPosition());
+
     }
 
     @Override
     public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-        View foregroundView = ((CartAdapter.ViewHolder)viewHolder).foreground;
-        getDefaultUIUtil().clearView(foregroundView);
+        View foreground = ((CartAdapter.ViewHolder)viewHolder).foreground;
+        getDefaultUIUtil().clearView(foreground);
+    }
+
+    @Override
+    public int convertToAbsoluteDirection(int flags, int layoutDirection) {
+        return super.convertToAbsoluteDirection(flags, layoutDirection);
     }
 
     @Override
@@ -46,19 +53,14 @@ public class RecyclerViewItemTouchHelperCart extends ItemTouchHelper.SimpleCallb
     }
 
     @Override
-    public int convertToAbsoluteDirection(int flags, int layoutDirection) {
-        return super.convertToAbsoluteDirection(flags, layoutDirection);
-    }
-
-    @Override
     public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        View foregroundView = ((CartAdapter.ViewHolder)viewHolder).foreground;
-        getDefaultUIUtil().onDraw(c,recyclerView,foregroundView,dX,dY,actionState,isCurrentlyActive);
+        View foreground = ((CartAdapter.ViewHolder)viewHolder).foreground;
+        getDefaultUIUtil().onDraw(c,recyclerView,foreground,dX,dY,actionState,isCurrentlyActive);
     }
 
     @Override
     public void onChildDrawOver(@NonNull Canvas c, @NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        View foregroundView = ((CartAdapter.ViewHolder)viewHolder).foreground;
-        getDefaultUIUtil().onDrawOver(c,recyclerView,foregroundView,dX,dY,actionState,isCurrentlyActive);
+        View foreground = ((CartAdapter.ViewHolder)viewHolder).foreground;
+        getDefaultUIUtil().onDrawOver(c,recyclerView,foreground,dX,dY,actionState,isCurrentlyActive);
     }
 }

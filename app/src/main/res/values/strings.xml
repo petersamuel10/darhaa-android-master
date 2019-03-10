@@ -186,5 +186,9 @@
     <string name="required" translatable="false">required</string>
     <string name="option_id" translatable="false">option_id</string>
     <string name="please_enter">Please enter</string>
-    <string name="sku">SKU</string>
+    <string name="sku">"SKU: "</string>
+    <string name="verify">Verify</string>
+    <string name="coupon_successfully">Coupon applied successfully</string>
+    <string name="sub_total">Sub-Total :</string>
+    <string name="total">Total :</string>
 </resources>

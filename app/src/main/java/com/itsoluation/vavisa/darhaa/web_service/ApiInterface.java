@@ -108,9 +108,13 @@ public interface ApiInterface {
     Observable<Status> addToCart(@Body AddToCardData json);
 
     @GET("index.php?route=restapi/cart")
-    Observable<CartData> viewCart(@Query("user_id") String user_id, @Query("device_id") String device_id);
+    Observable<CartData> viewCart(@Query("user_id") String user_id, @Query("device_id") String device_id,@Query("coupon_code") String coupon);
 
     @FormUrlEncoded
     @POST("index.php?route=restapi/cart/remove")
     Observable<Status> deleteCart(@Field("cart_id") String cart_id,@Field("user_id") String user_id, @Field("device_id") String device_id);
+
+    @FormUrlEncoded
+    @POST("index.php?route=restapi/cart/checkCoupon")
+    Observable<Status> checkCoupon(@Field("user_id") String user_id, @Field("couponCode") String couponCode);
 }

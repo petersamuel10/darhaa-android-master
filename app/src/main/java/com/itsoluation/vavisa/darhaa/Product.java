@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
@@ -61,6 +63,8 @@ import ss.com.bannerslider.Slider;
 
 public class Product extends AppCompatActivity implements View.OnClickListener {
 
+    @BindView(R.id.rootLayout)
+    RelativeLayout rootLayout;
     @BindView(R.id.back_arrow)
     ImageView back_arrow;
     @BindView(R.id.ic_fav)
@@ -83,6 +87,8 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
     RecyclerView related_rec;
     @BindView(R.id.product_options)
     LinearLayout product_options;
+    @BindView(R.id.addCardBtn)
+    Button addCart;
 
     TextView item_price, item_name, item_desc_details;
     Slider slider;
@@ -135,7 +141,12 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                     .subscribe(new Consumer<Status>() {
                         @Override
                         public void accept(Status status) throws Exception {
-                            Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
+                            if(status.getStatus().equals("error"))
+                                Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
+                            else {
+                                Snackbar snackbar = Snackbar.make(rootLayout, status.getMessage(), Snackbar.LENGTH_LONG);
+                                snackbar.show();
+                            }
                         }
                     }));
         }
@@ -421,8 +432,10 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 }
 
                 if(!stock){
+                    addCart.setVisibility(View.GONE);
                     special_price.setText(getResources().getString(R.string.out_of_stock));
                     special_price.setVisibility(View.VISIBLE);
+
                 }
 
                 if(!sku.equals("")){
@@ -771,6 +784,5 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
             listView.requestLayout();
 
         }
-
     }
 }

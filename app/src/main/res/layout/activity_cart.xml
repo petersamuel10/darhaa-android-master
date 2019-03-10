@@ -47,36 +47,23 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/cart_rec"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/toolBar"
+        android:layout_margin="4dp"
         android:clipToPadding="false"
         android:paddingBottom="100dp" />
-
 
     <Button
         android:id="@+id/cartBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/footer"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="10dp"
+        android:layout_margin="20dp"
+        android:layout_alignParentBottom="true"
         android:background="@drawable/big_button_blue"
-        android:padding="18dp"
-        android:text="price"
+        android:text="@string/continueTxt"
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
-        android:textSize="16sp" />
-
-    <ImageView
-        android:id="@+id/footer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/footer" />
+        android:textSize="18sp" />
 
 </RelativeLayout>

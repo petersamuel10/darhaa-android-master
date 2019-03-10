@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
@@ -45,11 +46,13 @@ public class Orders extends AppCompatActivity {
     OrdersAdapter adapter;
     ProgressDialog progressDialog;
     String user_id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_orders);
         ButterKnife.bind(this);
+
         progressDialog = new ProgressDialog(Orders.this);
         progressDialog.setCancelable(false);
 
@@ -57,9 +60,11 @@ public class Orders extends AppCompatActivity {
             back_arrow.setRotation(180);
         }
 
-        setupRecyclerView();
+        Log.i("access",Common.current_user.getUserAccessToken());
+      //  setupRecyclerView();
         if(Common.isConnectToTheInternet(Orders.this))
-            requestData();
+            ;
+          //  requestData();
         else
             Common.errorConnectionMess(Orders.this);
     }
@@ -74,6 +79,7 @@ public class Orders extends AppCompatActivity {
     }
 
     private void requestData() {
+
         progressDialog.show();
         user_id = String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id());
         compositeDisposable.add(Common.getAPI2().getOrders(user_id)
@@ -87,9 +93,8 @@ public class Orders extends AppCompatActivity {
                                        Common.showAlert2(Orders.this,ordersData.getStatus(),ordersData.getMessage());
                                    else{
 
-                                       /////////////////////// send to adapter /////////////////////
-                                   }
 
+                                   }
                                }
                            }));
     }

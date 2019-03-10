@@ -159,4 +159,8 @@
     <string name="max_number">الكمية غير متوفره.</string>
     <string name="please_enter">"من فضلك ادخل "</string>
     <string name="sku">رمز البريد</string>
+    <string name="verify">تفعيل</string>
+    <string name="coupon_successfully">تم الاستخدام بنجاح</string>
+    <string name="sub_total">الأجمالي</string>
+    <string name="total">الأجمالي النهائي</string>
 </resources>
