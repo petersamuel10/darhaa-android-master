@@ -2,6 +2,7 @@ package com.itsoluation.vavisa.darhaa;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.AsyncTask;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -110,7 +112,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     String product_id, minimum,maximum;
-    Integer user_id;
+    String user_id;
     Boolean wishList;
     Double price ,totalPrice;
     AddToCardData addCard;
@@ -121,6 +123,8 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
     @OnClick(R.id.addCardBtn)
     public void addOrder(){
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(rootLayout.getWindowToken(),0);
         addToCart();
     }
 
@@ -131,6 +135,8 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
         if(getCartOPtions()) {
             addCard.setOptions(cartOptions);
 
+            if(user_id == null)
+                user_id = String.valueOf(0);
             addCard.setUser_id(String.valueOf(user_id));
             addCard.setQuantity(item_amount.getText().toString());
             addCard.setProduct_id(product_id);
@@ -203,7 +209,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
             back_arrow.setRotation(180);
         }
 
-        user_id = (Common.current_user != null) ? Common.current_user.getCustomerInfo().getCustomer_id() : null;
+        user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : null;
 
         related_product_ids = new ArrayList<>();
         related_images = new ArrayList<>();

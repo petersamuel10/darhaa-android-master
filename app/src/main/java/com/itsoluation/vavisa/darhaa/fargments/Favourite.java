@@ -176,7 +176,7 @@ public class Favourite extends Fragment implements RecyclerItemTouchHelperListne
 
         compositeDisposable = new CompositeDisposable();
         String product_id = String.valueOf(favList.get(viewHolder.getAdapterPosition()).getProduct_id());
-        int user_id = Common.current_user.getCustomerInfo().getCustomer_id();
+        String user_id = String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id());
 
         if (viewHolder instanceof FavoritesAdapter.ViewHolder) {
 

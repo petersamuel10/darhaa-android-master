@@ -1,5 +1,7 @@
 package com.itsoluation.vavisa.darhaa.model.address.address;
 
+import android.support.annotation.Nullable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -9,9 +11,12 @@ public class AddressGet {
     @Expose
     private String address_id;
 
+    @Nullable
     @SerializedName("title")
     @Expose
     private String title;
+
+
 
     @SerializedName("address")
     @Expose
@@ -28,6 +33,7 @@ public class AddressGet {
     @SerializedName("city")
     @Expose
     private String city;
+
 
     public AddressGet() {
     }

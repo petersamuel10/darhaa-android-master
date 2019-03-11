@@ -1,7 +1,6 @@
 package com.itsoluation.vavisa.darhaa.profile_fragments;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
@@ -11,17 +10,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
 
-import com.itsoluation.vavisa.darhaa.Interface.EditDeleteAddrInterface;
+import com.itsoluation.vavisa.darhaa.Interface.AddressClicked;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.adapter.AddressAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.model.address.address.AddressDetails;
 import com.itsoluation.vavisa.darhaa.model.address.address.AddressGet;
+import com.itsoluation.vavisa.darhaa.payment.PaymentMethod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +32,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class Addresses extends AppCompatActivity implements EditDeleteAddrInterface {
+public class Addresses extends AppCompatActivity implements AddressClicked {
 
     @BindView(R.id.addresses_rec)
     RecyclerView address_rec;
@@ -85,7 +83,6 @@ public class Addresses extends AppCompatActivity implements EditDeleteAddrInterf
     }
 
     private void requestData() {
-
         progressDialog.show();
         compositeDisposable.add(Common.getAPI2().addressBook(Common.current_user.getCustomerInfo().getCustomer_id())
                            .subscribeOn(Schedulers.io())
@@ -157,23 +154,27 @@ public class Addresses extends AppCompatActivity implements EditDeleteAddrInterf
     }
 
     @Override
-    public void onItemClick(int position, int flag, View view) {
+    public void onItemClick(int position, int flag, View view,String address_id) {
 
 
+        // delete address
         if(flag == 0)
-        {
-            // delete address
             callDeleteAddressAPI(user_id,list.get(position).getAddress_id(),position);
 
-        }else if(flag == 1)
-        {
-            // edit address
+        // edit address
+        else if(flag == 1)
             callGetAddressDeAPI(user_id,list.get(position).getAddress_id(),false,true);
-        }else if (flag == 2)
-        {
-            // show address details
-            callGetAddressDeAPI(user_id,list.get(position).getAddress_id(), true,true);
+
+        // show address details
+        else if (flag == 2) {
+            if(getIntent().hasExtra("checkoutAddress")){
+                Intent intent = new Intent(this, PaymentMethod.class);
+                intent.putExtra("address_id",address_id);
+                startActivity(intent);
+            }else
+                callGetAddressDeAPI(user_id, list.get(position).getAddress_id(), true, true);
         }
+
     }
 
     private void callGetAddressDeAPI(String user_id, final String address_id, final boolean showDetails, final boolean isEdit) {

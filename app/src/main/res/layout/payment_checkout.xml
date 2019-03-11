@@ -33,23 +33,25 @@
 
     </android.support.v7.widget.Toolbar>
 
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/cart_rec"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/toolBar"
+        android:layout_above="@+id/footer"
         android:layout_margin="4dp"
         android:clipToPadding="false"
-        android:paddingBottom="100dp" />
+        android:paddingBottom="10dp" />
 
 
     <LinearLayout
+        android:id="@+id/footer"
         android:orientation = "vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
         android:layout_alignParentBottom="true"
+        android:elevation="20dp"
         android:padding = "4dp">
 
         <LinearLayout
@@ -57,11 +59,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
-        android:layout_alignParentBottom="true"
-        android:padding = "8dp">
+        android:padding = "4dp">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text = "@string/sub_total"
             android:textColor = "@android:color/black"
@@ -69,29 +70,31 @@
 
         <TextView
             android:id="@+id/subTotal"
+            android:textColor = "@android:color/black"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
     </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/couponLN"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/white"
-            android:layout_alignParentBottom="true"
-            android:padding = "8dp"
+            android:padding = "4dp"
             android:visibility="gone">
 
             <TextView
                 android:id="@+id/coupon"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor = "@android:color/black"
                 android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/couponValue"
+                android:textColor = "@android:color/black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -102,11 +105,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/white"
-            android:layout_alignParentBottom="true"
-            android:padding = "8dp">
+            android:padding = "4dp">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text = "@string/total"
                 android:textColor = "@android:color/black"
@@ -114,19 +116,20 @@
 
             <TextView
                 android:id="@+id/total"
+                android:textColor = "@android:color/black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
         </LinearLayout>
 
     <Button
-        android:id="@+id/cartBtn"
+        android:id="@+id/checkoutBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="10dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="4dp"
         android:background="@drawable/big_button_blue"
         android:text="@string/continueTxt"
         android:textAlignment="center"

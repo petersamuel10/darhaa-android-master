@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +16,12 @@ import android.widget.TextView;
 
 import com.itsoluation.vavisa.darhaa.Interface.CartInterface;
 import com.itsoluation.vavisa.darhaa.R;
+import com.itsoluation.vavisa.darhaa.model.cartData.Options;
 import com.itsoluation.vavisa.darhaa.model.cartData.Product;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,8 +34,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     private CartInterface listener = null;
 
-    public CartAdapter(boolean b) {
-        productList = new ArrayList<>();
+    public CartAdapter(boolean b, List<Product> productList) {
+        this.productList = new ArrayList<>(productList);
         this.isCheckout = b;
     }
 
@@ -43,7 +46,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         View view;
         context = parent.getContext();
         if(isCheckout) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cart, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cart_checkout, parent, false);
             return new ViewHolder(view);
         }else {
             if(viewType == R.layout.item_cart) {
@@ -59,14 +62,38 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull CartAdapter.ViewHolder holder, int position) {
 
+        // to show coupon code edit text
         if(position == productList.size()){
-            holder.coupon_code_ed.setHint("enter coupon code");
+            try {
+                holder.coupon_code_ed.setHint(context.getResources().getString(R.string.enter_coupon_code));
+            }catch (Exception e){}
+
         }else {
+
             holder.item_name.setText(productList.get(position).getName());
             holder.item_price.setText(productList.get(position).getTotal());
-            holder.item_amount.setText(productList.get(position).getQuantity());
+            try {holder.item_amount.setText(productList.get(position).getQuantity());}catch (Exception e){}
             Picasso.with(context).load(productList.get(position).getThumb()).into(holder.item_image);
+
+            //to show item options
+            if(productList.get(position).getOption().size()>0){
+
+                holder.item_option.setVisibility(View.VISIBLE);
+                holder.item_option.setText(context.getResources().getString(R.string.options));
+                String options_txt;
+                for (Options option:productList.get(position).getOption()) {
+                    options_txt =  holder.item_option.getText().toString();
+                    holder.item_option.setText(options_txt+"\n \u25CF"+option.getName()+": "+option.getValue());
+                }
+            }
         }
+
+        // that's for items in the checkout activity
+        if(isCheckout) {
+            holder.item_price.setText(context.getResources().getString(R.string.price)+productList.get(position).getTotal());
+            holder.item_quantity.setText(context.getResources().getString(R.string.quantity)+productList.get(position).getQuantity());
+        }
+
     }
 
 
@@ -79,7 +106,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return productList.size()+1;
+        if (isCheckout)
+            return productList.size();
+        else
+            return productList.size()+1;
     }
 
 
@@ -99,6 +129,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         ImageView item_add;
         @Nullable @BindView(R.id.item_min)
         ImageView item_remove;
+        @Nullable @BindView(R.id.item_quantity)
+        TextView item_quantity;
 
         @Nullable @BindView(R.id.foreground)
         public LinearLayout foreground;
@@ -153,7 +185,4 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         productList.remove(position);
     }
 
-    public void addAddress(ArrayList<Product> productList){
-        this.productList.addAll(productList);
-    }
 }

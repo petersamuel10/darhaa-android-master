@@ -3,6 +3,7 @@ package com.itsoluation.vavisa.darhaa.web_service;
 import com.google.gson.JsonElement;
 import com.itsoluation.vavisa.darhaa.model.addToCart.AddToCardData;
 import com.itsoluation.vavisa.darhaa.model.cartData.CartData;
+import com.itsoluation.vavisa.darhaa.model.cartData.EditCart;
 import com.itsoluation.vavisa.darhaa.model.home.Home;
 import com.itsoluation.vavisa.darhaa.model.ProfileData;
 import com.itsoluation.vavisa.darhaa.model.Status;
@@ -56,6 +57,10 @@ public interface ApiInterface {
     Observable<ArrayList<AddressGet>> addressBook(@Query("user_id") Integer user_id );
 
     @FormUrlEncoded
+    @POST("index.php?route=restapi/checkout/address")
+    Observable<ArrayList<AddressGet>> checkoutAddress(@Field("user_id") Integer user_id );
+
+    @FormUrlEncoded
     @POST("index.php?route=restapi/address/addAddress")
     Observable<Status> addAddress(@Field("user_id") Integer user_id,@Field("firstname") String firstname,
                                   @Field("address_1") String address_1,@Field("city") String city,@Field("country_id") String country_id,
@@ -92,11 +97,11 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("index.php?route=restapi/product/addToWishlist")
-    Observable<Status> addFavorte(@Field("product_id") String product_id, @Field("user_id") Integer user_id);
+    Observable<Status> addFavorte(@Field("product_id") String product_id, @Field("user_id") String user_id);
 
     @FormUrlEncoded
     @POST("index.php?route=restapi/product/deleteWishlist")
-    Observable<Status> removeFavorte(@Field("product_id") String product_id, @Field("user_id") Integer user_id);
+    Observable<Status> removeFavorte(@Field("product_id") String product_id, @Field("user_id") String user_id);
 
 
     @FormUrlEncoded
@@ -114,7 +119,14 @@ public interface ApiInterface {
     @POST("index.php?route=restapi/cart/remove")
     Observable<Status> deleteCart(@Field("cart_id") String cart_id,@Field("user_id") String user_id, @Field("device_id") String device_id);
 
+    @POST("index.php?route=restapi/cart/edit")
+    Observable<Status> editCart(@Body EditCart editCart);
+
     @FormUrlEncoded
     @POST("index.php?route=restapi/cart/checkCoupon")
-    Observable<Status> checkCoupon(@Field("user_id") String user_id, @Field("couponCode") String couponCode);
+    Observable<JsonElement> checkCoupon(@Field("user_id") String user_id, @Field("couponCode") String couponCode);
+
+    @GET("index.php?route=restapi/information")
+    Observable<JsonElement> getInformation(@Query("information_id") Integer information_id);
+
 }

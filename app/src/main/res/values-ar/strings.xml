@@ -86,7 +86,7 @@
     <string name="ok">موافق</string>
     <string name="thanks_rating">شكؤا لتقييمك</string>
     <string name="kd">دك</string>
-    <string name="quantity">العدد</string>
+    <string name="quantity">الكمية: </string>
     <string name="note">تعليمات خاصة</string>
     <string name="appointmentDetails">تفاصيل الموعد</string>
     <string name="company_name">اسم الشركة</string>
@@ -116,7 +116,7 @@
     <string name="za">ابجدى (ى - أ)</string>
     <string name="sort">ترتيب</string>
     <string name="filter">تصنيف</string>
-    <string name="price">السعر</string>
+    <string name="price">السعر: </string>
     <string name="tops">الاشهر</string>
     <string name="add_cart">اضافة الى العربية</string>
     <string name="wishList">المفضلة</string>
@@ -163,4 +163,7 @@
     <string name="coupon_successfully">تم الاستخدام بنجاح</string>
     <string name="sub_total">الأجمالي</string>
     <string name="total">الأجمالي النهائي</string>
+    <string name="you_get_discount">"سوف تحصل على "</string>
+    <string name="enter_coupon_code">ادخل كود الكوبون</string>
+    <string name="options">"الاضافات: "</string>
 </resources>

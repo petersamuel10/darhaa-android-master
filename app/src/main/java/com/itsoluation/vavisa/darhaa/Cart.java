@@ -3,14 +3,13 @@ package com.itsoluation.vavisa.darhaa;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -19,26 +18,37 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.gson.JsonElement;
 import com.itsoluation.vavisa.darhaa.Interface.CartInterface;
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerItemTouchHelperListner;
 import com.itsoluation.vavisa.darhaa.adapter.CartAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.model.cartData.CartData;
+import com.itsoluation.vavisa.darhaa.model.cartData.EditCart;
+import com.itsoluation.vavisa.darhaa.model.cartData.Quantity;
 import com.itsoluation.vavisa.darhaa.payment.Checkout;
 import com.itsoluation.vavisa.darhaa.recyclerItemTouchHelper.RecyclerViewItemTouchHelperCart;
 
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class Cart extends AppCompatActivity implements CartInterface, RecyclerItemTouchHelperListner {
+public class Cart extends AppCompatActivity implements CartInterface, RecyclerItemTouchHelperListner  {
 
     @BindView(R.id.rootLayout)
     RelativeLayout rootLayout;
@@ -46,11 +56,10 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
     ImageView back_arrow;
     @BindView(R.id.cart_rec)
     RecyclerView cart_rec;
+    @BindView(R.id.cartBtn)
+    Button cartBtn;
 
-    @OnClick(R.id.cartBtn)
-    public void checkout(){
-        startActivity(new Intent(Cart.this, Checkout.class));
-    }
+    HashMap<String,String> changesCarts = new HashMap<>();
 
     @OnClick(R.id.back_arrow)
     public void setBack() {
@@ -64,6 +73,9 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
     CartData cartData;
 
     String user_id, device_id;
+    String coupon_code = "";
+
+    private CartInterface onCartListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +87,12 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
         if (Common.isArabic) {
             back_arrow.setRotation(180);
         }
-
+        onCartListener = this;
         setupRecyclerView();
 
-        user_id = String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id());
-
+        user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : null;
         device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-        Log.i("device",device_id);
+
         if (Common.isConnectToTheInternet(this)) {
             callAPI();
         } else
@@ -101,10 +112,12 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
                         progressDialog.dismiss();
                         if (cartList.getStatus() != null) {
                             Common.showAlert2(Cart.this, cartList.getStatus(), cartList.getMessage());
+                            cartBtn.setVisibility(View.GONE);
                         } else {
                             cartData = cartList;
-                            adapter.addAddress(cartList.getProducts());
-                            adapter.notifyDataSetChanged();
+                            adapter = new CartAdapter(false,cartData.getProducts());
+                            adapter.setListener(onCartListener);
+                            cart_rec.setAdapter(adapter);
                         }
                     }
                 }));
@@ -114,14 +127,9 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
 
         cart_rec.setHasFixedSize(true);
         cart_rec.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new CartAdapter(false);
-        adapter.setListener(this);
-        cart_rec.setAdapter(adapter);
-
         ItemTouchHelper.SimpleCallback itemTouchHelperCallBack = new RecyclerViewItemTouchHelperCart(0, ItemTouchHelper.START, this);
-
         new ItemTouchHelper(itemTouchHelperCallBack).attachToRecyclerView(cart_rec);
-        adapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -130,6 +138,7 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
         finish();
     }
 
+    // listener to add or minus quantity and verify coupon code
     @Override
     public void onItemClick(int position, int flag, View item_amount_txt, View item_price_txt) {
 
@@ -147,6 +156,7 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
                     ((TextView) item_amount_txt).setText(String.valueOf(amount));
                     price += Double.parseDouble(cartData.getProducts().get(position).getPrice());
                     ((TextView) item_price_txt).setText(String.format(Locale.US, "%.3f", price));
+                    changesCarts.put(cartData.getProducts().get(position).getCart_id(), String.valueOf(amount));
                 }
                 //minus
             } else if (flag == 3) {
@@ -157,14 +167,15 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
                     ((TextView) item_amount_txt).setText(String.valueOf(amount));
                     price -= Double.parseDouble(cartData.getProducts().get(position).getPrice());
                     ((TextView) item_price_txt).setText(String.format(Locale.US, "%.3f", price));
+                    changesCarts.put(cartData.getProducts().get(position).getCart_id(), String.valueOf(amount));
                 }
             }
-        } catch (Exception e) {
-        }
+
+        } catch (Exception e) { }
 
         try {
 
-            String coupon;
+            String coupon = "";
             EditText coupon_ed = ((EditText) item_amount_txt);
             Button verify = ((Button) item_price_txt);
 
@@ -173,45 +184,57 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
                 InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(rootLayout.getWindowToken(), 0);
 
+                //get coupon code
                 coupon = coupon_ed.getText().toString();
-
-                verifyCoupon(coupon,verify,coupon_ed);
-
+                if(coupon.equals(""))
+                    Common.showAlert2(Cart.this,getResources().getString(R.string.warning),getResources().getString(R.string.enter_coupon_code));
+                else
+                    verifyCoupon(coupon,verify,coupon_ed);
             }
 
         } catch (Exception e) {
         }
-
-
     }
 
+    //coupon
     private void verifyCoupon(final String coupon, final Button verify, final EditText coupon_ed) {
+
         progressDialog.show();
         compositeDisposable = new CompositeDisposable();
-        Log.i("bbbbbb114441","etertr");
         compositeDisposable.add(Common.getAPI().checkCoupon(user_id, coupon)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Status>() {
+                .subscribe(new Consumer<JsonElement>() {
                     @Override
-                    public void accept(Status status) throws Exception {
-                        Log.i("bbbbbb2222","etertr");
+                    public void accept(JsonElement jsonElement) throws Exception {
                         progressDialog.dismiss();
-                            Common.showAlert2(Cart.this, status.getStatus(),status.getMessage());
-                            if(status.getStatus().equals("success")){
+
+                        String result = jsonElement.toString();
+                        JSONObject object = new JSONObject(result);
+                        if(object.getString("status").equals("error"))
+                            Common.showAlert2(Cart.this, object.getString("status"),object.getString("message"));
+                        else {
+                            if (object.getString("status").equals("success")) {
+                                JSONObject result_ = object.getJSONObject("result");
+                                coupon_code = result_.getString("code");
+                                String name = result_.getString("name");
+
+                                Common.showAlert2(Cart.this, object.getString("status"),object.getString("message")+"\n"
+                                        +getResources().getString(R.string.you_get_discount)+name+".");
 
                                 coupon_ed.setText(getResources().getString(R.string.coupon_successfully));
                                 coupon_ed.setBackgroundColor(getResources().getColor(R.color.grey));
                                 coupon_ed.setEnabled(false);
                                 verify.setEnabled(false);
-
                             }
+                        }
                     }
                 }));
     }
 
+    //delete cart
     @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int listSize) {
 
         compositeDisposable = new CompositeDisposable();
 
@@ -236,7 +259,75 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
 
             adapter.removeCart(viewHolder.getAdapterPosition());
             adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+
+            if(viewHolder.getAdapterPosition()==0)
+                cartBtn.setVisibility(View.GONE);
         }
     }
 
+    @OnClick(R.id.cartBtn)
+    public void checkout(){
+
+        if(!changesCarts.isEmpty()){
+            EditCart editCart = new EditCart();
+            editCart.setUser_id(user_id);
+            editCart.setDevice_id(device_id);
+            ArrayList<Quantity> quantityList = new ArrayList<>();
+
+            for (Map.Entry<String, String> entry : changesCarts.entrySet()) {
+                Quantity quantity= new Quantity(entry.getKey(),entry.getValue());
+                quantityList.add(quantity);
+            }
+
+            editCart.setQuantity(quantityList);
+
+            callAPIToEditCart(editCart);
+        }else {
+
+            Intent i = new Intent(Cart.this, Checkout.class);
+            if(!coupon_code.equals(""))
+                i.putExtra("couponCode",coupon_code);
+
+            startActivity(i);
+        }
+    }
+
+    private void callAPIToEditCart(EditCart editCart) {
+
+         final Status status_ = new Status();
+
+        Observable<Status> editCartInterface = Common.getAPI().editCart(editCart).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        editCartInterface.subscribe(new Observer<Status>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(Status status) {
+                status_.setMessage(status.getMessage());
+                status_.setStatus(status.getStatus());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+                if(status_.getStatus().equals("error"))
+                    Common.showAlert2(Cart.this,status_.getStatus(),status_.getMessage());
+                else {
+                    Intent i = new Intent(Cart.this, Checkout.class);
+                    if(!coupon_code.equals(""))
+                        i.putExtra("couponCode",coupon_code);
+
+                    startActivity(i);
+                }
+            }
+        });
+    }
 }

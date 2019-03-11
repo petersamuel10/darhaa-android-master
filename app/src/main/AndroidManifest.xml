@@ -13,8 +13,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".payment.Checkout"
+        <activity android:name=".payment.PaymentMethod"
             android:theme="@style/fragmentHeader"/>
+        <activity
+            android:name=".payment.Checkout"
+            android:theme="@style/fragmentHeader" />
         <activity
             android:name=".profile_fragments.ChangePassword"
             android:theme="@style/fragmentHeader"
