@@ -16,14 +16,14 @@ import com.itsoluation.vavisa.darhaa.Interface.RecyclerViewItemClickListener;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.CurrentCategoryDetails;
 import com.itsoluation.vavisa.darhaa.fargments.SubCartegory;
-import com.itsoluation.vavisa.darhaa.model.home.Catecory;
+import com.itsoluation.vavisa.darhaa.model.home.CategoryData;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
-    ArrayList<Catecory> categories_;
+    ArrayList<CategoryData> categories_;
     public static Context context;
 
     public static final int TYPE_FIRST_ITEM = 0;
@@ -65,7 +65,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 CurrentCategoryDetails.category_id = categories_.get(position).getCategory_id();
                 CurrentCategoryDetails.category_name = categories_.get(position).getName();
 
-                if(categories_.get(position).isSubCat())
+                if(categories_.get(position).getIsSubCat().equals("true"))
                     context.startActivity(new Intent(context, SubCartegory.class));
                 else
                     context.startActivity(new Intent(context, CategoryProducts.class));
@@ -143,7 +143,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     }
 
     // add categories comes from api
-    public void addHomeList(ArrayList<Catecory> newCategory) {categories_ = newCategory; }
+    public void addHomeList(ArrayList<CategoryData> newCategory) {categories_ = newCategory; }
 
     // parent activity will implement this method to respond to click events
     interface ItemClickListener {

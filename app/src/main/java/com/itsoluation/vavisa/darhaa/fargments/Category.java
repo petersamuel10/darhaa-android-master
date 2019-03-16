@@ -7,20 +7,19 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LayoutAnimationController;
 
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.adapter.CategoryAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
-import com.itsoluation.vavisa.darhaa.common.CurrentCategoryDetails;
+import com.itsoluation.vavisa.darhaa.model.home.CategoryData;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,7 +34,6 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,17 +44,13 @@ public class Category extends Fragment {
     SwipeRefreshLayout sl;
     @BindView(R.id.recyclerView)
     RecyclerView category_rec;
-//    @BindView(R.id.item_category)
-//    LinearLayout category;
-//    @OnClick(R.id.item_category)
-//    public void test(){
-//        getActivity().startActivity(new Intent(getActivity(), CategoryProducts.class));
-//    }
+    private MenuItem mSearchAction;
+    private SearchView searchView;
 
-    // private CategoryAdapter homeAdapter;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+   // private CompositeDisposable compositeDisposable = new CompositeDisposable();
     ProgressDialog progressDialog;
-    ArrayList<String> category_ids, category_names, category_images, isSubCats, isProds;
+
+    ArrayList<CategoryData> categoryList;
     RecyclerView recyclerView;
     CategoryAdapter adapter;
 
@@ -67,15 +61,15 @@ public class Category extends Fragment {
         View view = inflater.inflate(R.layout.fragment_category, container, false);
 
         progressDialog = new ProgressDialog(getActivity());
-
         ButterKnife.bind(this,view);
 
         setUpSwipeRefreshLayout();
-
         recyclerView = view.findViewById(R.id.recyclerView);
 
         //setup recycler
         setupRecyclerView();
+
+        setHasOptionsMenu(true);
 
         if(Common.isConnectToTheInternet(getActivity()))
             new GetCategoryItemsBackgroundTask(getActivity()).execute();
@@ -85,19 +79,33 @@ public class Category extends Fragment {
         return view;
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        mSearchAction = menu.findItem(R.id.action_search);
+
+        mSearchAction.setVisible(true);
+        searchView = (SearchView) mSearchAction.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                return true;
+            }
+        });
+    }
+
     private void setupRecyclerView() {
 
         category_rec.setHasFixedSize(false);
         category_rec.setLayoutManager(new LinearLayoutManager(getContext()));
-        /*
-        home_recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),
-                DividerItemDecoration.HORIZONTAL));
-        home_recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),
-                DividerItemDecoration.VERTICAL));
-                */
-
-      //  homeAdapter = new CategoryAdapter();
-      //  home_recyclerView.setAdapter(homeAdapter);
     }
 
     private void setUpSwipeRefreshLayout() {
@@ -116,7 +124,6 @@ public class Category extends Fragment {
         });
     }
 
-
     /** Get Home Items **/
     private class GetCategoryItemsBackgroundTask extends AsyncTask<String, Void, String> {
         public ProgressDialog dialog;
@@ -124,12 +131,7 @@ public class Category extends Fragment {
 
         GetCategoryItemsBackgroundTask(Activity activity) {
             this.dialog = new ProgressDialog(activity);
-
-            category_ids = new ArrayList<>();
-            category_names = new ArrayList<>();
-            category_images = new ArrayList<>();
-            isSubCats = new ArrayList<>();
-            isProds = new ArrayList<>();
+            categoryList = new ArrayList<>();
         }
 
         @Override
@@ -193,30 +195,17 @@ public class Category extends Fragment {
                 try {
                     JSONObject categories = firstJsonArray.getJSONObject(i);
 
-                    String category_id = categories.getString("category_id");
-                    String image = categories.getString("image");
-                    String name = categories.getString("name");
-                    String isSubCat = categories.getString("isSubCat");
-                    String isProducts = categories.getString("isProducts");
+                    CategoryData categoryData = new CategoryData(categories.getString("category_id"),categories.getString("image"),
+                            categories.getString("name"),categories.getString("isSubCat"),categories.getString("isProducts"));
 
-                    category_ids.add(category_id);
-                    category_images.add(image);
-                    category_names.add(name);
-                    isSubCats.add(isSubCat);
-                    isProds.add(isProducts);
-
-                    String[] category_ids_array = category_ids.toArray(new String[category_ids.size()]);
-                    String[] category_images_array = category_images.toArray(new String[category_images.size()]);
-                    String[] category_names_array = category_names.toArray(new String[category_names.size()]);
-                    String[] category_isSub_array = isSubCats.toArray(new String[isSubCats.size()]);
-                    String[] category_isProds_array = isProds.toArray(new String[isProds.size()]);
+                    categoryList.add(categoryData);
 
                     // set up the RecyclerView
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    adapter = new CategoryAdapter(category_ids_array, category_images_array, category_names_array, category_isSub_array, category_isProds_array);
-//                    adapter.setClickListener(this); // to allow on click events
+                    adapter = new CategoryAdapter(categoryList);
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                     recyclerView.setAdapter(adapter);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

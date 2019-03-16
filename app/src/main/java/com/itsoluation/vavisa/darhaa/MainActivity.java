@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().findItem(R.id.action_search);
     }
 
 
@@ -142,7 +143,7 @@ public class MainActivity extends AppCompatActivity
 
         SearchView mSearchView = (SearchView) mSearch.getActionView();
         mSearchView.setQueryHint("Search");
-        mSearchView.setOnQueryTextListener(this);
+        //mSearchView.setOnQueryTextListener(this);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -171,23 +172,23 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_home) {
             fragment = new  Home();
-
+          //  mSearch.setVisible(false);
             titleTxt.setPaddingRelative(0,0,24,0);
         } else if (id == R.id.nav_category) {
             fragment = new  Category();
-            mSearch.setVisible(true);
+           // mSearch.setVisible(true);
             titleTxt.setPaddingRelative(8,0,0,0);
         } else if (id == R.id.nav_favourite) {
             fragment = new Favourite();
-         //   mSearch.setVisible(false);
+          //  mSearch.setVisible(false);
             titleTxt.setPaddingRelative(0,0,24,0);
         } else if (id == R.id.nav_profile) {
             fragment = new Profile();
-        //    mSearch.setVisible(false);
+            //mSearch.setVisible(false);
             titleTxt.setPaddingRelative(0,0,24,0);
         }else if (id == R.id.nav_support) {
             fragment = new ContactSupport();
-         //   mSearch.setVisible(false);
+           // mSearch.setVisible(false);
             titleTxt.setPaddingRelative(0,0,24,0);
         }
 

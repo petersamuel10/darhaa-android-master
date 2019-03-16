@@ -10,13 +10,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LayoutAnimationController;
 
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.adapter.HomeAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
-import com.itsoluation.vavisa.darhaa.model.home.Catecory;
+import com.itsoluation.vavisa.darhaa.model.home.CategoryData;
 
 import java.util.ArrayList;
 
@@ -36,7 +34,7 @@ public class Home extends Fragment {
 
     HomeAdapter homeAdapter;
 
-    public ArrayList<Catecory> categories;
+    public ArrayList<CategoryData> categories;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     ProgressDialog progressDialog;

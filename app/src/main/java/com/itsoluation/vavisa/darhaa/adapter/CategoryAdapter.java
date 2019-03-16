@@ -18,13 +18,19 @@ import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.CategoryProducts;
 import com.itsoluation.vavisa.darhaa.common.CurrentCategoryDetails;
 import com.itsoluation.vavisa.darhaa.fargments.SubCartegory;
+import com.itsoluation.vavisa.darhaa.model.home.CategoryData;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
 
     private String[] category_ids, category_images, category_names, isSubs, isProds;
+    private ArrayList<CategoryData> categoryList = new ArrayList<>();
     Context context;
 
+
+/*
     // data is passed into the constructor
     public CategoryAdapter( String[] ids, String[] images, String[] names, String[] subs, String[] prods) {
         this.category_ids = ids;
@@ -34,6 +40,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         this.isProds = prods;
 
         Log.i("nnnn", String.valueOf(names.length));
+    }
+
+*/
+    public CategoryAdapter(ArrayList<CategoryData> categoryList) {
+        this.categoryList = categoryList;
     }
 
     // inflates the cell layout from xml when needed
@@ -49,20 +60,20 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        holder.category_name.setText(Html.fromHtml(category_names[position]).toString());
-        Picasso.with(context).load(category_images[position]).into(holder.category_image);
+        holder.category_name.setText(Html.fromHtml(categoryList.get(position).getName()));
+        Picasso.with(context).load(categoryList.get(position).getImage()).into(holder.category_image);
 
-        if(isSubs[position].equals("false")){
-            holder.category_prods.setText(isProds[position]+" "+ context.getResources().getString(R.string.items));
+        if(categoryList.get(position).getIsSubCat().equals("false")){
+            holder.category_prods.setText(categoryList.get(position).getIsProduct()+" "+ context.getResources().getString(R.string.items));
         }
 
 
         holder.setItemClickListener(new RecyclerViewItemClickListener() {
             @Override
             public void onClick(View view, int position) {
-                CurrentCategoryDetails.category_name = category_names[position];
-                CurrentCategoryDetails.category_id = category_ids[position];
-                if(isSubs[position].equals("false"))
+                CurrentCategoryDetails.category_name = categoryList.get(position).getName();
+                CurrentCategoryDetails.category_id = categoryList.get(position).getCategory_id();
+                if(categoryList.get(position).getIsSubCat().equals("false"))
                     context.startActivity(new Intent(context, CategoryProducts.class));
                 else
                     context.startActivity(new Intent(context, SubCartegory.class));
@@ -73,7 +84,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     // total number of cells
     @Override
     public int getItemCount() {
-        return category_ids.length;
+        return categoryList.size();
     }
 
     // stores and recycles views as they are scrolled off screen
@@ -101,8 +112,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         }
     }
 
+   /*
     // convenience method for getting data at click position
     public String getItem(int id) {
         return category_names[id];
     }
+    */
 }

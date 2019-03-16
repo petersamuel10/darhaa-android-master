@@ -3,7 +3,7 @@ package com.itsoluation.vavisa.darhaa.model.home;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Catecory {
+public class CategoryData {
 
     @SerializedName("category_id")
     @Expose
@@ -19,16 +19,23 @@ public class Catecory {
 
     @SerializedName("isSubCat")
     @Expose
-    private boolean isSubCat ;
+    private String isSubCat;
 
-    public Catecory() {
+    @SerializedName("isProducts")
+    @Expose
+    private String isProduct ;
+
+
+
+    public CategoryData() {
     }
 
-    public Catecory(String category_id, String image, String name, boolean isSubCat) {
+    public CategoryData(String category_id, String image, String name, String isSubCat, String isProduct) {
         this.category_id = category_id;
         this.image = image;
         this.name = name;
         this.isSubCat = isSubCat;
+        this.isProduct = isProduct;
     }
 
     public String getCategory_id() {
@@ -55,11 +62,19 @@ public class Catecory {
         this.name = name;
     }
 
-    public boolean isSubCat() {
+    public String getIsSubCat() {
         return isSubCat;
     }
 
-    public void setSubCat(boolean subCat) {
-        isSubCat = subCat;
+    public void setIsSubCat(String isSubCat) {
+        this.isSubCat = isSubCat;
+    }
+
+    public String getIsProduct() {
+        return isProduct;
+    }
+
+    public void setIsProduct(String isProduct) {
+        this.isProduct = isProduct;
     }
 }

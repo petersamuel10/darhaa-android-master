@@ -9,33 +9,33 @@ public class Home {
 
     @SerializedName("recent_category")
     @Expose
-    private Catecory recent_category;
+    private CategoryData recent_category;
 
     @SerializedName("categories")
     @Expose
-    private ArrayList<Catecory> categories;
+    private ArrayList<CategoryData> categories;
 
     public Home() {
     }
 
-    public Home(Catecory recent_category, ArrayList<Catecory> categories) {
+    public Home(CategoryData recent_category, ArrayList<CategoryData> categories) {
         this.recent_category = recent_category;
         this.categories = categories;
     }
 
-    public Catecory getRecent_category() {
+    public CategoryData getRecent_category() {
         return recent_category;
     }
 
-    public void setRecent_category(Catecory recent_category) {
+    public void setRecent_category(CategoryData recent_category) {
         this.recent_category = recent_category;
     }
 
-    public ArrayList<Catecory> getCategories() {
+    public ArrayList<CategoryData> getCategories() {
         return categories;
     }
 
-    public void setCategories(ArrayList<Catecory> categories) {
+    public void setCategories(ArrayList<CategoryData> categories) {
         this.categories = categories;
     }
 }
