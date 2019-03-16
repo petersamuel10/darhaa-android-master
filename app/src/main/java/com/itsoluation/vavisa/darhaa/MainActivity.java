@@ -41,7 +41,7 @@ import butterknife.OnClick;
 import io.paperdb.Paper;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener ,SearchView.OnQueryTextListener{
 
     //@BindView(R.id.action_search)
    // ImageView ic_search;
@@ -62,8 +62,6 @@ public class MainActivity extends AppCompatActivity
         toolbar.setTitle("");
         titleTxt = findViewById(R.id.title);
         setSupportActionBar(toolbar);
-
-
 
         //init paper
         Paper.init(this);
@@ -110,6 +108,7 @@ public class MainActivity extends AppCompatActivity
             finish();
         }
     }
+
     private void checkAuthontication() {
         if(Paper.book("DarHaa").contains("currentUser")) {
              Common.current_user = Paper.book("DarHaa").read("currentUser");
@@ -143,6 +142,7 @@ public class MainActivity extends AppCompatActivity
 
         SearchView mSearchView = (SearchView) mSearch.getActionView();
         mSearchView.setQueryHint("Search");
+        mSearchView.setOnQueryTextListener(this);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -171,19 +171,24 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_home) {
             fragment = new  Home();
-            mSearch.setVisible(false);
+
+            titleTxt.setPaddingRelative(0,0,24,0);
         } else if (id == R.id.nav_category) {
             fragment = new  Category();
             mSearch.setVisible(true);
+            titleTxt.setPaddingRelative(8,0,0,0);
         } else if (id == R.id.nav_favourite) {
             fragment = new Favourite();
-            mSearch.setVisible(false);
+         //   mSearch.setVisible(false);
+            titleTxt.setPaddingRelative(0,0,24,0);
         } else if (id == R.id.nav_profile) {
             fragment = new Profile();
-            mSearch.setVisible(false);
+        //    mSearch.setVisible(false);
+            titleTxt.setPaddingRelative(0,0,24,0);
         }else if (id == R.id.nav_support) {
             fragment = new ContactSupport();
-            mSearch.setVisible(false);
+         //   mSearch.setVisible(false);
+            titleTxt.setPaddingRelative(0,0,24,0);
         }
 
        // item.setChecked(true);
@@ -204,4 +209,16 @@ public class MainActivity extends AppCompatActivity
         transaction.replace(R.id.content_frame, fragment);
         transaction.commit();
     }
+
+    @Override
+    public boolean onQueryTextSubmit(String s) {
+
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String s) {
+        return false;
+    }
+
 }

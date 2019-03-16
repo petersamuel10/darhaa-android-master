@@ -51,7 +51,7 @@ public class Checkout extends AppCompatActivity {
     CartAdapter adapter;
     CartData cartData;
 
-    String user_id, device_id;
+    String user_id, device_id,total_;
     String coupon_code = null;
 
     @OnClick(R.id.back_arrow)
@@ -68,14 +68,14 @@ public class Checkout extends AppCompatActivity {
 
         if (Common.isArabic) {back_arrow.setRotation(180); }
 
-        if(getIntent().hasExtra("couponCode"))
-           coupon_code = getIntent().getStringExtra("couponCode");
-
-
         setupRecyclerView();
 
-        user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : null;
+        user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : "0";
         device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        //get coupon code if exist
+        if(getIntent().hasExtra("couponCode"))
+            coupon_code = getIntent().getStringExtra("couponCode");
 
         if (Common.isConnectToTheInternet(this)) {
             callAPI();
@@ -104,15 +104,16 @@ public class Checkout extends AppCompatActivity {
                             for (Total total:cartData.getTotals()) {
 
                                 if(total.getTitle().equals("Sub-Total"))
-                                    subTotal_txt.setText(total.getTotal());
-                                else if(total.getTitle().equals("Total"))
-                                    total_txt.setText(total.getTotal());
+                                    subTotal_txt.setText(" "+total.getTotal()+" "+getResources().getString(R.string.kd));
+                                else if(total.getTitle().equals("Total")) {
+                                    total_txt.setText(" " + total.getTotal()+" "+getResources().getString(R.string.kd));
+                                    total_ = total.getTotal();
+                                }
                                 else if(total.getTitle().contains("Coupon")){
                                     couponLN.setVisibility(View.VISIBLE);
                                     coupon_title_txt.setText(total.getTitle()+": ");
-                                    coupon_txt.setText(total.getTotal());
+                                    coupon_txt.setText(" "+total.getTotal());
                                 }
-
                             }
                             adapter.notifyDataSetChanged();
                         }
@@ -121,10 +122,8 @@ public class Checkout extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-
         cart_rec.setHasFixedSize(true);
         cart_rec.setLayoutManager(new LinearLayoutManager(this));
-
     }
 
     @Override
@@ -135,14 +134,21 @@ public class Checkout extends AppCompatActivity {
 
     @OnClick(R.id.checkoutBtn)
     public void completeOrder(){
-        if(user_id == null){
+        if(user_id == "0"){
+            Intent i = new Intent(this, BillingAddress.class);
+            i.putExtra("total",total_);
+            if(getIntent().hasExtra("couponCode"))
+                i.putExtra("couponCode",getIntent().getStringExtra("couponCode"));
+            startActivity(i);
 
         }else{
             Intent i = new Intent(this, Addresses.class);
+            i.putExtra("total",total_);
+            // true to make address picker in the next activity
             i.putExtra("checkoutAddress",true);
+            if(getIntent().hasExtra("couponCode"))
+                i.putExtra("couponCode",getIntent().getStringExtra("couponCode"));
             startActivity(i);
         }
-
-
     }
 }

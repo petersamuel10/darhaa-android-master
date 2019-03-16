@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Controller2 {
 
-    final static String BASE_URL = "http://templates.vavisa-kw.com/darhaa/";
+    final static String BASE_URL = "http://templates.vavisa-kw.com/darhaa_new/";
     final static String API_TOKEN = "16aac5b8216f1134770e665a8d";
     final static String CONTENT_TYPE = "application/x-www-form-urlencoded";
     final static String USER_ACCESS_TOKEN = Common.current_user.getUserAccessToken();

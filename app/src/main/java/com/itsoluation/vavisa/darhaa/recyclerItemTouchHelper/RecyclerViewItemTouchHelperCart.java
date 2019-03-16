@@ -27,7 +27,6 @@ public class RecyclerViewItemTouchHelperCart extends ItemTouchHelper.SimpleCallb
 
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-
         if(listenerCart != null)
             listenerCart.onSwiped(viewHolder,direction,viewHolder.getAdapterPosition());
 

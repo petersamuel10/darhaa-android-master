@@ -60,11 +60,10 @@ public class Orders extends AppCompatActivity {
             back_arrow.setRotation(180);
         }
 
-        Log.i("access",Common.current_user.getUserAccessToken());
-      //  setupRecyclerView();
+
+        setupRecyclerView();
         if(Common.isConnectToTheInternet(Orders.this))
-            ;
-          //  requestData();
+            requestData();
         else
             Common.errorConnectionMess(Orders.this);
     }
@@ -73,8 +72,6 @@ public class Orders extends AppCompatActivity {
 
         orders_rec.setHasFixedSize(true);
         orders_rec.setLayoutManager(new LinearLayoutManager(Orders.this));
-        adapter = new OrdersAdapter();
-        orders_rec.setAdapter(adapter);
 
     }
 
@@ -92,13 +89,13 @@ public class Orders extends AppCompatActivity {
                                    if(ordersData.getStatus() !=null)
                                        Common.showAlert2(Orders.this,ordersData.getStatus(),ordersData.getMessage());
                                    else{
-
-
+                                       Log.i("nnnn", String.valueOf(ordersData.getOrders().get(0).getName()));
+                                       adapter = new OrdersAdapter(ordersData.getOrders());
+                                       orders_rec.setAdapter(adapter);
                                    }
                                }
                            }));
     }
-
 
     @Override
     public void onBackPressed() {

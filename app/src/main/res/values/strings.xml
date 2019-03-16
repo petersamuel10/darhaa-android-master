@@ -100,7 +100,7 @@
     <string name="note">Note</string>
 
     <string name="appointmentDetails">Appointment Details</string>
-    <string name="company_name">Company Name</string>
+    <string name="company_name">Company name</string>
     <string name="address">Address</string>
     <string name="date">Date</string>
     <string name="time">Time</string>
@@ -158,9 +158,9 @@
     <string name="register_api" translatable="false">http://templates.vavisa-kw.com/darhaa/index.php?route=restapi/register</string>
     <string name="login_api" translatable="false">http://templates.vavisa-kw.com/darhaa/index.php?route=restapi/login</string>
     <string name="home_items_api" translatable="false">http://templates.vavisa-kw.com/darhaa/index.php?route=restapi/home</string>
-    <string name="category_items_api" translatable="false">http://templates.vavisa-kw.com/darhaa/index.php?route=restapi/category</string>
-    <string name="category_products_api" translatable="false">http://templates.vavisa-kw.com/darhaa/index.php?route=restapi/product</string>
-    <string name="product_details_api" translatable="false">http://templates.vavisa-kw.com/darhaa/index.php?route=restapi/product/productdetails</string>
+    <string name="category_items_api" translatable="false">http://templates.vavisa-kw.com/darhaa_new/index.php?route=restapi/category</string>
+    <string name="category_products_api" translatable="false">http://templates.vavisa-kw.com/darhaa_new/index.php?route=restapi/product</string>
+    <string name="product_details_api" translatable="false">http://templates.vavisa-kw.com/darhaa_new/index.php?route=restapi/product/productdetails</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
@@ -168,10 +168,10 @@
     <string name="no_product_details_found" translatable="false">No details found. Please choose another product.</string>
     <string name="price_high_low">Price (High-low)</string>
     <string name="price_low_high">Price (low-High)</string>
-    <string name="country">Country :</string>
-    <string name="area">Area :</string>
-    <string name="postcode">Postcode :</string>
-    <string name="address_description">Address description :</string>
+    <string name="country">"Country "</string>
+    <string name="area">"Area "</string>
+    <string name="postcode">"Postcode "</string>
+    <string name="address_details">"Address details "</string>
     <string name="set_as_default">Set as default</string>
     <string name="select_country_first">Please select country</string>
     <string name="select_area_first">Please select area</string>
@@ -194,4 +194,35 @@
     <string name="you_get_discount">You will get</string>
     <string name="enter_coupon_code">Enter coupon code</string>
     <string name="options">Options:</string>
+    <string name="optional">optional</string>
+    <string name="please_enter_shipping_method">Please enter shipping method :</string>
+    <string name="please_enter_payment_method">"Please enter payment method : "</string>
+    <string name="your_order_completed_successfuly">Your order completed successfuly</string>
+    <string name="payment_Id">"PaymentID : "</string>
+    <string name="result">"Result : "</string>
+    <string name="done">Done</string>
+    <string name="there_is_no_item_in_cart">There is no item in cart!</string>
+    <string name="congratulation">Congratulation</string>
+    <string name="user_name_">User name</string>
+    <string name="adding_billing_address">Adding biiling address</string>
+    <string name="adding_shipping_address">Adding shipping address</string>
+    <string name="use_same_address_for_delivery">Use same address for delivery</string>
+    <string name="paying_now">Paying now</string>
+    <string name="order_info">Order Info</string>
+    <string name="order_id">Order Id :</string>
+    <string name="added_date">Added date :</string>
+    <string name="payment_address">Payment address :</string>
+    <string name="payment_method">Payment method :</string>
+    <string name="shipping_method">Shipping method :</string>
+    <string name="shipping_address">Shipping address :</string>
+    <string name="payment_info">Payment Info</string>
+    <string name="reference_id">Reference Id</string>
+    <string name="payment_id">Payment Id :</string>
+    <string name="transfer_id">Transfer Id</string>
+    <string name="product_info">Product Info</string>
+    <string name="item">Item</string>
+    <string name="history">History</string>
+    <string name="totals">Totals</string>
+    <string name="flate_shipping_rate" translatable="false">Flate shipping rate</string>
+    <string name="products">Products</string>
 </resources>

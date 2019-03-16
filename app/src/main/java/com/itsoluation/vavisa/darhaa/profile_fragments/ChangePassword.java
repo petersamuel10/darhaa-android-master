@@ -5,10 +5,13 @@ import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.gson.JsonElement;
 import com.itsoluation.vavisa.darhaa.Login;
 import com.itsoluation.vavisa.darhaa.Product;
 import com.itsoluation.vavisa.darhaa.R;
@@ -35,10 +38,17 @@ public class ChangePassword extends AppCompatActivity {
     EditText newPass;
     @BindView(R.id.confirmPassword)
     EditText conPass;
+    @BindView(R.id.back_arrow)
+    ImageView back_arrow;
 
     @OnClick(R.id.saveBtn_)
     public void changePass(){
         changePassword();
+    }
+
+    @OnClick(R.id.back_arrow)
+    public void setBack() {
+        onBackPressed();
     }
 
     String oldPass_st,newPass_st,conPass_st;
@@ -58,13 +68,10 @@ public class ChangePassword extends AppCompatActivity {
 
     }
 
-
     private void changePassword() {
         oldPass_st = oldPass.getText().toString();
         newPass_st = newPass.getText().toString();
         conPass_st = conPass.getText().toString();
-
-        Toast.makeText(this, "///////", Toast.LENGTH_SHORT).show();
 
         if(validation(oldPass_st,newPass_st,conPass_st)){
             if(Common.isConnectToTheInternet(this))
@@ -77,7 +84,7 @@ public class ChangePassword extends AppCompatActivity {
     private void callRegisterApi(String newPass_st, String conPass_st, Integer customer_id, String oldPass_st) {
 
         progressDialog.show();
-        compositeDisposable.add(Common.getAPI().changePassword(newPass_st,conPass_st,customer_id,oldPass_st)
+        compositeDisposable.add(Common.getAPI2().changePassword(newPass_st,conPass_st,customer_id,oldPass_st)
                            .subscribeOn(Schedulers.io())
                            .observeOn(AndroidSchedulers.mainThread())
                            .subscribe(new Consumer<Status>() {
@@ -86,6 +93,9 @@ public class ChangePassword extends AppCompatActivity {
 
                                    progressDialog.dismiss();
                                    Common.showAlert2(ChangePassword.this,status.getStatus(),status.getMessage());
+                                   oldPass.setText("");
+                                   newPass.setText("");
+                                   conPass.setText("");
                                }
                            }));
 
@@ -114,5 +124,11 @@ public class ChangePassword extends AppCompatActivity {
             }
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

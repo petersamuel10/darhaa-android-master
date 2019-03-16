@@ -38,7 +38,6 @@ public class Home extends Fragment {
 
     public ArrayList<Catecory> categories;
 
-
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     ProgressDialog progressDialog;
 
@@ -49,6 +48,7 @@ public class Home extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setCancelable(false);
 
         ButterKnife.bind(this,view);
 
@@ -76,10 +76,10 @@ public class Home extends Fragment {
                                    public void accept(com.itsoluation.vavisa.darhaa.model.home.Home home) throws Exception {
                                        categories = new ArrayList<>();
                                        categories.addAll(home.getCategories());
+                                       //fist Home item
                                        categories.add(0,home.getRecent_category());
-                                       homeAdapter.addCategory(categories);
+                                       homeAdapter.addHomeList(categories);
                                        homeAdapter.notifyDataSetChanged();
-                                   //    Toast.makeText(getContext(), "/RRR/"+categories.size(), Toast.LENGTH_SHORT).show();
                                        progressDialog.dismiss();
 
                                    }
@@ -95,6 +95,7 @@ public class Home extends Fragment {
         home_rec.setHasFixedSize(true);
 
         GridLayoutManager mLayoutManager = new GridLayoutManager(getActivity(), 2, LinearLayoutManager.VERTICAL, false);
+
         mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
@@ -108,6 +109,8 @@ public class Home extends Fragment {
                 }
             }
         });
+
+
 
         home_rec.setLayoutManager(mLayoutManager);
         homeAdapter = new HomeAdapter();

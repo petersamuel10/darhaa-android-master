@@ -3,6 +3,7 @@ package com.itsoluation.vavisa.darhaa.web_service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.itsoluation.vavisa.darhaa.common.Common;
+import com.itsoluation.vavisa.darhaa.profile_fragments.Language;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Controller {
 
-    final static String BASE_URL = "http://templates.vavisa-kw.com/darhaa/";
+    final static String BASE_URL = "http://templates.vavisa-kw.com/darhaa_new/";
     final static String API_TOKEN = "16aac5b8216f1134770e665a8d";
     final static String CONTENT_TYPE = "application/x-www-form-urlencoded";
     static String LANGUAGE  = "en";
@@ -25,6 +26,8 @@ public class Controller {
     public Controller() {
         if(Common.isArabic)
             LANGUAGE = "ar";
+        else
+            LANGUAGE = "en";
 
         OkHttpClient httpClient =new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @Override

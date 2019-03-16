@@ -165,13 +165,17 @@ public class Addresses extends AppCompatActivity implements AddressClicked {
         else if(flag == 1)
             callGetAddressDeAPI(user_id,list.get(position).getAddress_id(),false,true);
 
-        // show address details
         else if (flag == 2) {
+            // choose address for payment order
             if(getIntent().hasExtra("checkoutAddress")){
                 Intent intent = new Intent(this, PaymentMethod.class);
                 intent.putExtra("address_id",address_id);
+                intent.putExtra("total",getIntent().getStringExtra("total"));
+                if(getIntent().hasExtra("couponCode"))
+                    intent.putExtra("couponCode",getIntent().getStringExtra("couponCode"));
                 startActivity(intent);
             }else
+                //show address details
                 callGetAddressDeAPI(user_id, list.get(position).getAddress_id(), true, true);
         }
 

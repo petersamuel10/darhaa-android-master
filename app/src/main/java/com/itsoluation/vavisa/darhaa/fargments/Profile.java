@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -45,6 +46,8 @@ public class Profile extends Fragment implements View.OnClickListener {
 
     @BindView(R.id.view)
     LinearLayout contentView;
+    @BindView(R.id.scrollData)
+    ScrollView scrollView;
     @BindView(R.id.headerLN)
     LinearLayout headerLN;
     @BindView(R.id.addressesLN)
@@ -109,6 +112,9 @@ public class Profile extends Fragment implements View.OnClickListener {
         }
         else
             newView();
+
+        scrollView.setVisibility(View.VISIBLE);
+
         return view;
     }
 
@@ -195,7 +201,6 @@ public class Profile extends Fragment implements View.OnClickListener {
             getActivity().startActivity(new Intent(getContext(), Terms.class));
         }
     }
-
 
     private void logout() {
 

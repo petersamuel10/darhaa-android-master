@@ -58,6 +58,8 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
     RecyclerView cart_rec;
     @BindView(R.id.cartBtn)
     Button cartBtn;
+    @BindView(R.id.no_item)
+    TextView no_item_txt;
 
     HashMap<String,String> changesCarts = new HashMap<>();
 
@@ -90,7 +92,7 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
         onCartListener = this;
         setupRecyclerView();
 
-        user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : null;
+        user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : "0";
         device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
         if (Common.isConnectToTheInternet(this)) {
@@ -111,16 +113,19 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
                     public void accept(CartData cartList) throws Exception {
                         progressDialog.dismiss();
                         if (cartList.getStatus() != null) {
-                            Common.showAlert2(Cart.this, cartList.getStatus(), cartList.getMessage());
-                            cartBtn.setVisibility(View.GONE);
+                           // Common.showAlert2(Cart.this, cartList.getStatus(), cartList.getMessage());
+                            no_item_txt.setVisibility(View.VISIBLE);
                         } else {
                             cartData = cartList;
                             adapter = new CartAdapter(false,cartData.getProducts());
                             adapter.setListener(onCartListener);
                             cart_rec.setAdapter(adapter);
+                            cartBtn.setVisibility(View.VISIBLE);
                         }
                     }
                 }));
+
+
     }
 
     private void setupRecyclerView() {
@@ -188,8 +193,12 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
                 coupon = coupon_ed.getText().toString();
                 if(coupon.equals(""))
                     Common.showAlert2(Cart.this,getResources().getString(R.string.warning),getResources().getString(R.string.enter_coupon_code));
-                else
-                    verifyCoupon(coupon,verify,coupon_ed);
+                else {
+                    if (Common.isConnectToTheInternet(this))
+                        verifyCoupon(coupon, verify, coupon_ed);
+                     else
+                        Common.errorConnectionMess(this);
+                }
             }
 
         } catch (Exception e) {
@@ -234,9 +243,11 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
 
     //delete cart
     @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int listSize) {
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction,int position) {
 
         compositeDisposable = new CompositeDisposable();
+
+        if (Common.isConnectToTheInternet(this)) {
 
         String cart_id = String.valueOf(cartData.getProducts().get(viewHolder.getAdapterPosition()).getCart_id());
 
@@ -251,8 +262,15 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
                             if (status.getStatus().equals("error"))
                                 Common.showAlert2(Cart.this, status.getStatus(), status.getMessage());
                             else {
+
                                 Snackbar snackbar = Snackbar.make(rootLayout, status.getMessage(), Snackbar.LENGTH_LONG);
                                 snackbar.show();
+
+                                if(adapter.getItemCount() == 1) {
+                                    cart_rec.setVisibility(View.GONE);
+                                    cartBtn.setVisibility(View.GONE);
+                                    no_item_txt.setVisibility(View.VISIBLE);
+                                }
                             }
                         }
                     }));
@@ -260,14 +278,15 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
             adapter.removeCart(viewHolder.getAdapterPosition());
             adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
 
-            if(viewHolder.getAdapterPosition()==0)
-                cartBtn.setVisibility(View.GONE);
-        }
+        } } else
+            Common.errorConnectionMess(this);
+
     }
 
     @OnClick(R.id.cartBtn)
     public void checkout(){
 
+        // check if there is any changes of product quantity
         if(!changesCarts.isEmpty()){
             EditCart editCart = new EditCart();
             editCart.setUser_id(user_id);
@@ -283,7 +302,6 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
 
             callAPIToEditCart(editCart);
         }else {
-
             Intent i = new Intent(Cart.this, Checkout.class);
             if(!coupon_code.equals(""))
                 i.putExtra("couponCode",coupon_code);

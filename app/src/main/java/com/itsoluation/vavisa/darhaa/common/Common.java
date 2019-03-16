@@ -95,7 +95,6 @@ public class Common {
 
     public static ApiInterface getAPI2(){ return new  Controller2().getAPI();}
 
-
     public static void errorConnectionMess(Context context){
 
         AlertDialog.Builder error = new AlertDialog.Builder(context);

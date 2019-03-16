@@ -253,30 +253,16 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
             else
                 default_ = null;
 
-            if(save.getText().equals(R.string.save)) {
+            if(save.getText().equals(getResources().getString(R.string.save))) {
                 compositeDisposable.add(Common.getAPI2().addAddress(userId, first_name, address_desc, city_name, country_id, postcode, zone_id, title, default_)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Consumer<Status>() {
                             @Override
                             public void accept(Status status) throws Exception {
-                                AlertDialog.Builder builder1 = new AlertDialog.Builder(AddAddress.this);
-                                builder1.setMessage(status.getMessage());
-                                builder1.setTitle(status.getStatus());
-                                builder1.setCancelable(false);
-                                builder1.setPositiveButton(
-                                        R.string.ok,
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                dialog.cancel();
-                                            }
-                                        });
-
-                                AlertDialog alert11 = builder1.create();
-                                alert11.show();
+                               Common.showAlert2(AddAddress.this,status.getStatus(),status.getMessage());
                             }
                         }));
-
 
                 title_ed.setText("");
                 postcode_ed.setText("");
@@ -285,7 +271,6 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
                 country_spinner.setSelection(0);
             }else
             {
-                Log.i("aaaasss","eeeeeee");
                 compositeDisposable.add(Common.getAPI2().editAddress(userId,Common.address_id, first_name, address_desc, city_name, country_id, postcode, zone_id, title, default_)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -343,7 +328,6 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
             return false;
         } else if (TextUtils.isEmpty(postcode_)) {
             postcode = null;
-            return false;
         }
 
         return true;
@@ -357,6 +341,5 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
 }

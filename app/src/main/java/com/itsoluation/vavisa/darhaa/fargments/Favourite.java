@@ -25,7 +25,7 @@ import com.itsoluation.vavisa.darhaa.adapter.FavoritesAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.model.favorite.Products;
-import com.itsoluation.vavisa.darhaa.recyclerItemTouchHelper.RecyclerItemTouchHelper;
+import com.itsoluation.vavisa.darhaa.recyclerItemTouchHelper.RecyclerItemTouchHelperFavorite;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.paperdb.Paper;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
@@ -99,21 +98,7 @@ public class Favourite extends Fragment implements RecyclerItemTouchHelperListne
 
                                     if (result.contains("error")) {
                                         JSONObject object = new JSONObject(result);
-                                        AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
-                                        builder1.setMessage(object.getString("message"));
-                                        builder1.setTitle(object.getString("status"));
-                                        builder1.setCancelable(true);
-                                        builder1.setPositiveButton(
-                                                R.string.ok,
-                                                new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int id) {
-                                                        dialog.cancel();
-                                                    }
-                                                });
-
-                                        AlertDialog alert11 = builder1.create();
-                                        alert11.show();
-
+                                        Common.showAlert2(getContext(),object.getString("status"),object.getString("message"));
                                     } else {
                                         JSONArray jArray = new JSONArray(result);
                                         favList = new ArrayList<>();
@@ -150,7 +135,7 @@ public class Favourite extends Fragment implements RecyclerItemTouchHelperListne
         adapter = new FavoritesAdapter();
         fav_rec.setAdapter(adapter);
 
-        ItemTouchHelper.SimpleCallback itemTouchHelperCallBack = new RecyclerItemTouchHelper(0, ItemTouchHelper.START, this);
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallBack = new RecyclerItemTouchHelperFavorite(0, ItemTouchHelper.START, this);
 
         new ItemTouchHelper(itemTouchHelperCallBack).attachToRecyclerView(fav_rec);
     }

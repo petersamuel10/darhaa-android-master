@@ -21,16 +21,14 @@ public class Orders {
     @Expose
     private String date_added;
 
+    @SerializedName("products")
+    @Expose
+    private String products;
 
-    public Orders() {
-    }
+    @SerializedName("total")
+    @Expose
+    private String total;
 
-    public Orders(String order_id, String name, String status, String date_added) {
-        this.order_id = order_id;
-        this.name = name;
-        this.status = status;
-        this.date_added = date_added;
-    }
 
     public String getOrder_id() {
         return order_id;
@@ -62,5 +60,21 @@ public class Orders {
 
     public void setDate_added(String date_added) {
         this.date_added = date_added;
+    }
+
+    public String getProducts() {
+        return products;
+    }
+
+    public void setProducts(String products) {
+        this.products = products;
+    }
+
+    public String getTotal() {
+        return total;
+    }
+
+    public void setTotal(String total) {
+        this.total = total;
     }
 }

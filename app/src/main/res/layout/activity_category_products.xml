@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <RelativeLayout
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -25,22 +25,28 @@
                 android:id="@+id/back_arrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_alignParentStart="true"
-                android:scaleType="fitXY"
                 android:adjustViewBounds="true"
-                android:src="@drawable/ic_arrow" />
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_arrow"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:id="@+id/toolBarTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
                 android:textColor="@android:color/white"
-                android:layout_centerInParent="true"
-                android:text="@string/tops"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:textSize="20sp"/>
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/back_arrow"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </RelativeLayout>
+        </android.support.constraint.ConstraintLayout>
 
     </android.support.v7.widget.Toolbar>
 
@@ -53,37 +59,37 @@
         android:weightSum="2">
 
         <Button
-            android:id="@+id/sortBtn"
+            android:id="@+id/filterBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="22dp"
-            android:text="@string/sort"
-            android:background="@color/brownLight"
+            android:padding="16dp"
+            android:text="@string/filter"
+            android:background="@android:color/white"
             android:textColor="@android:color/black"
+            android:drawableStart="@drawable/ic_filter"
+            android:drawablePadding="2dp"
             android:textAlignment="center"
             android:textAllCaps="false"
             android:textSize="16sp"/>
 
         <Button
-            android:id="@+id/filterBtn"
+            android:id="@+id/sortBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="18dp"
-            android:text="@string/filter"
-            android:background="@drawable/border_brown"
+            android:padding="16dp"
+            android:text="@string/sort"
+            android:drawableStart="@drawable/ic_sort"
+            android:background="@android:color/white"
             android:textColor="@android:color/black"
-            android:drawableStart="@drawable/ic_swap"
-            android:drawableEnd="@drawable/ic_arrow_down"
             android:textAlignment="center"
             android:textAllCaps="false"
             android:textSize="16sp"/>
 
     </LinearLayout>
 
-
-        <android.support.v4.widget.SwipeRefreshLayout
+   <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/sl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -100,7 +106,6 @@
             android:clipToPadding="false"/>
 
         </android.support.v4.widget.SwipeRefreshLayout>
-
 
     <ImageView
         android:layout_width="match_parent"

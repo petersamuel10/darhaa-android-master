@@ -213,7 +213,7 @@ public class Category extends Fragment {
 
                     // set up the RecyclerView
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    adapter = new CategoryAdapter(getContext(), category_ids_array, category_images_array, category_names_array, category_isSub_array, category_isProds_array);
+                    adapter = new CategoryAdapter(category_ids_array, category_images_array, category_names_array, category_isSub_array, category_isProds_array);
 //                    adapter.setClickListener(this); // to allow on click events
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                     recyclerView.setAdapter(adapter);

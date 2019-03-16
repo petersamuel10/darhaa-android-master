@@ -23,6 +23,7 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,6 +68,8 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
     @BindView(R.id.rootLayout)
     RelativeLayout rootLayout;
+    @BindView(R.id.scrollData)
+    ScrollView scrollView;
     @BindView(R.id.back_arrow)
     ImageView back_arrow;
     @BindView(R.id.ic_fav)
@@ -189,7 +192,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 }else
                 {
                     Toast.makeText(this, getResources().getString(R.string.warning)+" : "+
-                            getResources().getString(R.string.please_enter) +" "+ value.get(1),
+                                    getResources().getString(R.string.please_enter) +" "+ value.get(1),
                             Toast.LENGTH_SHORT).show();
                     return false;
                 }
@@ -251,33 +254,33 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-       switch (v.getId()){
-           case R.id.ic_share:
-               share();
-               break;
-           case R.id.ic_add:
-               amount++;
-               totalPrice +=price;
-               item_price.setText(String.format(Locale.US, "%.3f", totalPrice));
-               item_amount.setText(String.valueOf(amount));
-               break;
-           case R.id.ic_remove:
-               if(amount == Integer.parseInt(minimum)) {
-                   Common.showAlert(this, R.string.warning, R.string.minimum_number);
-               }else {
-                   amount--;
-                   totalPrice -=price;
-                   item_price.setText(String.format(Locale.US, "%.3f", totalPrice));
-                   item_amount.setText(String.valueOf(amount));
-               }
-               break;
-           case R.id.ic_fav:
-               if(user_id !=null)
-                   setFavorite();
-               else
-                   startActivity(new Intent(this,Login.class));
-               break;
-       }
+        switch (v.getId()){
+            case R.id.ic_share:
+                share();
+                break;
+            case R.id.ic_add:
+                amount++;
+                totalPrice +=price;
+                item_price.setText(String.format(Locale.US, "%.3f", totalPrice));
+                item_amount.setText(String.valueOf(amount));
+                break;
+            case R.id.ic_remove:
+                if(amount == Integer.parseInt(minimum)) {
+                    Common.showAlert(this, R.string.warning, R.string.minimum_number);
+                }else {
+                    amount--;
+                    totalPrice -=price;
+                    item_price.setText(String.format(Locale.US, "%.3f", totalPrice));
+                    item_amount.setText(String.valueOf(amount));
+                }
+                break;
+            case R.id.ic_fav:
+                if(user_id !=null)
+                    setFavorite();
+                else
+                    startActivity(new Intent(this,Login.class));
+                break;
+        }
 
     }
 
@@ -289,20 +292,20 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
     }
     private void addFav() {
         compositeDisposable.add(Common.getAPI().addFavorte(product_id,user_id)
-                           .subscribeOn(Schedulers.io())
-                           .observeOn(AndroidSchedulers.mainThread())
-                           .subscribe(new Consumer<Status>() {
-                               @Override
-                               public void accept(Status status) throws Exception {
-                                   if(status.getStatus().equals("error")){
-                                       Common.showAlert2(Product.this,status.getStatus(),status.getMessage());
-                                   }else {
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Status>() {
+                    @Override
+                    public void accept(Status status) throws Exception {
+                        if(status.getStatus().equals("error")){
+                            Common.showAlert2(Product.this,status.getStatus(),status.getMessage());
+                        }else {
 
-                                       ic_fav.setImageResource(R.drawable.ic_fav);
-                                       wishList = true;
-                                   }
-                               }
-                           }));
+                            ic_fav.setImageResource(R.drawable.ic_fav);
+                            wishList = true;
+                        }
+                    }
+                }));
 
     }
     private void removeFav() {
@@ -397,6 +400,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
             if (dialog != null && dialog.isShowing())
                 dialog.dismiss();
 
+
             Log.d("ststst", "result: " + result);
 
             JSONObject firstJsonObject = null;
@@ -407,6 +411,9 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
             }
 
             try {
+
+                scrollView.setVisibility(View.VISIBLE);
+
                 String product_id = firstJsonObject.getString("product_id");
                 String manufacturer = firstJsonObject.getString("manufacturer");
                 String description = firstJsonObject.getString("description");
@@ -503,7 +510,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                             createCheck(option_name,option_options,true,option_required,option_id);
 
                     }
-               } catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -690,35 +697,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
                 related_rec.setAdapter(adapter);
 
-                    /*
-                    if (related_product_ids != null) {
-                        Log.d("ststst", "1");
-                        for (int m = 0; m < related_product_ids.size(); m++) {
-                            ViewPagerModel viewPagerModel = new ViewPagerModel();
 
-                            viewPagerModel.images = related_images.get(m);
-                            viewPagerModel.names = related_names.get(m);
-                            viewPagerModel.prices = related_prices.get(m);
-                            viewPagerModel.ids = related_product_ids.get(m);
-
-                            mViewpager.setOffscreenPageLimit(0); // Lazy loading (does not show until it is scrolled into view)
-                            mViewpager.setAdapter(mAdapter);
-
-                            if (!is_arabic) {
-                                mViewpager.setPadding(0, 0, 290, 0);
-                            } else {
-                                mViewpager.setPadding(290, 0, 0, 0);
-                            }
-
-                            mViewpager.setPageMargin(54);
-                            mContents.add(viewPagerModel);
-
-                            if (mViewpager.getParent() != null)
-                                ((ViewGroup) mViewpager.getParent()).removeView(mViewpager);
-                        }
-                        mViewpager.setAdapter(new ViewPagerAdapter(mContents, Product.this));
-                    }
-                    */
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -733,7 +712,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
             note.setBackground(getResources().getDrawable(R.drawable.border_blue));
             note.setGravity(Gravity.CENTER_HORIZONTAL);
             note.setPadding(4,30,4,30);
-           // note.setLayoutParams(linear);
+            // note.setLayoutParams(linear);
             note.setHint(option_name);
             note.setTextSize(20);
             note.setLayoutParams(linear);

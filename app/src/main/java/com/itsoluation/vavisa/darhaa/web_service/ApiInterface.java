@@ -13,6 +13,9 @@ import com.itsoluation.vavisa.darhaa.model.address.address.AddressGet;
 import com.itsoluation.vavisa.darhaa.model.address.address.Countries;
 import com.itsoluation.vavisa.darhaa.model.address.address.areaAndCity.AreaAndCities;
 import com.itsoluation.vavisa.darhaa.model.orders.OrdersData;
+import com.itsoluation.vavisa.darhaa.model.paymentData.CheckoutPageParameters;
+import com.itsoluation.vavisa.darhaa.model.paymentData.CheckoutProductPage;
+import com.itsoluation.vavisa.darhaa.model.paymentData.UserSendData;
 
 import java.util.ArrayList;
 
@@ -46,6 +49,8 @@ public interface ApiInterface {
     @GET("index.php?route=restapi/home")
     Observable<Home> home();
 
+    @GET("index.php?route=restapi/category")
+    Observable<JsonElement> getSubCat(@Query("category_id") String category_id);
 
     @GET("index.php?route=restapi/profile/getProfile")
     Observable<ProfileData> getProfile(@Query("user_id") Integer user_id);
@@ -95,6 +100,9 @@ public interface ApiInterface {
     @GET("index.php?route=restapi/order")
     Observable<OrdersData> getOrders(@Query("user_id") String user_id);
 
+    @GET("index.php?route=restapi/order/orderInfo")
+    Observable<JsonElement> getOrderDetails(@Query("user_id") String user_id,@Query("order_id") String order_id);
+
     @FormUrlEncoded
     @POST("index.php?route=restapi/product/addToWishlist")
     Observable<Status> addFavorte(@Field("product_id") String product_id, @Field("user_id") String user_id);
@@ -128,5 +136,15 @@ public interface ApiInterface {
 
     @GET("index.php?route=restapi/information")
     Observable<JsonElement> getInformation(@Query("information_id") Integer information_id);
+
+    @POST("index.php?route=restapi/checkout/paymentMethod")
+    Observable<JsonElement> paymentMethod(@Body UserSendData data);
+
+    @POST("index.php?route=restapi/checkout/shippingMethod")
+    Observable<JsonElement> shippingMethod(@Body UserSendData data);
+
+    @POST("index.php?route=restapi/checkout/confirm")
+    Observable<CheckoutProductPage> checkoutProductPage(@Body CheckoutPageParameters data);
+
 
 }

@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/colorAccent</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -29,6 +30,7 @@
         <item name="colorPrimary">@color/colorPrimaryDark</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorPrimaryDark</item>
+        <item name="colorControlNormal">@color/colorAccent</item>
     </style>
 
     <!-- for profile activities -->
@@ -45,9 +47,11 @@
 
     <!-- style for size and color of items of navigation drawer -->
     <style name="NavigationDrawerStyle">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:listDivider">@color/blueLight</item>
         <item name="android:layout_margin">2dp</item>
+        <item name="colorControlHighlight">@android:color/transparent</item>
+
     </style>
 
 </resources>

@@ -1,5 +1,7 @@
 package com.itsoluation.vavisa.darhaa.model.cartData;
 
+import android.support.annotation.Nullable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -50,7 +52,18 @@ public class Product {
     @SerializedName("total_quantity")
     @Expose
     private String total_quantity;
+/*
+    @Nullable
+    @SerializedName("product_id")
+    @Expose
+    private String product_id;
 
+    @Nullable
+    @SerializedName("subtract")
+    @Expose
+    private Integer subtract;
+
+*/
     public String getCart_id() {
         return cart_id;
     }
@@ -138,4 +151,22 @@ public class Product {
     public void setTotal_quantity(String total_quantity) {
         this.total_quantity = total_quantity;
     }
+
+    /*
+    public String getProduct_id() {
+        return product_id;
+    }
+
+    public void setProduct_id(String product_id) {
+        this.product_id = product_id;
+    }
+
+    public Integer getSubtract() {
+        return subtract;
+    }
+
+    public void setSubtract(Integer subtract) {
+        this.subtract = subtract;
+    }
+    */
 }

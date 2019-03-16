@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Dar Haa</string>
     <string name="home">الرئيسية</string>
@@ -142,10 +141,10 @@
     <string name="price_high_low">السعر (عالى - منخفض)</string>
     <string name="price_low_high">السعر (منخفض - عالى)</string>
     <string name="login_no_match">من فضلك تاكد من بريدك الالكترونى وكلمة المرور</string>
-    <string name="country">الدولة:</string>
-    <string name="area">المنطقة :</string>
-    <string name="postcode">رقم البريد :</string>
-    <string name="address_description">تفاصيل العنوان :</string>
+    <string name="country">الدولة</string>
+    <string name="area">"المنطقة "</string>
+    <string name="postcode">"رقم البريد "</string>
+    <string name="address_details">"تفاصيل العنوان "</string>
     <string name="set_as_default">اختياره كعنوان افتراضى</string>
     <string name="select_country_first">قم باختيار الدولة اولا</string>
     <string name="select_area_first">قم باختيار المنطقة اولا</string>
@@ -166,4 +165,35 @@
     <string name="you_get_discount">"سوف تحصل على "</string>
     <string name="enter_coupon_code">ادخل كود الكوبون</string>
     <string name="options">"الاضافات: "</string>
+	 <string name="optional">أختياري</string>
+    <string name="please_enter_shipping_method">الرجاء اختيار طريقه التوصيل :</string>
+    <string name="please_enter_payment_method">الرجاء اختيار طريقه الدفع :</string>
+    <string name="your_order_completed_successfuly">تم طلبك بنجاح</string>
+    <string name="result">"النتيجة : "</string>
+    <string name="payment_Id">"كود الدفع : "</string>
+    <string name="done">تم</string>
+    <string name="there_is_no_item_in_cart">لا توجد عناصر!</string>
+    <string name="congratulation">تهنئة</string>
+    <string name="user_name_">اسم العميل</string>
+    <string name="adding_billing_address">اضف عنوان للدفع</string>
+    <string name="adding_shipping_address">اضف عنوان التوصيل</string>
+    <string name="use_same_address_for_delivery">استخدام نفس العنوان للتوصيل</string>
+    <string name="paying_now">ادفع الان</string>
+    <string name="order_info">بيانات الطلب</string>
+    <string name="order_id">"كود الطلب : "</string>
+    <string name="payment_method">"طريقة الدفع : "</string>
+    <string name="payment_address">"عنوان الدفع : "</string>
+    <string name="added_date">"تاريخ الطلب : "</string>
+    <string name="shipping_method">"طريقة الشحن : "</string>
+    <string name="shipping_address">"عنوان الشحن : "</string>
+    <string name="payment_info">بيانات الدفع</string>
+    <string name="reference_id">"رقم المرجع : "</string>
+    <string name="payment_id">"رقم الدفع : "</string>
+    <string name="transfer_id">"رقم التحويل : "</string>
+    <string name="product_info">بيانات المنتجات</string>
+    <string name="item">عنصر</string>
+    <string name="history">التفاصيل السابقة</string>
+    <string name="totals">"تفاصيل الدفع "</string>
+    <string name="products">منتجات</string>
+
 </resources>

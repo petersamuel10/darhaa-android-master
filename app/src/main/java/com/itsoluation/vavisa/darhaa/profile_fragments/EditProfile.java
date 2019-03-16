@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ImageView;
 
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.Common;
@@ -20,6 +21,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class EditProfile extends AppCompatActivity {
 
+    @BindView(R.id.back_arrow)
+    ImageView back_arrow;
     @BindView(R.id.edName)
     MaterialEditText name_ed;
     @BindView(R.id.edEmail)
@@ -30,12 +33,16 @@ public class EditProfile extends AppCompatActivity {
     String name_str,email_str,phone_str;
     CompositeDisposable compositeDisposable = new CompositeDisposable();
 
+    public void setBack() {onBackPressed(); }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_edit_profile);
 
         ButterKnife.bind(this);
+
+        if (Common.isArabic) {back_arrow.setRotation(180);}
 
         name_ed.setText(Common.current_user.getCustomerInfo().getFirstname());
         email_ed.setText(Common.current_user.getCustomerInfo().getEmail());
@@ -111,5 +118,9 @@ public class EditProfile extends AppCompatActivity {
                 return true;
     }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

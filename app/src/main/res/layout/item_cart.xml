@@ -59,7 +59,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp"
-                    android:ellipsize="none"
+                    android:ellipsize="end"
+                    android:maxLines= "2"
                     android:text="white cotton shirt"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
@@ -76,7 +77,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:ellipsize="none"
-                    android:text="8 KD"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
 

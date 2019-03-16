@@ -9,8 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.itsoluation.vavisa.darhaa.adapter.CategoryProductAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
@@ -44,6 +46,8 @@ public class CategoryProducts extends AppCompatActivity {
     ImageView back_arrow;
     @BindView(R.id.sl)
     SwipeRefreshLayout sl;
+    @BindView(R.id.toolBarTitle)
+    TextView title;
 
     public static String filter_type, filter_value, category_price_min_value, category_price_max_value, sort_type;
 
@@ -78,6 +82,8 @@ public class CategoryProducts extends AppCompatActivity {
             back_arrow.setRotation(180);
         }
 
+        title.setText(Html.fromHtml(CurrentCategoryDetails.category_name).toString());
+
         product_ids = new ArrayList<>();
         thumbs = new ArrayList<>();
         names = new ArrayList<>();
@@ -89,16 +95,18 @@ public class CategoryProducts extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.rvNumbers);
         setUpSwipeRefreshLayout();
+
+        if(Common.isConnectToTheInternet(CategoryProducts.this))
+            new GetCategoryProductsBackgroundTask(CategoryProducts.this).execute();
+        else
+            Common.errorConnectionMess(CategoryProducts.this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        if(Common.isConnectToTheInternet(CategoryProducts.this))
-            new GetCategoryProductsBackgroundTask(CategoryProducts.this).execute();
-        else
-            Common.errorConnectionMess(CategoryProducts.this);
+
     }
 
     private void setUpSwipeRefreshLayout() {
@@ -271,6 +279,7 @@ public class CategoryProducts extends AppCompatActivity {
 
     /** Filter Category Items **/
     private class FilterCategoryProductsBackgroundTask extends AsyncTask<String, Void, String> {
+
         public ProgressDialog dialog;
         Boolean is_arabic = Common.isArabic;
 

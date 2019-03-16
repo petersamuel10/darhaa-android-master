@@ -7,17 +7,44 @@
     android:background="@drawable/background2"
     tools:context=".profile_fragments.EditProfile">
 
-    <ImageView
-        android:id="@+id/header"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:scaleType="fitXY"
-        android:adjustViewBounds="true"
-        android:src="@drawable/header" />
+        android:background="@color/colorPrimary"
+        android:padding="4dp"
+        android:gravity="top"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/back_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_margin="5dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_arrow" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:layout_centerInParent="true"
+                android:text="@string/edit_porfile"
+                android:textStyle="bold"
+                android:textSize="20sp"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.Toolbar>
 
     <ScrollView
-        android:layout_below="@+id/header"
+        android:layout_below="@+id/toolBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -28,6 +55,7 @@
             <ImageView
                 android:layout_width="150dp"
                 android:layout_height="150dp"
+                android:layout_marginTop="20dp"
                 android:layout_gravity="center_horizontal"
                 android:scaleType="fitXY"
                 android:adjustViewBounds="true"

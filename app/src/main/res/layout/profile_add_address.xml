@@ -188,7 +188,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    android:text="@string/address_description"
+                    android:text="@string/address_details"
                     android:textColor="@android:color/black"
                     android:textSize="16dp"
                     android:textStyle="bold" />
