@@ -260,7 +260,10 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
                         .subscribe(new Consumer<Status>() {
                             @Override
                             public void accept(Status status) throws Exception {
-                               Common.showAlert2(AddAddress.this,status.getStatus(),status.getMessage());
+                                if(status.getStatus().equals("error"))
+                                    Common.showAlert2(AddAddress.this,status.getStatus(),status.getMessage());
+                                else
+                                    onBackPressed();
                             }
                         }));
 

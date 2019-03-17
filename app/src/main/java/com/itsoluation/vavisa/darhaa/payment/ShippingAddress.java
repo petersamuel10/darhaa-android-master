@@ -251,7 +251,7 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
             return false;
         }
         if (TextUtils.isEmpty(company_name_)) {
-            company_name = null;
+            company_name = "";
         }
 
         if (TextUtils.isEmpty(address_desc)) {
@@ -260,7 +260,7 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
             return false;
         }
         if (TextUtils.isEmpty(postcode_)) {
-            postcode = null;
+            postcode = "";
         }
 
         return true;

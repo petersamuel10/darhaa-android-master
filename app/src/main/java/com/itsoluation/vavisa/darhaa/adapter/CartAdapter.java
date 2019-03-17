@@ -185,4 +185,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         productList.remove(position);
     }
 
+
+
 }

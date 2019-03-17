@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -78,7 +79,17 @@ public class Profile extends Fragment implements View.OnClickListener {
 
     @OnClick(R.id.logoutBtn)
     public void logout_() {
-        logout();
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(R.string.are_you_logout);
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                logout();
+            }
+        });
+        builder.setNegativeButton(R.string.no,null);
+
+        builder.show();
     }
     @OnClick(R.id.editBtn)
     public void editProfile(){getContext().startActivity(new Intent(getContext(), EditProfile.class));}
@@ -217,41 +228,15 @@ public class Profile extends Fragment implements View.OnClickListener {
                     public void accept(Status status) throws Exception {
                         progressDialog.dismiss();
                         if (status.getStatus().equals("error")) {
-                            AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
-                            builder1.setMessage(status.getMessage());
-                            builder1.setTitle(status.getStatus());
-                            builder1.setCancelable(true);
-                            builder1.setPositiveButton(
-                                    R.string.ok,
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            dialog.cancel();
-                                        }
-                                    });
-
-                            AlertDialog alert11 = builder1.create();
-                            alert11.show();
+                            Common.showAlert2(getContext(), status.getStatus(), status.getMessage());
                         } else {
-                            AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
-                            builder1.setMessage(status.getMessage());
-                            builder1.setTitle(status.getStatus());
-                            builder1.setCancelable(true);
-                            builder1.setPositiveButton(
-                                    R.string.ok,
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            dialog.cancel();
-                                        }
-                                    });
 
-                            AlertDialog alert11 = builder1.create();
-                            alert11.show();
-
+                            Snackbar snackbar = Snackbar.make(contentView, getResources().getString(R.string.logout_successfully), Snackbar.LENGTH_LONG);
+                            snackbar.show();
                             Paper.book("DarHaa").delete("currentUser");
                             Common.current_user = null;
                             newView();
                         }
-
                     }
                 }));
     }

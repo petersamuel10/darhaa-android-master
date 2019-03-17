@@ -89,14 +89,38 @@ public class Category extends Fragment {
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
+            public boolean onQueryTextSubmit(String newText) {
 
+               newText = newText.toLowerCase();
+                ArrayList<CategoryData> newList=new ArrayList<>();
+
+                for (CategoryData category : categoryList){
+
+                    String username = category.getName().toLowerCase();
+
+                    if (username.contains(newText)){
+                        newList.add(category);
+                    }
+                }
+                adapter.setFilter(newList);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
 
+                newText = newText.toLowerCase();
+                ArrayList<CategoryData> newList=new ArrayList<>();
+
+                for (CategoryData category : categoryList){
+
+                    String category_name = category.getName().toLowerCase();
+
+                    if (category_name.contains(newText)){
+                        newList.add(category);
+                    }
+                }
+                adapter.setFilter(newList);
                 return true;
             }
         });
@@ -109,6 +133,7 @@ public class Category extends Fragment {
     }
 
     private void setUpSwipeRefreshLayout() {
+
         sl.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
 
         sl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

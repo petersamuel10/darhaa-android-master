@@ -268,7 +268,7 @@ public class BillingAddress extends AppCompatActivity implements AdapterView.OnI
             return false;
         }
         if (TextUtils.isEmpty(company_name_)) {
-           company_name = null;
+           company_name = "";
         }
 
         if (TextUtils.isEmpty(email)) {
@@ -300,7 +300,7 @@ public class BillingAddress extends AppCompatActivity implements AdapterView.OnI
             return false;
         }
         if (TextUtils.isEmpty(postcode_)) {
-            postcode = null;
+            postcode = "";
         }
 
         return true;

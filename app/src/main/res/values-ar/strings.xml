@@ -117,7 +117,7 @@
     <string name="filter">تصنيف</string>
     <string name="price">السعر: </string>
     <string name="tops">الاشهر</string>
-    <string name="add_cart">اضافة الى العربية</string>
+    <string name="add_cart">اضف الى العربة</string>
     <string name="wishList">المفضلة</string>
     <string name="share">مشاركة</string>
     <string name="description">التفاصيل</string>
@@ -195,5 +195,9 @@
     <string name="history">التفاصيل السابقة</string>
     <string name="totals">"تفاصيل الدفع "</string>
     <string name="products">منتجات</string>
+    <string name="are_you_logout">هل تريد تسجيل الخروج ؟</string>
+    <string name="logout_successfully">تم تسجيل خروجك بنجاح</string>
+    <string name="no">لا</string>
+    <string name="model">الموديل :</string>
 
 </resources>

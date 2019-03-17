@@ -1,24 +1,33 @@
 package com.itsoluation.vavisa.darhaa.profile_fragments;
 
 import android.app.ProgressDialog;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.adapter.OrdersAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
+import com.itsoluation.vavisa.darhaa.model.cartData.Options;
 import com.itsoluation.vavisa.darhaa.model.orders.OrdersData;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -73,7 +82,6 @@ public class OrderDetails extends AppCompatActivity {
     @OnClick(R.id.back_arrow)
     public void setBack() {onBackPressed(); }
 
-
     private CompositeDisposable compositeDisposable;
     ProgressDialog progressDialog;
 
@@ -92,8 +100,6 @@ public class OrderDetails extends AppCompatActivity {
         user_id = String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id());
         order_id = getIntent().getStringExtra("order_id");
 
-        Log.i("rrrrr2",user_id);
-        Log.i("rrrrr",order_id);
 
         if (Common.isArabic) { back_arrow.setRotation(180);}
 
@@ -148,22 +154,39 @@ public class OrderDetails extends AppCompatActivity {
             // products info
             JSONArray products_info = object.getJSONArray("products");
             for (int i = 0; i < products_info.length(); i++) {
+
                 JSONObject product_info = products_info.getJSONObject(i);
+
                 TextView name = createText(product_info.getString("name"));
-                TextView model = createText(product_info.getString("model"));
-                TextView quantity = createText(product_info.getString("quantity")+" "+getResources().getString(R.string.items));
-                TextView sku = createText(product_info.getString("sku"));
-               // TextView options = createText(product_info.getString("option"));
-                TextView price = createText(product_info.getString("price"));
+                name.setTypeface(name.getTypeface(), Typeface.BOLD);
+                TextView model = createText(getResources().getString(R.string.model)+product_info.getString("model"));
+                TextView quantity = createText(getResources().getString(R.string.quantity)+product_info.getString("quantity")+" "+getResources().getString(R.string.items));
+                TextView sku = createText(getResources().getString(R.string.sku)+product_info.getString("sku"));
+                TextView price = createText(getResources().getString(R.string.total)+product_info.getString("price"));
+                ArrayList<Options> options = new Gson().fromJson((product_info.getJSONArray("option")).toString(), new TypeToken<List<Options>>(){}.getType());
 
                 product_Ln.addView(name);
                 product_Ln.addView(model);
-                product_Ln.addView(quantity);
-                if(!sku.getText().equals(""))
+                if(sku.getText().toString().length()>5)
                     product_Ln.addView(sku);
-               // product_Ln.addView(options);
+
+                //to show item options
+                if(options.size()>0){
+                    TextView options_txt = createText("");
+                    options_txt.setText(getResources().getString(R.string.options));
+                    String options_str;
+                    for (Options option:options) {
+                        options_str =  options_txt.getText().toString();
+                        options_txt.setText(options_str+"\n \u25CF"+option.getName()+": "+option.getValue());
+                    }
+                    product_Ln.addView(options_txt);
+                }
+
+                product_Ln.addView(quantity);
                 product_Ln.addView(price);
 
+                if(i<products_info.length()-1)
+                    product_Ln.addView(createView());
             }
 
             // history info
@@ -176,6 +199,9 @@ public class OrderDetails extends AppCompatActivity {
 
                 history_Ln.addView(date);
                 history_Ln.addView(comment);
+
+                if(i<history_info.length()-1)
+                    history_Ln.addView(createView());
             }
 
             // total info
@@ -187,14 +213,11 @@ public class OrderDetails extends AppCompatActivity {
                 total_Ln.addView(title);
             }
 
-
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
     }
-
 
     public TextView createText (String text){
 
@@ -205,6 +228,16 @@ public class OrderDetails extends AppCompatActivity {
 
         return textView;
     }
+
+    public View createView (){
+        View v = new View(this);
+        v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,1));
+        v.setBackgroundColor(getResources().getColor(R.color.grey));
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)v.getLayoutParams();
+        params.setMargins(0, 2, 0, 4);
+        v.setLayoutParams(params);
+        return v;
+    };
 
     @Override
     public void onBackPressed() {

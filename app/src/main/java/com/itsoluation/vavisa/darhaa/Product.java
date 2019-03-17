@@ -27,8 +27,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.itsoluation.vavisa.darhaa.adapter.CategoryProductAdapter;
 import com.itsoluation.vavisa.darhaa.adapter.MainSliderAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
@@ -57,7 +55,6 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
@@ -153,8 +150,9 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                             if(status.getStatus().equals("error"))
                                 Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
                             else {
-                                Snackbar snackbar = Snackbar.make(rootLayout, status.getMessage(), Snackbar.LENGTH_LONG);
-                                snackbar.show();
+                                //Snackbar snackbar = Snackbar.make(rootLayout, status.getMessage(), Snackbar.LENGTH_LONG);
+                                //snackbar.show();
+                                onBackPressed();
                             }
                         }
                     }));
@@ -595,29 +593,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 }
             });
 
-            expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-                @Override
-                public void onGroupExpand(int groupPosition) {
-
-                    Toast.makeText(getApplicationContext(),
-                            expandableListTitle.get(groupPosition) + " List Expanded.",
-                            Toast.LENGTH_SHORT).show();
-
-                }
-            });
-
-            expandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
-
-                @Override
-                public void onGroupCollapse(int groupPosition) {
-                    Toast.makeText(getApplicationContext(),
-                            expandableListTitle.get(groupPosition) + " List Collapsed.",
-                            Toast.LENGTH_SHORT).show();
-
-                }
-            });
-
-
+            /*
             expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v,
@@ -629,7 +605,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                     option.setValue(childListId.get(childPosition));
                     Log.i("nnn1",option.getId());
                     Log.i("nnn2222",option.getValue());
-                    */
+
                     Toast.makeText(
                             getApplicationContext(),
                             expandableListTitle.get(groupPosition)
@@ -641,7 +617,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                     return false;
                 }
             });
-
+            */
         }
 
         private void setRelatedProduct(JSONArray relatedProducts) {

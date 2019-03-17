@@ -66,11 +66,10 @@ public class CategoryProducts extends AppCompatActivity {
     }
     @OnClick(R.id.back_arrow)
     public void setBack(){onBackPressed();}
-
-//    @OnClick(R.id.item)
-//    public void ff(){
-//        startActivity(new Intent(this, Product.class));
-//    }
+    @OnClick(R.id.ic_cart)
+    public void cart(){
+        startActivity(new Intent(this, Cart.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

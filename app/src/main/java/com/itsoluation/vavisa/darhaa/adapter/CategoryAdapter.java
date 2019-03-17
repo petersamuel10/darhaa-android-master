@@ -25,24 +25,10 @@ import java.util.ArrayList;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
 
-    private String[] category_ids, category_images, category_names, isSubs, isProds;
-    private ArrayList<CategoryData> categoryList = new ArrayList<>();
+
+    private ArrayList<CategoryData> categoryList;
     Context context;
 
-
-/*
-    // data is passed into the constructor
-    public CategoryAdapter( String[] ids, String[] images, String[] names, String[] subs, String[] prods) {
-        this.category_ids = ids;
-        this.category_images = images;
-        this.category_names = names;
-        this.isSubs = subs;
-        this.isProds = prods;
-
-        Log.i("nnnn", String.valueOf(names.length));
-    }
-
-*/
     public CategoryAdapter(ArrayList<CategoryData> categoryList) {
         this.categoryList = categoryList;
     }
@@ -112,10 +98,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         }
     }
 
-   /*
-    // convenience method for getting data at click position
-    public String getItem(int id) {
-        return category_names[id];
+    public void setFilter(ArrayList<CategoryData> categoryList_){
+        categoryList = new ArrayList<>();
+        categoryList.addAll(categoryList_);
+        notifyDataSetChanged();
     }
-    */
+
 }

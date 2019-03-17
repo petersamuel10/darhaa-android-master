@@ -225,4 +225,8 @@
     <string name="totals">Totals</string>
     <string name="flate_shipping_rate" translatable="false">Flate shipping rate</string>
     <string name="products">Products</string>
+    <string name="logout_successfully">You have been logged off successfully.</string>
+    <string name="are_you_logout">Are you want to logout?</string>
+    <string name="no">no</string>
+    <string name="model">Model :</string>
 </resources>
