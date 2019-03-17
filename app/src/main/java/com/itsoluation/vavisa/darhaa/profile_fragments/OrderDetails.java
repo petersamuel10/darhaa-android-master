@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -101,8 +102,12 @@ public class OrderDetails extends AppCompatActivity {
         order_id = getIntent().getStringExtra("order_id");
 
 
-        if (Common.isArabic) { back_arrow.setRotation(180);}
-
+        if (Common.isArabic) {
+            getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+            back_arrow.setRotation(180);}
+        else{
+            getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+        }
         callAPI();
     }
 
@@ -225,6 +230,12 @@ public class OrderDetails extends AppCompatActivity {
         textView.setTextSize(14);
         textView.setTextColor(getResources().getColor(R.color.black));
         textView.setText(text);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        params.weight = 1.0f;
+        params.gravity = Gravity.START;
+
+        textView.setLayoutParams(params);
 
         return textView;
     }

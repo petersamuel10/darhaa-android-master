@@ -3,26 +3,21 @@ package com.itsoluation.vavisa.darhaa;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.SearchView;
-import android.text.TextUtils;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.fargments.Category;
@@ -30,14 +25,10 @@ import com.itsoluation.vavisa.darhaa.fargments.ContactSupport;
 import com.itsoluation.vavisa.darhaa.fargments.Favourite;
 import com.itsoluation.vavisa.darhaa.fargments.Home;
 import com.itsoluation.vavisa.darhaa.fargments.Profile;
-import com.itsoluation.vavisa.darhaa.profile_fragments.Orders;
-import com.mancj.materialsearchbar.MaterialSearchBar;
 
 import java.util.Locale;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.paperdb.Paper;
 
 public class MainActivity extends AppCompatActivity
@@ -66,6 +57,7 @@ public class MainActivity extends AppCompatActivity
         //init paper
         Paper.init(this);
 
+        Log.i("axccess",Common.current_user.getUserAccessToken());
         chooseFragment(new Home());
         titleTxt.setText(getResources().getText(R.string.home));
 

@@ -33,6 +33,7 @@ public class EditProfile extends AppCompatActivity {
     String name_str,email_str,phone_str;
     CompositeDisposable compositeDisposable = new CompositeDisposable();
 
+    @OnClick(R.id.back_arrow)
     public void setBack() {onBackPressed(); }
 
     @Override

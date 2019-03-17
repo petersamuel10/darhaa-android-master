@@ -46,6 +46,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class AddAddress extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    @BindView(R.id.toolBarTitle)
+    TextView toolBarTitle;
     @BindView(R.id.address_name)
     EditText title_ed;
     @BindView(R.id.country)
@@ -219,6 +221,7 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
 
     private void setAddressData() {
         if(Common.showAddrDetails){
+            toolBarTitle.setText(currentAddress.getTitle());
             title_ed.setEnabled(false);
             country_spinner.setEnabled(false);
             area_spinner.setEnabled(false);

@@ -69,6 +69,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/order"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
@@ -99,7 +100,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
+            android:gravity="start"
             android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -142,7 +143,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
+            android:gravity="start"
             android:text="@string/payment_address"
             android:textColor="@color/brownLight"
             android:textSize="14sp"
@@ -153,14 +154,14 @@
 
         <TextView
             android:id="@+id/payment_address"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
             android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/order3"
             app:layout_constraintTop_toBottomOf="@+id/added_date"
             app:layout_constraintWidth_percent="0.6" />
@@ -182,7 +183,7 @@
 
         <TextView
             android:id="@+id/payment_method"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:textColor="@color/black"
@@ -211,7 +212,7 @@
 
         <TextView
             android:id="@+id/shipping_address"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
@@ -219,7 +220,7 @@
             android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.47"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/order5"
             app:layout_constraintTop_toBottomOf="@+id/payment_method"
             app:layout_constraintWidth_percent="0.6" />
@@ -243,7 +244,7 @@
 
         <TextView
             android:id="@+id/shipping_method"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:textColor="@color/black"
@@ -394,7 +395,7 @@
 
         <TextView
             android:id="@+id/result"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:textColor="@color/black"

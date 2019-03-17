@@ -50,7 +50,7 @@
 
                 <TextView
                     android:id="@+id/address_name"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:gravity="start"
@@ -60,7 +60,7 @@
 
                 <TextView
                     android:id="@+id/country"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
                     android:layout_marginBottom="8dp"
@@ -70,7 +70,7 @@
 
                 <TextView
                     android:id="@+id/areaAndCity"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:textColor="@color/grey"
@@ -78,7 +78,7 @@
 
                 <TextView
                     android:id="@+id/address_desc"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="start"
                     android:maxLines="4"
