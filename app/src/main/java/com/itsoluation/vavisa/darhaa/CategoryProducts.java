@@ -4,19 +4,23 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.itsoluation.vavisa.darhaa.Interface.RecyclerViewItemClickListener;
 import com.itsoluation.vavisa.darhaa.adapter.CategoryProductAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.common.CurrentCategoryDetails;
+import com.itsoluation.vavisa.darhaa.common.CurrentProductDetails;
+import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.view_setting.Filter;
 import com.itsoluation.vavisa.darhaa.view_setting.Sort;
 
@@ -34,8 +38,12 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
-public class CategoryProducts extends AppCompatActivity {
+public class CategoryProducts extends AppCompatActivity implements RecyclerViewItemClickListener {
 
     CategoryProductAdapter adapter;
     ArrayList<String> product_ids, thumbs, names, prices, specials, minimums;
@@ -49,8 +57,11 @@ public class CategoryProducts extends AppCompatActivity {
     @BindView(R.id.toolBarTitle)
     TextView title;
 
-    public static String filter_type, filter_value, category_price_min_value, category_price_max_value, sort_type;
+    RecyclerViewItemClickListener itemClickListener;
 
+    public static String user_id,filter_type, filter_value, category_price_min_value, category_price_max_value, sort_type;
+
+    private CompositeDisposable compositeDisposable;
     public final static int REQUEST_SORT = 1;
     public final static int REQUEST_FILTER = 2;
 
@@ -81,6 +92,8 @@ public class CategoryProducts extends AppCompatActivity {
             back_arrow.setRotation(180);
         }
 
+        itemClickListener = this;
+        user_id = String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id());
         title.setText(Html.fromHtml(CurrentCategoryDetails.category_name).toString());
 
         product_ids = new ArrayList<>();
@@ -101,13 +114,6 @@ public class CategoryProducts extends AppCompatActivity {
             Common.errorConnectionMess(CategoryProducts.this);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-
-    }
-
     private void setUpSwipeRefreshLayout() {
         sl.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
         sl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -125,6 +131,67 @@ public class CategoryProducts extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onClick(View view, int position, String product_id, String product_name, int flag) {
+
+        if(flag == 0){
+            CurrentProductDetails.product_id = product_id;
+            CurrentProductDetails.product_name = product_name;
+            startActivity(new Intent(this, Product.class));
+        }else if(flag == 1){
+            if(user_id !=null)
+                setFavorite(position,view);
+            else
+                startActivity(new Intent(this,Login.class));
+
+        }
+    }
+
+    private void setFavorite(int position, View view) {
+        if(wishLists.get(position))
+            removeFav(position,view);
+        else
+            addFav(position,view);
+    }
+    private void addFav(final int position, final View view) {
+        compositeDisposable = new CompositeDisposable();
+        compositeDisposable.add(Common.getAPI().addFavorte(product_ids.get(position),user_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Status>() {
+                    @Override
+                    public void accept(Status status) throws Exception {
+                        if(status.getStatus().equals("error")){
+                            Common.showAlert2(CategoryProducts.this,status.getStatus(),status.getMessage());
+                        }else {
+                            ((ImageView)view).setImageResource(R.drawable.ic_fav);
+                            wishLists.remove(position);
+                            wishLists.add(position,true);
+                        }
+                    }
+                }));
+
+    }
+    private void removeFav(final int position, final View view) {
+        compositeDisposable = new CompositeDisposable();
+        compositeDisposable.add(Common.getAPI().removeFavorte(product_ids.get(position),user_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Status>() {
+                    @Override
+                    public void accept(Status status) throws Exception {
+                        if(status.getStatus().equals("error")){
+                            Common.showAlert2(CategoryProducts.this,status.getStatus(),status.getMessage());
+                        }else {
+                            ((ImageView)view).setImageResource(R.drawable.ic_fav_border);
+                            wishLists.remove(position);
+                            wishLists.add(position,false);
+                        }
+                    }
+                }));
+    }
+
 
     /** Get Category Items **/
     private class GetCategoryProductsBackgroundTask extends AsyncTask<String, Void, String> {
@@ -269,6 +336,7 @@ public class CategoryProducts extends AppCompatActivity {
                 recyclerView.scheduleLayoutAnimation();
                 adapter = new CategoryProductAdapter(CategoryProducts.this, product_ids_array, thumbs_array, names_array, prices_array, specials_array,
                         minimums_array, wishLists, stocks,false);
+                adapter.setItemClickListener(itemClickListener);
                 recyclerView.setAdapter(adapter);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -401,6 +469,7 @@ public class CategoryProducts extends AppCompatActivity {
                 recyclerView.setLayoutManager(new GridLayoutManager(CategoryProducts.this, numberOfColumns));
                 adapter = new CategoryProductAdapter(CategoryProducts.this, product_ids_array, thumbs_array, names_array, prices_array, specials_array,
                         minimums_array, wishLists, stocks, false);
+                adapter.setItemClickListener(itemClickListener);
                 recyclerView.setAdapter(adapter);
             } catch (JSONException e) {
                 e.printStackTrace();

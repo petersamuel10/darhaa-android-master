@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -414,7 +415,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
                 String product_id = firstJsonObject.getString("product_id");
                 String manufacturer = firstJsonObject.getString("manufacturer");
-                String description = firstJsonObject.getString("description");
+                String description = Html.fromHtml(firstJsonObject.getString("description")).toString();
                 String name = firstJsonObject.getString("name");
                 String special = firstJsonObject.getString("special");
                 Boolean stock = firstJsonObject.getBoolean("stock");

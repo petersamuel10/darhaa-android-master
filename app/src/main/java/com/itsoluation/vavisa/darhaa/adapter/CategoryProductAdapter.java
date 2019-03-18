@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ public class CategoryProductAdapter extends RecyclerView.Adapter<CategoryProduct
     Context context;
     Boolean isRelated;
     private LayoutInflater mInflater;
+    public RecyclerViewItemClickListener mClickListener;
 
     // data is passed into the constructor
     public CategoryProductAdapter(Context context, String[] ids, String[] thumbs, String[] names, String[] prices, String[] specials,
@@ -77,14 +79,17 @@ public class CategoryProductAdapter extends RecyclerView.Adapter<CategoryProduct
         if(products_wishList.get(position).toString().equals("true"))
             holder.product_wish.setImageResource(R.drawable.ic_fav);
 
+
+        /*
         holder.setItemClickListener(new RecyclerViewItemClickListener() {
             @Override
-            public void onClick(View view, int position) {
+            public void onClick(View view, int position,int products_ids[position]) {
                 CurrentProductDetails.product_id = products_ids[position];
                 CurrentProductDetails.product_name = products_names[position];
                 context.startActivity(new Intent(context, Product.class));
             }
         });
+        */
 
     }
 
@@ -99,7 +104,6 @@ public class CategoryProductAdapter extends RecyclerView.Adapter<CategoryProduct
         TextView product_price, product_name,special_price;
         ImageView product_wish;
         ImageView product_image;
-        private RecyclerViewItemClickListener mClickListener;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -108,22 +112,35 @@ public class CategoryProductAdapter extends RecyclerView.Adapter<CategoryProduct
             special_price = itemView.findViewById(R.id.item_price_special);
             product_name = itemView.findViewById(R.id.item_name);
             product_wish = itemView.findViewById(R.id.ic_wish);
-            itemView.setOnClickListener(this);
-        }
 
-        public void setItemClickListener(RecyclerViewItemClickListener itemClickListener) {
-            this.mClickListener = itemClickListener;
+            itemView.setOnClickListener(this);
+            product_wish.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onClick(view, getAdapterPosition());
+           // Log.i("fdsa","gfugeuif");
+            if(view == itemView){
+                Log.i("bnnnn22","guig");
+                if (mClickListener != null) {
+                    mClickListener.onClick(view, getAdapterPosition(), products_ids[getAdapterPosition()], products_names[getAdapterPosition()], 0);
+                }
+            }else if (view.getId() == R.id.ic_wish) {
+                    Log.i("bnnnn","guig");
+                    if (mClickListener != null)
+                        mClickListener.onClick(view, getAdapterPosition(), products_ids[getAdapterPosition()], null, 1);
+
+                }
         }
     }
 
     // convenience method for getting data at click position
     public String getItem(int id) {
         return products_ids[id];
+    }
+
+    public void setItemClickListener(RecyclerViewItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
     }
 
 }

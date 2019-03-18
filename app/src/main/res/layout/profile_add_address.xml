@@ -75,15 +75,15 @@
 
                 <EditText
                     android:id="@+id/address_name"
-                    android:layout_marginBottom="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
                     android:background="@drawable/border_blue"
+                    android:gravity="center_vertical|start"
+                    android:hint="@string/addressName"
                     android:inputType="text"
                     android:padding="5dp"
-                    android:textColor="@color/black"
-                    android:gravity="center_vertical|start"
-                    android:hint="@string/addressName"/>
+                    android:textColor="@color/black" />
 
 
                 <TextView

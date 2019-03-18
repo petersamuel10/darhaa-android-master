@@ -61,7 +61,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         holder.setmClickListener(new RecyclerViewItemClickListener() {
             @Override
-            public void onClick(View view, int position) {
+            public void onClick(View view, int position, String product_id, String product_name, int flag) {
                 CurrentCategoryDetails.category_id = categories_.get(position).getCategory_id();
                 CurrentCategoryDetails.category_name = categories_.get(position).getName();
 
@@ -115,7 +115,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         @Override
         public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onClick(view, getAdapterPosition());
+            if (mClickListener != null) mClickListener.onClick(view, getAdapterPosition(),null,null,0);
         }
     }
 
@@ -138,7 +138,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         @Override
         public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onClick(view, getAdapterPosition());
+            if (mClickListener != null) mClickListener.onClick(view, getAdapterPosition(),null,null,0);
         }
     }
 

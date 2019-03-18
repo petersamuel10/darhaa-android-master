@@ -56,7 +56,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
         holder.setItemClickListener(new RecyclerViewItemClickListener() {
             @Override
-            public void onClick(View view, int position) {
+            public void onClick(View view, int position, String product_id, String product_name, int flag) {
                 CurrentCategoryDetails.category_name = categoryList.get(position).getName();
                 CurrentCategoryDetails.category_id = categoryList.get(position).getCategory_id();
                 if(categoryList.get(position).getIsSubCat().equals("false"))
@@ -94,7 +94,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
         @Override
         public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onClick(view, getAdapterPosition());
+            if (mClickListener != null) mClickListener.onClick(view, getAdapterPosition(),null,null,0);
         }
     }
 

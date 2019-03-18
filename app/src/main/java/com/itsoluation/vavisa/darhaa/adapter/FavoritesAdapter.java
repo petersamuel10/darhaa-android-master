@@ -48,7 +48,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
 
         holder.setItemClickListener(new RecyclerViewItemClickListener() {
             @Override
-            public void onClick(View view, int position) {
+            public void onClick(View view, int position, String product_id, String product_name, int flag) {
                 CurrentProductDetails.product_id = String.valueOf(favoritesList.get(position).getProduct_id());
                 mContext.startActivity(new Intent(mContext, Product.class));
             }
@@ -82,7 +82,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
         @Override
         public void onClick(View v) {
          if(mClickListener!=null)
-             mClickListener.onClick(v,getAdapterPosition());
+             mClickListener.onClick(v,getAdapterPosition(),null,null,0);
         }
 
         public void setItemClickListener(RecyclerViewItemClickListener itemClickListener) {

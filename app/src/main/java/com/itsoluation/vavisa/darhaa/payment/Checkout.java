@@ -103,13 +103,13 @@ public class Checkout extends AppCompatActivity {
 
                             for (Total total:cartData.getTotals()) {
 
-                                if(total.getTitle().equals("Sub-Total"))
-                                    subTotal_txt.setText(" "+total.getTotal()+" "+getResources().getString(R.string.kd));
-                                else if(total.getTitle().equals("Total")) {
-                                    total_txt.setText(" " + total.getTotal()+" "+getResources().getString(R.string.kd));
+                                if(total.getTitle().equals(getString(R.string.sub_total)))
+                                    subTotal_txt.setText(": "+total.getTotal()+" "+getResources().getString(R.string.kd));
+                                else if(total.getTitle().equals(getString(R.string.total))) {
+                                    total_txt.setText(": " + total.getTotal()+" "+getResources().getString(R.string.kd));
                                     total_ = total.getTotal();
                                 }
-                                else if(total.getTitle().contains("Coupon")){
+                                else if(total.getTitle().contains(getString(R.string.coupon))){
                                     couponLN.setVisibility(View.VISIBLE);
                                     coupon_title_txt.setText(total.getTitle()+": ");
                                     coupon_txt.setText(" "+total.getTotal());
