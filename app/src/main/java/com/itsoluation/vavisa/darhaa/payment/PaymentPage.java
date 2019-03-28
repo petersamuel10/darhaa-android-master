@@ -134,7 +134,19 @@ public class KnetPage extends AppCompatActivity {
                                                 intent.putExtra("date",date);
                                                 intent.putExtra("result",result);
                                                 intent.putExtra("total",total);
+                                                intent.putExtra("status",value);
                                                 startActivity(intent);
+                                                finish();
+
+                                            }else if ("\"0\"".equals(value))
+                                            {Intent intent = new Intent(KnetPage.this, PaymentResult.class);
+                                                intent.putExtra("paymentId",paymentId);
+                                                intent.putExtra("date",date);
+                                                intent.putExtra("result",result);
+                                                intent.putExtra("total",total);
+                                                intent.putExtra("status",value);
+                                                startActivity(intent);
+                                                finish();
 
                                             }
                                         }
@@ -152,4 +164,10 @@ public class KnetPage extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        System.exit(0);
+    }
 }
