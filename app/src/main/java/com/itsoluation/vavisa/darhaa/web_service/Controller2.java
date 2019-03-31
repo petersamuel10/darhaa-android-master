@@ -16,14 +16,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Controller2 {
 
-    final static String BASE_URL = "http://templates.vavisa-kw.com/darhaa_new/";
+    final static String BASE_URL = "http://173.231.196.229/~hvavisa/darhaa/";
     final static String API_TOKEN = "16aac5b8216f1134770e665a8d";
     final static String CONTENT_TYPE = "application/x-www-form-urlencoded";
-    final static String USER_ACCESS_TOKEN = Common.current_user.getUserAccessToken();
+   // static String USER_ACCESS_TOKEN = Common.userAccessToken;
     static String LANGUAGE  = "en";
     private ApiInterface apiInterface;
 
-    public Controller2() {
+    public Controller2(final String userAccess) {
         if(Common.isArabic)
             LANGUAGE = "ar";
 
@@ -34,10 +34,10 @@ public class Controller2 {
                 Request original_request =chain.request();
 
                 Request.Builder builder = original_request.newBuilder()
-                        .addHeader("api_Token",API_TOKEN)
+                        .addHeader("api-token",API_TOKEN)
                         .addHeader("Content-Type",CONTENT_TYPE)
                         .addHeader("language",LANGUAGE)
-                        .addHeader("userAccessToken",USER_ACCESS_TOKEN);
+                        .addHeader("useraccesstoken",userAccess);
 
                 Request newRequest = builder.build();
 

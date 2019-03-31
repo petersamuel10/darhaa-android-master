@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background2"
+    android:background="@drawable/background"
     tools:context=".Register">
 
     <ImageView
@@ -43,16 +43,15 @@
                     android:id="@+id/edName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
                     android:hint="@string/user_name"
                     android:inputType="text"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:drawableStart="@drawable/ic_person"
                     android:drawablePadding="4dp"
                     app:met_baseColor="@color/brownLight"
                     app:met_floatingLabel="highlight"
-                    app:met_maxCharacters="20"
                     app:met_primaryColor="@color/brownHint"
                     app:met_singleLineEllipsis="true" />
 
@@ -60,11 +59,11 @@
                     android:id="@+id/edEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
                     android:hint="@string/email"
                     android:inputType="textEmailAddress"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:drawableStart="@drawable/ic_email"
                     android:drawablePadding="4dp"
                     app:met_baseColor="@color/brownLight"
@@ -76,16 +75,15 @@
                     android:id="@+id/edPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
                     android:hint="@string/phone"
                     android:inputType="phone"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:drawableStart="@drawable/ic_phone"
                     android:drawablePadding="4dp"
                     app:met_baseColor="@color/brownLight"
                     app:met_floatingLabel="highlight"
-                    app:met_maxCharacters="20"
                     app:met_primaryColor="@color/brownHint"
                     app:met_singleLineEllipsis="true" />
 
@@ -93,17 +91,15 @@
                     android:id="@+id/edPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
                     android:hint="@string/password"
                     android:inputType="textPassword"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:drawableStart="@drawable/ic_lock"
                     android:drawablePadding="4dp"
                     app:met_baseColor="@color/brownLight"
                     app:met_floatingLabel="highlight"
-                    app:met_maxCharacters="20"
-                    app:met_minCharacters="6"
                     app:met_primaryColor="@color/brownHint"
                     app:met_singleLineEllipsis="true" />
 
@@ -111,17 +107,15 @@
                     android:id="@+id/edConfirmPass"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
                     android:hint="@string/confirm_password"
                     android:inputType="textPassword"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:drawableStart="@drawable/ic_lock"
                     android:drawablePadding="4dp"
                     app:met_baseColor="@color/brownLight"
                     app:met_floatingLabel="highlight"
-                    app:met_maxCharacters="20"
-                    app:met_minCharacters="6"
                     app:met_primaryColor="@color/brownHint"
                     app:met_singleLineEllipsis="true" />
 
@@ -158,12 +152,5 @@
 
     </ScrollView>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/footer" />
 
 </RelativeLayout>

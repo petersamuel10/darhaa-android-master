@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.gson.JsonElement;
 import com.itsoluation.vavisa.darhaa.Interface.AddressClicked;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.adapter.AddressAdapter;
@@ -19,7 +20,12 @@ import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.model.address.address.AddressDetails;
 import com.itsoluation.vavisa.darhaa.model.address.address.AddressGet;
+import com.itsoluation.vavisa.darhaa.model.favorite.Products;
 import com.itsoluation.vavisa.darhaa.payment.PaymentMethod;
+import com.itsoluation.vavisa.darhaa.web_service.Controller2;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +53,10 @@ public class Addresses extends AppCompatActivity implements AddressClicked {
 
     int pos = 0;
     String user_id;
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    CompositeDisposable compositeDisposable;
     AddressAdapter adapter;
     ProgressDialog progressDialog;
-    List<AddressGet> list = new ArrayList<>();
+    ArrayList<AddressGet> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +64,11 @@ public class Addresses extends AppCompatActivity implements AddressClicked {
         setContentView(R.layout.profile_addresses);
         progressDialog = new ProgressDialog(this);
         ButterKnife.bind(this);
-        user_id = String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id());
-        if(Common.isArabic) {
-            back_arrow.setRotation(180);
+        if (Common.isArabic) {
+            getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+            back_arrow.setRotation(180);}
+        else{
+            getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
         }
     }
 
@@ -68,7 +76,9 @@ public class Addresses extends AppCompatActivity implements AddressClicked {
     public void onStart() {
         super.onStart();
 
-       // list.clear();
+        list = new ArrayList<>();
+        compositeDisposable = new CompositeDisposable();
+        user_id = String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id());
 
         setupRecyclerView();
         if(Common.isConnectToTheInternet(this)){
@@ -76,29 +86,53 @@ public class Addresses extends AppCompatActivity implements AddressClicked {
         } else
             Common.errorConnectionMess(this);
 
-        //  adapter.notifyDataSetChanged();
-
-        // adapter = new AddressAdapter();
-        // requestData();
     }
 
     private void requestData() {
         progressDialog.show();
-        compositeDisposable.add(Common.getAPI2().addressBook(Common.current_user.getCustomerInfo().getCustomer_id())
+try {
+        compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().addressBook(Common.current_user.getCustomerInfo().getCustomer_id())
                            .subscribeOn(Schedulers.io())
                            .observeOn(AndroidSchedulers.mainThread())
-                           .subscribe(new Consumer<ArrayList<AddressGet>>() {
+                           .subscribe(new Consumer<JsonElement>() {
                                @Override
-                               public void accept(ArrayList<AddressGet> addressGets) throws Exception {
+                               public void accept(JsonElement jsonElement) throws Exception {
+
                                    progressDialog.dismiss();
-                                   list.addAll(addressGets);
-                                   adapter.notifyDataSetChanged();
-                                   adapter.addAddress(addressGets);
-                                   Log.i("vvv", String.valueOf(addressGets.size()));
+                                   String result = jsonElement.toString();
+
+                                   if (result.contains("error")) {
+                                           JSONObject object = new JSONObject(result);
+                                           Common.showAlert2(Addresses.this, object.getString("status"), object.getString("message"));
+                                   }else {
+
+                                       JSONArray jArray = new JSONArray(result);
+                                       list = new ArrayList<>();
+                                           for (int i = 0; i < jArray.length(); i++) {
+                                               JSONObject object1 = jArray.getJSONObject(i);
+                                               AddressGet address = new AddressGet();
+                                               address.setAddress_id(object1.getString("address_id"));
+                                               address.setTitle(object1.getString("title"));
+                                               address.setAddress(object1.getString("address"));
+                                               address.setCountry(object1.getString("country"));
+                                               address.setArea(object1.getString("area"));
+                                               address.setCity(object1.getString("city"));
+
+                                               list.add(address);
+                                           }
+                                           adapter.addAddress(list);
+                                           adapter.notifyDataSetChanged();
+
+                                   }
+
                                }
                            }));
 
+    } catch (Exception e) {
+        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
     }
+
+}
 
     private void setupRecyclerView() {
 
@@ -112,7 +146,7 @@ public class Addresses extends AppCompatActivity implements AddressClicked {
     private void callDeleteAddressAPI(String id, String address_id, final int position) {
 
         try {
-            compositeDisposable.add(Common.getAPI2().deleteAddress(id, address_id)
+            compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().deleteAddress(id, address_id)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<Status>() {
@@ -150,7 +184,6 @@ public class Addresses extends AppCompatActivity implements AddressClicked {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
     }
 
     @Override
@@ -158,14 +191,19 @@ public class Addresses extends AppCompatActivity implements AddressClicked {
 
 
         // delete address
-        if(flag == 0)
-            callDeleteAddressAPI(user_id,list.get(position).getAddress_id(),position);
-
+        if(flag == 0) {
+            if(Common.isConnectToTheInternet(this))
+                callDeleteAddressAPI(user_id, list.get(position).getAddress_id(), position);
+            else
+                Common.errorConnectionMess(this);
+        }
         // edit address
-        else if(flag == 1)
-            callGetAddressDeAPI(user_id,list.get(position).getAddress_id(),false,true);
-
-        else if (flag == 2) {
+        else if(flag == 1) {
+            if(Common.isConnectToTheInternet(this))
+                callGetAddressDeAPI(user_id, list.get(position).getAddress_id(), false, true);
+            else
+                Common.errorConnectionMess(this);
+        } else if (flag == 2) {
             // choose address for payment order
             if(getIntent().hasExtra("checkoutAddress")){
                 Intent intent = new Intent(this, PaymentMethod.class);
@@ -174,15 +212,28 @@ public class Addresses extends AppCompatActivity implements AddressClicked {
                 if(getIntent().hasExtra("couponCode"))
                     intent.putExtra("couponCode",getIntent().getStringExtra("couponCode"));
                 startActivity(intent);
-            }else
+            }else {
                 //show address details
-                callGetAddressDeAPI(user_id, list.get(position).getAddress_id(), true, true);
+                if(Common.isConnectToTheInternet(this))
+                    callGetAddressDeAPI(user_id, list.get(position).getAddress_id(), true, false);
+                else
+                    Common.errorConnectionMess(this);
+            }
         }
 
     }
 
     private void callGetAddressDeAPI(String user_id, final String address_id, final boolean showDetails, final boolean isEdit) {
-        compositeDisposable.add(Common.getAPI2().getAddress(user_id, address_id)
+
+        Common.showAddrDetails = showDetails;
+        Common.isEditAddress = isEdit;
+      /*  if(isEdit)
+            Common.currentAddress = addressDetails;*/
+        Intent i = new Intent(Addresses.this,AddAddress.class);
+        i.putExtra("address_id",address_id);
+        startActivity(i);
+
+/*        compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().getAddress(user_id, address_id)
                            .subscribeOn(Schedulers.io())
                            .observeOn(AndroidSchedulers.mainThread())
                            .subscribe(new Consumer<AddressDetails>() {
@@ -195,10 +246,10 @@ public class Addresses extends AppCompatActivity implements AddressClicked {
                                          Common.showAddrDetails = showDetails;
                                          Common.currentAddress = addressDetails;
                                          Common.address_id = address_id;
-                                         startActivity(new Intent(Addresses.this,AddAddress.class));
+
                                    }
                                }
-                           }));
+                           }));*/
     }
 
 }

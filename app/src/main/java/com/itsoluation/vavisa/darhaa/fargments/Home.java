@@ -15,6 +15,7 @@ import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.adapter.HomeAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.home.CategoryData;
+import com.itsoluation.vavisa.darhaa.model.home.HomeData;
 
 import java.util.ArrayList;
 
@@ -63,18 +64,16 @@ public class Home extends Fragment {
         if(Common.isConnectToTheInternet(getActivity())) {
             progressDialog.setMessage(getString(R.string.loading));
             progressDialog.show();
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-           // this.progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-
+            try {
             compositeDisposable.add(Common.getAPI().home()
                                .subscribeOn(Schedulers.io())
                                .observeOn(AndroidSchedulers.mainThread())
-                               .subscribe(new Consumer<com.itsoluation.vavisa.darhaa.model.home.Home>() {
+                               .subscribe(new Consumer<HomeData>() {
                                    @Override
-                                   public void accept(com.itsoluation.vavisa.darhaa.model.home.Home home) throws Exception {
-                                       categories = new ArrayList<>();
+                                   public void accept(HomeData home) throws Exception {
+                                      categories = new ArrayList<>();
                                        categories.addAll(home.getCategories());
-                                       //fist Home item
+                                       //fist HomeData item
                                        categories.add(0,home.getRecent_category());
                                        homeAdapter.addHomeList(categories);
                                        homeAdapter.notifyDataSetChanged();
@@ -82,6 +81,10 @@ public class Home extends Fragment {
 
                                    }
                                }));
+
+        } catch (Exception e) {
+            Common.showAlert2(getContext(), getString(R.string.warning), e.getMessage());
+        }
         }else {
             Common.errorConnectionMess(getContext());
             progressDialog.dismiss();
@@ -108,8 +111,6 @@ public class Home extends Fragment {
             }
         });
 
-
-
         home_rec.setLayoutManager(mLayoutManager);
         homeAdapter = new HomeAdapter();
         home_rec.setAdapter(homeAdapter);
@@ -130,115 +131,4 @@ public class Home extends Fragment {
             }
         });
     }
-
-/*
-    @Override
-    public void onItemClick(View view, int position) {
-        Log.i("TAG", "You clicked number " + adapter.getItem(position) + ", which is at cell position " + position);
-    }
-*/
-
-
-/*
-    // Get Home Items
-    private class GetHomeItemsBackgroundTask extends AsyncTask<String, Void, String> {
-        public ProgressDialog dialog;
-        Boolean is_arabic = Common.isArabic;
-
-        GetHomeItemsBackgroundTask(Activity activity) {
-            this.dialog = new ProgressDialog(activity);
-            this.dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            this.dialog.setMessage(getString(R.string.loading));
-            this.dialog.show();
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            String get_home_url = getString(R.string.home_items_api);
-            try {
-                URL url = new URL(get_home_url);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.setRequestProperty("api_Token", getString(R.string.api_token));
-                httpURLConnection.setRequestProperty("Content-Type", getString(R.string.content_type));
-                httpURLConnection.setConnectTimeout(7000);
-                httpURLConnection.setReadTimeout(7000);
-
-                if (is_arabic) {
-                    httpURLConnection.setRequestProperty("language", "ar");
-                } else {
-                    httpURLConnection.setRequestProperty("language", "en");
-                }
-
-                httpURLConnection.connect();
-
-                int responseCode = httpURLConnection.getResponseCode();
-
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        sb.append(line).append("\n");
-                    }
-                    br.close();
-                    return sb.toString();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "";
-            }
-            return "";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (dialog != null && dialog.isShowing())
-                dialog.dismiss();
-
-            JSONObject firstJsonObject = null;
-            try {
-                firstJsonObject = new JSONObject(result);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            for (int i = 0; i < firstJsonObject.length(); i++) {
-                try {
-                    JSONArray categories = firstJsonObject.getJSONArray("categories");
-
-                    for (int j = 0; j < categories.length(); j++) {
-                        JSONObject object = categories.getJSONObject(j);
-                        String category_id = object.getString("category_id");
-                        String image = object.getString("image");
-                        String name = object.getString("name");
-                        String isSubCat = object.getString("isSubCat");
-
-                        category_ids.add(category_id);
-                        category_images.add(image);
-                        category_names.add(name);
-                        isSubCats.add(isSubCat);
-                    }
-
-                    String[] category_ids_array = category_ids.toArray(new String[category_ids.size()]);
-                    String[] category_images_array = category_images.toArray(new String[category_images.size()]);
-                    String[] category_names_array = category_names.toArray(new String[category_names.size()]);
-
-                    // set up the RecyclerView
-                    int numberOfColumns = 2;
-                    recyclerView.setLayoutManager(new GridLayoutManager(getContext(), numberOfColumns));
-                    adapter = new HomeAdapter(getContext(), category_ids_array, category_images_array, category_names_array);
-//                    adapter.setClickListener(this); // to allow on click events
-                    recyclerView.setAdapter(adapter);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-*/
 }

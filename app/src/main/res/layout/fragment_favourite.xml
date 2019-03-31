@@ -4,25 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/rootLayout"
-    android:background="@drawable/background2"
+    android:background="@drawable/background"
     tools:context=".fargments.Favourite">
 
-<LinearLayout
+<RelativeLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/sl"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:visibility="visible">
+        android:layout_height="wrap_content"
+        android:visibility="gone">
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/fav_rec"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:paddingBottom="50dp"
                     android:clipToPadding="false"/>
 
@@ -35,9 +34,40 @@
         android:gravity="center"
         android:text="@string/no_favourite"
         android:textStyle="bold"
+        android:textColor="@color/blue"
         android:visibility="gone"/>
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/loginLN"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/please_login_to_view_wishlist"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/loginText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/blue"
+            android:textSize="18sp"
+            android:layout_gravity="center"
+            android:text="@string/click_here_to_login"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</RelativeLayout>
 
 
 </FrameLayout>

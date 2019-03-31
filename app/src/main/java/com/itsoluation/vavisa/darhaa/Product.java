@@ -1,23 +1,30 @@
 package com.itsoluation.vavisa.darhaa;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.StringDef;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -28,6 +35,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.itsoluation.vavisa.darhaa.Interface.RecyclerViewItemClickListener;
 import com.itsoluation.vavisa.darhaa.adapter.CategoryProductAdapter;
 import com.itsoluation.vavisa.darhaa.adapter.MainSliderAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
@@ -37,6 +45,7 @@ import com.itsoluation.vavisa.darhaa.expandableAdapter.ExpandableListAdapter;
 import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.model.addToCart.AddToCardData;
 import com.itsoluation.vavisa.darhaa.model.addToCart.Options;
+import com.itsoluation.vavisa.darhaa.model.favorite.Products;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,7 +71,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import ss.com.bannerslider.Slider;
 
-public class Product extends AppCompatActivity implements View.OnClickListener {
+public class Product extends AppCompatActivity implements View.OnClickListener , RecyclerViewItemClickListener {
 
     @BindView(R.id.rootLayout)
     RelativeLayout rootLayout;
@@ -90,29 +99,33 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
     RecyclerView related_rec;
     @BindView(R.id.product_options)
     LinearLayout product_options;
+    @BindView(R.id.attributes_layout)
+    LinearLayout attributes_layout;
+    @BindView(R.id.discount_txt)
+    TextView discount_txt;
     @BindView(R.id.addCardBtn)
     Button addCart;
 
-    TextView item_price, item_name, item_desc_details;
+    TextView item_price, item_name;
+    WebView item_desc_details;
     Slider slider;
 
     CategoryProductAdapter adapter;
+    ArrayList<Products> relativeProductsList;
+    RecyclerViewItemClickListener recyclerListener;
 
     static String current_product_id;
     private int amount = 1;
 
     com.itsoluation.vavisa.darhaa.expandableAdapter.ExpandableListAdapter expandable_adapter;
 
-    ArrayList<String> related_product_ids, related_images, related_names, related_prices,
-            related_specials, related_minimums;
-
-    ArrayList<Boolean>related_wishLists, related_stocks;
     List<EditText> editTexts = new ArrayList<>();
     List<ExpandableListView> expandableListViews = new ArrayList<>();
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    ProgressDialog progressDialog;
 
-    String product_id, minimum,maximum;
+    String product_id, minimum;
     String user_id;
     Boolean wishList;
     Double price ,totalPrice;
@@ -126,7 +139,10 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
     public void addOrder(){
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(rootLayout.getWindowToken(),0);
-        addToCart();
+        if(Common.isConnectToTheInternet(this))
+            addToCart();
+        else
+            Common.errorConnectionMess(this);
     }
 
     private void addToCart() {
@@ -143,21 +159,27 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
             addCard.setProduct_id(product_id);
             addCard.setDevice_id(Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
 
+            progressDialog.show();
+try {
             compositeDisposable.add(Common.getAPI().addToCart(addCard).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<Status>() {
                         @Override
                         public void accept(Status status) throws Exception {
+                            progressDialog.dismiss();
                             if(status.getStatus().equals("error"))
                                 Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
                             else {
-                                //Snackbar snackbar = Snackbar.make(rootLayout, status.getMessage(), Snackbar.LENGTH_LONG);
-                                //snackbar.show();
-                                onBackPressed();
+                                Snackbar snackbar = Snackbar.make(rootLayout, status.getMessage(), Snackbar.LENGTH_LONG);
+                                snackbar.show();
                             }
                         }
                     }));
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
         }
+
+    }
 
     }
 
@@ -203,9 +225,16 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if(Common.isArabic)
+            setLanguage("ar");
+        else
+            setLanguage("en");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_details);
         ButterKnife.bind(this);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+
         OptionsSelection.optionsSelection.clear();
         if(Common.isArabic){
             back_arrow.setRotation(180);
@@ -213,28 +242,29 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
         user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : null;
 
-        related_product_ids = new ArrayList<>();
-        related_images = new ArrayList<>();
-        related_names = new ArrayList<>();
-        related_prices = new ArrayList<>();
-        related_specials = new ArrayList<>();
-        related_minimums = new ArrayList<>();
-        related_wishLists = new ArrayList<>();
-        related_stocks = new ArrayList<>();
-
         product_id = CurrentProductDetails.product_id;
         ic_add.setOnClickListener(this);
         ic_remove.setOnClickListener(this);
         ic_fav.setOnClickListener(this);
         ic_share.setOnClickListener(this);
 
-//        product_image = findViewById(R.id.product_image);
+        recyclerListener = this;
         item_price = findViewById(R.id.item_price);
         item_name = findViewById(R.id.item_name);
         item_desc_details = findViewById(R.id.item_desc_details);
         slider = findViewById(R.id.banner_slider1);
 
-        new GetItemDetailsBackgroundTask(this).execute();
+        if(Common.isConnectToTheInternet(this))
+            new GetItemDetailsBackgroundTask(this).execute();
+        else
+            Common.errorConnectionMess(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : null;
     }
 
     private void share() {
@@ -277,53 +307,123 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 if(user_id !=null)
                     setFavorite();
                 else
-                    startActivity(new Intent(this,Login.class));
+                    showAlert();
                 break;
         }
 
     }
 
     private void setFavorite() {
-        if(wishList)
-            removeFav();
-        else
-            addFav();
+        if(wishList) {
+            removeFav(product_id,ic_fav);
+            wishList = false;
+        }else{
+            addFav(product_id,ic_fav);
+            wishList = true;
+        }
     }
-    private void addFav() {
-        compositeDisposable.add(Common.getAPI().addFavorte(product_id,user_id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Status>() {
-                    @Override
-                    public void accept(Status status) throws Exception {
-                        if(status.getStatus().equals("error")){
-                            Common.showAlert2(Product.this,status.getStatus(),status.getMessage());
-                        }else {
 
-                            ic_fav.setImageResource(R.drawable.ic_fav);
-                            wishList = true;
+    private void addFav(String product_id, ImageView ic_fav) {
+        if(Common.isConnectToTheInternet(this)) {
+            ic_fav.setImageResource(R.drawable.ic_fav);
+            try {
+            compositeDisposable.add(Common.getAPI().addFavorte(product_id, user_id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Status>() {
+                        @Override
+                        public void accept(Status status) throws Exception {
+                            if (status.getStatus().equals("error")) {
+                                Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
+                            }
                         }
-                    }
-                }));
+                    }));
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
+
+    }else
+            Common.errorConnectionMess(this);
+    }
+    private void removeFav(String product_id, ImageView ic_fav) {
+        if(Common.isConnectToTheInternet(this)) {
+            ic_fav.setImageResource(R.drawable.ic_fav_border);
+            try {
+            compositeDisposable.add(Common.getAPI().removeFavorte(product_id, user_id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Status>() {
+                        @Override
+                        public void accept(Status status) throws Exception {
+                            if (status.getStatus().equals("error")) {
+                                Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
+                            }
+                        }
+                    }));
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
+
+    }else
+            Common.errorConnectionMess(this);
 
     }
-    private void removeFav() {
-        compositeDisposable.add(Common.getAPI().removeFavorte(product_id,user_id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Status>() {
-                    @Override
-                    public void accept(Status status) throws Exception {
-                        if(status.getStatus().equals("error")){
-                            Common.showAlert2(Product.this,status.getStatus(),status.getMessage());
-                        }else {
 
-                            ic_fav.setImageResource(R.drawable.ic_fav_border);
-                            wishList = false;
-                        }
-                    }
-                }));
+    @Override
+    public void onClick(View view, int position, String product_id, String product_name, int flag) {
+        if(flag == 0){
+            CurrentProductDetails.product_id = product_id;
+            CurrentProductDetails.product_name = product_name;
+            startActivity(new Intent(this, Product.class));
+        }else if(flag == 1){
+            if(user_id !=null)
+                setFavoriteRelate(position,view);
+            else
+                showAlert();
 
+        }
+    }
+
+
+    private void setFavoriteRelate(int position, View view) {
+            if (relativeProductsList.get(position).getWishList()){
+                removeFav(relativeProductsList.get(position).getProduct_id(), ((ImageView)view));
+                relativeProductsList.get(position).setWishList(false);
+            }else{
+                addFav(relativeProductsList.get(position).getProduct_id(), ((ImageView)view));
+                relativeProductsList.get(position).setWishList(true);
+            }
+
+    }
+
+    private void showAlert() {
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.custom_alert_login_fav);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
+
+        // set the custom dialog components - text, image and button
+
+        TextView login =  dialog.findViewById(R.id.login_alert_btn);
+        TextView cancel =  dialog.findViewById(R.id.cancel_alert_btn);
+
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                startActivity(new Intent(Product.this, Login.class));
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
     /** Get Item Details Items **/
@@ -362,7 +462,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 URL url = new URL(get_product_details_url);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.setRequestProperty("api_Token", getString(R.string.api_token));
+                httpURLConnection.setRequestProperty("api-token", getString(R.string.api_token));
                 httpURLConnection.setRequestProperty("Content-Type", getString(R.string.content_type));
                 httpURLConnection.setConnectTimeout(7000);
                 httpURLConnection.setReadTimeout(7000);
@@ -416,6 +516,9 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 String product_id = firstJsonObject.getString("product_id");
                 String manufacturer = firstJsonObject.getString("manufacturer");
                 String description = Html.fromHtml(firstJsonObject.getString("description")).toString();
+              //  Spanned description = Html.fromHtml(firstJsonObject.getString("description").replaceAll("\\n\\n","").replaceAll("\\r",""));
+                //String description = descriptionSpanned.toString().replaceAll("\\n\\n","\n");
+
                 String name = firstJsonObject.getString("name");
                 String special = firstJsonObject.getString("special");
                 Boolean stock = firstJsonObject.getBoolean("stock");
@@ -457,7 +560,9 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
                 item_amount.setText(minimum);
                 amount = Integer.parseInt(minimum);
-                item_desc_details.setText(description);
+                item_desc_details.setBackgroundColor(0x00000000);
+                item_desc_details.loadData(description , "text/html; charset=UTF-8", null);
+                //item_desc_details.setText(description);
                 current_product_id = product_id;
 
 
@@ -474,18 +579,24 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
                 }
 
                 slider.setAdapter(new MainSliderAdapter(Product.this, side_images));
+
                 Slider.init(new PicassoImageLoadingService(Product.this));
 
 
                 JSONArray discounts = firstJsonObject.getJSONArray("discounts");
 
-//                try { // TODO: ask what can discounts array contain so that you can know what to add for strings
-//                    for (int i = 0; i < discounts.length(); i++) {
-//
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                   for (int i = 0; i < discounts.length(); i++) {
+                       JSONObject discount_item = discounts.getJSONObject(i);
+                       String discount_quantity = discount_item.getString("quantity");
+                       String discount_price = discount_item.getString("price");
+
+                       discount_txt.setText(R.string.take+" "+discount_quantity+" "+R.string.or_more_for+" "+ discount_price+" "+R.string.each);
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
                 JSONArray options = firstJsonObject.getJSONArray("options");
                 try {
@@ -517,13 +628,27 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
 
                 JSONArray attribute_groups = firstJsonObject.getJSONArray("attribute_groups");
 
-//                try { // TODO: ask what can attribute_groups array contain so that you can know what to add for strings
-//                    for (int i = 0; i < attribute_groups.length(); i++) {
-//
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    for (int i = 0; i < attribute_groups.length(); i++) {
+
+                        JSONObject attribut_item = attribute_groups.getJSONObject(i);
+
+                        attributes_layout.setVisibility(View.VISIBLE);
+                        //title
+                        createTextTitle(attributes_layout,attribut_item.getString("name"),true);
+                        JSONArray attributes = attribut_item.getJSONArray("attribute");
+                        for (int x = 0; x < attributes.length(); x++){
+
+                            JSONObject attribut2 = attributes.getJSONObject(x);
+                            //attribute name
+                            createTextTitle(attributes_layout,attribut2.getString("name")+": "+attribut2.getString("text"),false);
+                        }
+
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
                 // related products
                 JSONArray relatedProducts = firstJsonObject.getJSONArray("relatedProducts");
@@ -621,59 +746,38 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
             */
         }
 
-        private void setRelatedProduct(JSONArray relatedProducts) {
+        private void setRelatedProduct(JSONArray relatedProducts_) {
 
-            related_product_ids.clear();
-            related_images.clear();
-            related_names.clear();
-            related_prices.clear();
-            related_specials.clear();
-            related_minimums.clear();
-            related_wishLists.clear();
-            related_stocks.clear();
             try {
-                for (int i = 0; i < relatedProducts.length(); i++) {
-                    JSONObject related_product = relatedProducts.getJSONObject(i);
-                    String related_product_id = related_product.getString("product_id");
-                    String related_image = related_product.getString("image");
-                    String related_name = related_product.getString("name");
-                    String related_price = related_product.getString("price");
-                    String related_special = related_product.getString("special");
-                    String related_minimum = related_product.getString("minimum");
-                    Boolean related_wishList = related_product.getBoolean("wishList");
-                    Boolean related_stock = related_product.getBoolean("stock");
+                 relativeProductsList = new ArrayList<>();
 
-                    related_product_ids.add(related_product_id);
-                    related_images.add(related_image);
-                    related_names.add(related_name);
-                    related_prices.add(related_price);
-                    related_specials.add(related_special);
-                    related_minimums.add(related_minimum);
-                    related_wishLists.add(related_wishList);
-                    related_stocks.add(related_stock);
+                for (int i = 0; i < relatedProducts_.length(); i++) {
+                    JSONObject object = relatedProducts_.getJSONObject(i);
+
+                    Products products1 = new Products();
+
+                    products1.setProduct_id(object.getString("product_id"));
+                    products1.setName(object.getString("name"));
+                    products1.setThumb(object.getString("image"));
+                    products1.setPrice(object.getString("price"));
+                    products1.setSpecial(object.getString("special"));
+                    products1.setStock(object.getBoolean("stock"));
+                    products1.setMinimum(object.getString("minimum"));
+                    products1.setWishList(object.getBoolean("wishList"));
+
+                    relativeProductsList.add(products1);
+
                 }
-                String[] related_product_ids_array, related_images_array, related_names_array, related_prices_array,
-                        related_specials_array, related_minimums_array, related_wishLists_array ,related_stocks_array;
-
-                related_product_ids_array = related_product_ids.toArray(new String[related_product_ids.size()]);
-                related_images_array = related_images.toArray(new String[related_images.size()]);
-                related_names_array = related_names.toArray(new String[related_names.size()]);
-                related_prices_array = related_prices.toArray(new String[related_prices.size()]);
-                related_specials_array = related_specials.toArray(new String[related_specials.size()]);
-                related_minimums_array = related_minimums.toArray(new String[related_minimums.size()]);
-                // related_wishLists_array = related_wishLists.toArray(new String[related_wishLists.size()]);
-                //  related_stocks_array = related_stocks.toArray(new String[related_stocks.size()]);
 
                 related_rec.setHasFixedSize(false);
 
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(Product.this,LinearLayoutManager.HORIZONTAL,false);
                 related_rec.setLayoutManager(linearLayoutManager);
 
-                adapter = new CategoryProductAdapter(Product.this, related_product_ids_array, related_images_array, related_names_array,
-                        related_prices_array, related_specials_array, related_minimums_array, related_wishLists, related_stocks,true);
+                adapter = new CategoryProductAdapter(relativeProductsList,true);
+                adapter.setItemClickListener(recyclerListener);
 
                 related_rec.setAdapter(adapter);
-
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -711,6 +815,34 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
             note.setTag(R.string.option_id,option_id);
         }
 
+        private void createTextTitle(LinearLayout layout, String attribute_name, Boolean isTitle) {
+
+            RelativeLayout.LayoutParams linear = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+            linear.setMargins(4,4,4,4);
+
+            TextView attribute = new TextView(Product.this);
+            attribute.setGravity(Gravity.START);
+            attribute.setLines(1);
+            attribute.setLayoutParams(linear);
+
+            attribute.setText(attribute_name);
+
+
+            if (isTitle){
+                attribute.setTextSize(22);
+                attribute.setPadding(4,30,4,4);
+                attribute.setTextColor(Product.this.getResources().getColor(R.color.brownLight));
+            }else {
+                attribute.setTextSize(14);
+                attribute.setPadding(4,2,4,4);
+                attribute.setTextColor(Product.this.getResources().getColor(R.color.black));
+            }
+
+            layout.addView(attribute);
+
+        }
+
         private void setListViewHeight(ExpandableListView listView,
                                        int group) {
             ExpandableListAdapter listAdapter = (ExpandableListAdapter) listView.getExpandableListAdapter();
@@ -746,5 +878,15 @@ public class Product extends AppCompatActivity implements View.OnClickListener {
             listView.requestLayout();
 
         }
+
     }
+    public void setLanguage(String lang)
+    {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale= locale;
+        getBaseContext().getResources().updateConfiguration(config,getBaseContext().getResources().getDisplayMetrics());
+    }
+
 }

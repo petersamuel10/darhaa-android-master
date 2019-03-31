@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/dd"
-    android:background="@drawable/background2"
+    android:background="@drawable/background"
     tools:context=".profile_fragments.Orders">
 
     <android.support.v7.widget.Toolbar
@@ -51,12 +51,5 @@
                 android:paddingBottom="150dp"
                 android:clipToPadding="false"/>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:scaleType="fitXY"
-        android:adjustViewBounds="true"
-        android:src="@drawable/footer" />
 
 </RelativeLayout>

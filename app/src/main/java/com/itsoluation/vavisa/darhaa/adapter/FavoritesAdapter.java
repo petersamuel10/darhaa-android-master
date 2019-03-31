@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerViewItemClickListener;
 import com.itsoluation.vavisa.darhaa.Product;
 import com.itsoluation.vavisa.darhaa.R;
@@ -42,9 +43,9 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
     @Override
     public void onBindViewHolder(@NonNull FavoritesAdapter.ViewHolder holder, int position) {
 
-        holder.item_price.setText(favoritesList.get(position).getPrice());
+        holder.item_price.setText(favoritesList.get(position).getPrice()+" "+mContext.getResources().getString(R.string.kd));
         holder.item_name.setText(favoritesList.get(position).getName());
-        Picasso.with(mContext).load(favoritesList.get(position).getThumb()).into(holder.fav_image);
+        Glide.with(mContext).load(favoritesList.get(position).getThumb()).into(holder.fav_image);
 
         holder.setItemClickListener(new RecyclerViewItemClickListener() {
             @Override
@@ -71,7 +72,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            item_price = itemView.findViewById(R.id.item_name);
+            item_price = itemView.findViewById(R.id.item_price);
             item_name = itemView.findViewById(R.id.item_name);
             fav_image = itemView.findViewById(R.id.com_photo);
             background = itemView.findViewById(R.id.background);
@@ -91,7 +92,9 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
     }
 
     public void addFavList(ArrayList<Products> favoritesData){
+        favoritesList = new ArrayList<>();
         favoritesList.addAll(favoritesData);
+        notifyDataSetChanged();
     }
 
     public void deleteItem(int position)

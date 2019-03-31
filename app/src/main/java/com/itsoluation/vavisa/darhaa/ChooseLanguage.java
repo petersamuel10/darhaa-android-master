@@ -40,7 +40,7 @@ public class ChooseLanguage extends AppCompatActivity {
     private void nextActivity() {
 
         startActivity(new Intent(this,MainActivity.class));
-        finish();
+      //  finish();
     }
 
 }

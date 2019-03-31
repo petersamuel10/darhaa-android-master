@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.itsoluation.vavisa.darhaa.Interface.CartInterface;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.model.cartData.Options;
@@ -28,14 +29,14 @@ import butterknife.ButterKnife;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
-    ArrayList<Product> productList;
+    List<Product> productList;
     Context context;
     Boolean isCheckout;
 
     private CartInterface listener = null;
 
     public CartAdapter(boolean b, List<Product> productList) {
-        this.productList = new ArrayList<>(productList);
+        this.productList = productList;
         this.isCheckout = b;
     }
 
@@ -73,7 +74,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             holder.item_name.setText(productList.get(position).getName());
             holder.item_price.setText(productList.get(position).getTotal());
             try {holder.item_amount.setText(productList.get(position).getQuantity());}catch (Exception e){}
-            Picasso.with(context).load(productList.get(position).getThumb()).into(holder.item_image);
+               Glide.with(context).load(productList.get(position).getThumb()).into(holder.item_image);
 
             //to show item options
             if(productList.get(position).getOption().size()>0){

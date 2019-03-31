@@ -71,8 +71,8 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
     List<String> area_name_list;
     List<String> cities_name_list;
 
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
-    String user_name,email,postcode,phone,company_name,address_details,city_name,
+    CompositeDisposable compositeDisposable ;
+    String user_name,postcode,company_name,address_details,city_name,
             country_id,zone_id,device_id,country_,zone;
 
     ProgressDialog progressDialog;
@@ -86,17 +86,7 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
         progressDialog = new ProgressDialog(ShippingAddress.this);
         progressDialog.setCancelable(false);
 
-        device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-
-        if (Common.isArabic) {
-            back_arrow.setRotation(180);
-        }
-
-        // to show adddress details only
-        if (Common.isConnectToTheInternet(this)) {
-            getCountries();
-        } else
-            Common.errorConnectionMess(ShippingAddress.this);
+        if (Common.isArabic) { back_arrow.setRotation(180); }
 
         country_spinner.setOnItemSelectedListener(this);
         area_spinner.setOnItemSelectedListener(this);
@@ -104,11 +94,27 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        compositeDisposable = new CompositeDisposable();
+
+        // to show adddress details only
+        if (Common.isConnectToTheInternet(this)) {
+            getCountries();
+        } else
+            Common.errorConnectionMess(ShippingAddress.this);
+    }
+
     private void getCountries() {
         progressDialog.show();
         countryArrayList = new ArrayList<>();
         country_name_list = new ArrayList<>();
 
+        try {
         Observable<ArrayList<Countries>> apiCountry = Common.getAPI().getCountries().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
         apiCountry.subscribe(new Observer<ArrayList<Countries>>() {
@@ -143,7 +149,11 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
                 country_spinner.setAdapter(country_adapter);
             }
         });
+    } catch (Exception e) {
+        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
     }
+
+}
 
     private void getArea(String country_id, String country_code) {
      //   progressDialog.show();

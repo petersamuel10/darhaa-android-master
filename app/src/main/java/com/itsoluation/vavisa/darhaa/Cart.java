@@ -1,11 +1,13 @@
 package com.itsoluation.vavisa.darhaa;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,6 +49,9 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Cart extends AppCompatActivity implements CartInterface, RecyclerItemTouchHelperListner  {
 
@@ -76,6 +81,7 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
 
     String user_id, device_id;
     String coupon_code = "";
+    boolean isAddAddress = false;
 
     private CartInterface onCartListener;
 
@@ -85,12 +91,14 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
         setContentView(R.layout.activity_cart);
         ButterKnife.bind(this);
         progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
 
         if (Common.isArabic) {
             back_arrow.setRotation(180);
         }
         onCartListener = this;
         setupRecyclerView();
+
 
         user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : "0";
         device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -101,9 +109,11 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
             Common.errorConnectionMess(this);
     }
 
+
     private void callAPI() {
 
         progressDialog.show();
+        try {
         compositeDisposable = new CompositeDisposable();
         compositeDisposable.add(Common.getAPI().viewCart(user_id, device_id, null)
                 .subscribeOn(Schedulers.io())
@@ -124,6 +134,9 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
                         }
                     }
                 }));
+    } catch (Exception e) {
+        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+    }
 
 
     }
@@ -209,6 +222,7 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
     private void verifyCoupon(final String coupon, final Button verify, final EditText coupon_ed) {
 
         progressDialog.show();
+        try {
         compositeDisposable = new CompositeDisposable();
         compositeDisposable.add(Common.getAPI().checkCoupon(user_id, coupon)
                 .subscribeOn(Schedulers.io())
@@ -239,46 +253,52 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
                         }
                     }
                 }));
+    } catch (Exception e) {
+        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
     }
+
+}
 
     //delete cart
     @Override
-    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction,int position) {
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, final int position) {
 
         compositeDisposable = new CompositeDisposable();
 
         if (Common.isConnectToTheInternet(this)) {
 
-        String cart_id = String.valueOf(cartData.getProducts().get(viewHolder.getAdapterPosition()).getCart_id());
+            String cart_id = String.valueOf(cartData.getProducts().get(viewHolder.getAdapterPosition()).getCart_id());
 
-        if (viewHolder instanceof CartAdapter.ViewHolder) {
+            progressDialog.show();
+            Call<Status> delete = Common.getAPI().deleteCart(cart_id, user_id, device_id);
 
-            compositeDisposable.add(Common.getAPI().deleteCart(cart_id, user_id, device_id)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<Status>() {
-                        @Override
-                        public void accept(Status status) throws Exception {
-                            if (status.getStatus().equals("error"))
-                                Common.showAlert2(Cart.this, status.getStatus(), status.getMessage());
-                            else {
+            delete.enqueue(new Callback<Status>() {
+                @Override
+                public void onResponse(Call<Status> call, Response<Status> response) {
 
-                                Snackbar snackbar = Snackbar.make(rootLayout, status.getMessage(), Snackbar.LENGTH_LONG);
-                                snackbar.show();
+                    if (response.body().getStatus().equals("error"))
+                        Common.showAlert2(Cart.this, response.body().getStatus(), response.body().getMessage());
+                    else {
 
-                                if(adapter.getItemCount() == 1) {
-                                    cart_rec.setVisibility(View.GONE);
-                                    cartBtn.setVisibility(View.GONE);
-                                    no_item_txt.setVisibility(View.VISIBLE);
-                                }
-                            }
+                        progressDialog.dismiss();
+                        cartData.getProducts().remove(position);
+                        adapter.notifyItemRemoved(position);
+
+
+                        if (adapter.getItemCount() == 1) {
+                            cart_rec.setVisibility(View.GONE);
+                            cartBtn.setVisibility(View.GONE);
+                            no_item_txt.setVisibility(View.VISIBLE);
                         }
-                    }));
+                    }
+                }
 
-            adapter.removeCart(viewHolder.getAdapterPosition());
-            adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                @Override
+                public void onFailure(Call<Status> call, Throwable t) {
 
-        } } else
+                }
+            });
+        } else
             Common.errorConnectionMess(this);
 
     }
@@ -286,28 +306,81 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
     @OnClick(R.id.cartBtn)
     public void checkout(){
 
+        if(user_id.equals("0")) {
+                showAlert();
+        }else {
+         checkoutMethod();
+        }
+    }
+
+    public void checkoutMethod(){
         // check if there is any changes of product quantity
-        if(!changesCarts.isEmpty()){
+        if (!changesCarts.isEmpty()) {
             EditCart editCart = new EditCart();
             editCart.setUser_id(user_id);
             editCart.setDevice_id(device_id);
             ArrayList<Quantity> quantityList = new ArrayList<>();
 
             for (Map.Entry<String, String> entry : changesCarts.entrySet()) {
-                Quantity quantity= new Quantity(entry.getKey(),entry.getValue());
+                Quantity quantity = new Quantity(entry.getKey(), entry.getValue());
                 quantityList.add(quantity);
             }
 
             editCart.setQuantity(quantityList);
 
-            callAPIToEditCart(editCart);
-        }else {
+            if(Common.isConnectToTheInternet(this))
+                callAPIToEditCart(editCart);
+            else
+                Common.errorConnectionMess(this);
+
+        } else {
             Intent i = new Intent(Cart.this, Checkout.class);
-            if(!coupon_code.equals(""))
-                i.putExtra("couponCode",coupon_code);
+            if (!coupon_code.equals(""))
+                i.putExtra("couponCode", coupon_code);
 
             startActivity(i);
         }
+    }
+
+    private void showAlert() {
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.custom_alert);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
+
+        // set the custom dialog components - text, image and button
+
+        TextView login =  dialog.findViewById(R.id.login_alert);
+        TextView addAddress = dialog.findViewById(R.id.add_address_alert);
+        TextView cancel =  dialog.findViewById(R.id.cancel_alert);
+
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                startActivity(new Intent(Cart.this, Login.class));
+            }
+        });
+
+
+        addAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                checkoutMethod();
+
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
     private void callAPIToEditCart(EditCart editCart) {

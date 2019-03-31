@@ -1,15 +1,26 @@
 package com.itsoluation.vavisa.darhaa.common;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
+import android.view.View;
+import android.widget.TextView;
 
+import com.itsoluation.vavisa.darhaa.Login;
 import com.itsoluation.vavisa.darhaa.R;
+import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.model.User;
 import com.itsoluation.vavisa.darhaa.model.address.address.AddressDetails;
 import com.itsoluation.vavisa.darhaa.model.address.address.AddressGet;
+import com.itsoluation.vavisa.darhaa.payment.BillingAddress;
+import com.itsoluation.vavisa.darhaa.payment.Checkout;
 import com.itsoluation.vavisa.darhaa.web_service.ApiInterface;
 import com.itsoluation.vavisa.darhaa.web_service.Controller;
 import com.itsoluation.vavisa.darhaa.web_service.Controller2;
@@ -22,13 +33,13 @@ import java.net.URL;
 public class Common {
 
     public static boolean isArabic = false;
-    public static boolean isSkip = false;
     public static User current_user;
     public static AddressDetails currentAddress;
     public static boolean isEditAddress = false;
     public static String address_id = null;
     public static boolean showAddrDetails = false;
-    public static boolean isBooking = false;
+   // public static String userAccessToken ="";
+
 
 
     public static Boolean isConnectToTheInternet (Context context) {
@@ -93,50 +104,84 @@ public class Common {
         return new Controller().getAPI();
     }
 
-    public static ApiInterface getAPI2(){ return new  Controller2().getAPI();}
+  //  public static ApiInterface getAPI2(){ return new  Controller2(userAccessToken).getAPI();}
 
     public static void errorConnectionMess(Context context){
 
-        AlertDialog.Builder error = new AlertDialog.Builder(context);
-        error.setMessage(R.string.error_connection);
-        AlertDialog dialog = error.create();
-        dialog.setCancelable(true);
+        final Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.custom_alert_error);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
+
+        // set the custom dialog components - text, image and button
+
+        TextView title_ =  dialog.findViewById(R.id.alert_title);
+        TextView message_ = dialog.findViewById(R.id.alert_message);
+        TextView cancel =  dialog.findViewById(R.id.cancel_alert);
+
+        title_.setText(context.getText(R.string.error));
+        message_.setText(context.getText(R.string.error_connection));
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
         dialog.show();
 
     }
 
     public static void showAlert(Context context, int title, int msg) {
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
-        builder1.setMessage(msg);
-        builder1.setTitle(title);
-        builder1.setCancelable(false);
-        builder1.setPositiveButton(
-                R.string.ok,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
+        final Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.custom_alert_error);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
 
-        AlertDialog alert11 = builder1.create();
-        alert11.show();
+        // set the custom dialog components - text, image and button
+
+        TextView title_ =  dialog.findViewById(R.id.alert_title);
+        TextView message_ = dialog.findViewById(R.id.alert_message);
+        TextView cancel =  dialog.findViewById(R.id.cancel_alert);
+
+        title_.setText(context.getText(title));
+        message_.setText(context.getText(msg));
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
     public static void showAlert2(Context context, String title, String msg) {
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
-        builder1.setMessage(msg);
-        builder1.setTitle(title);
-        builder1.setCancelable(false);
-        builder1.setPositiveButton(
-                R.string.ok,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
 
-        AlertDialog alert11 = builder1.create();
-        alert11.show();
+        final Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.custom_alert_error);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
+
+        // set the custom dialog components - text, image and button
+
+        TextView title_ =  dialog.findViewById(R.id.alert_title);
+        TextView message_ = dialog.findViewById(R.id.alert_message);
+        TextView cancel =  dialog.findViewById(R.id.cancel_alert);
+
+        title_.setText(title);
+        message_.setText(msg);
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
 }

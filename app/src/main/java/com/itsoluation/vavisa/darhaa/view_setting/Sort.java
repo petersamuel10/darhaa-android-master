@@ -23,6 +23,8 @@ public class Sort extends AppCompatActivity {
 
     @BindView(R.id.back_arrow)
     ImageView back_arrow;
+    @BindView(R.id.lanGroup)
+    RadioGroup radioGroup;
 
     @OnClick(R.id.back_arrow)
     public void setBack(){onBackPressed();}
@@ -41,6 +43,8 @@ public class Sort extends AppCompatActivity {
         }
 
         sort_apply = findViewById(R.id.sortApply);
+
+        radioGroup.clearCheck();
 
         sort_apply.setOnClickListener(new View.OnClickListener() {
             @Override

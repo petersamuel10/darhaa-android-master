@@ -51,6 +51,9 @@ public class Filter extends AppCompatActivity {
 
         filter_apply = findViewById(R.id.filterApply);
 
+        if(CategoryProducts.category_price_max_value.equals(CategoryProducts.category_price_min_value) )
+            rangeSeekBar.setEnabled(false);
+
         rangeSeekBar.setMaxValue(Float.parseFloat(CategoryProducts.category_price_max_value));
         rangeSeekBar.setMinValue(Float.parseFloat(CategoryProducts.category_price_min_value));
 
@@ -58,11 +61,11 @@ public class Filter extends AppCompatActivity {
         rangeSeekBar.setOnRangeSeekbarChangeListener(new OnRangeSeekbarChangeListener() {
             @Override
             public void valueChanged(Number minValue, Number maxValue) {
-                min_price.setText(getResources().getString(R.string.from)+" "+String.valueOf(minValue)+" "+getResources().getString(R.string.kd));
-                max_price.setText(getResources().getString(R.string.to)+" "+String.valueOf(maxValue)+" "+getResources().getString(R.string.kd));
+                min_price.setText(getResources().getString(R.string.from)+" "+String.format("%.3f",minValue.floatValue())+" "+getResources().getString(R.string.kd));
+                max_price.setText(getResources().getString(R.string.to)+" "+String.format("%.3f",maxValue.floatValue())+" "+getResources().getString(R.string.kd));
 
-                min_value = String.valueOf(minValue);
-                max_value = String.valueOf(maxValue);
+                min_value = String.valueOf(minValue.floatValue());
+                max_value = String.valueOf(maxValue.floatValue());
             }
         });
 
@@ -70,7 +73,7 @@ public class Filter extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 CategoryProducts.filter_type = "price_range";
-                CategoryProducts.filter_value = min_value + "-" + max_value;
+                CategoryProducts.filter_value_price = min_value + "-" + max_value;
                 Intent resultIntent = new Intent();
                 setResult(Activity.RESULT_OK, resultIntent);
                 finish();

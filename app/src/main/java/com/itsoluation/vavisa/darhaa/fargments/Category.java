@@ -6,12 +6,14 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +49,6 @@ public class Category extends Fragment {
     private MenuItem mSearchAction;
     private SearchView searchView;
 
-   // private CompositeDisposable compositeDisposable = new CompositeDisposable();
     ProgressDialog progressDialog;
 
     ArrayList<CategoryData> categoryList;
@@ -80,8 +81,7 @@ public class Category extends Fragment {
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         mSearchAction = menu.findItem(R.id.action_search);
 
         mSearchAction.setVisible(true);
@@ -89,41 +89,34 @@ public class Category extends Fragment {
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String newText) {
-
-               newText = newText.toLowerCase();
-                ArrayList<CategoryData> newList=new ArrayList<>();
-
-                for (CategoryData category : categoryList){
-
-                    String username = category.getName().toLowerCase();
-
-                    if (username.contains(newText)){
-                        newList.add(category);
-                    }
-                }
-                adapter.setFilter(newList);
-                return true;
+            public boolean onQueryTextSubmit(String s) {
+                return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
 
-                newText = newText.toLowerCase();
-                ArrayList<CategoryData> newList=new ArrayList<>();
+                newText = newText.toLowerCase().trim();
+                ArrayList<CategoryData> newList = new ArrayList<>();
 
-                for (CategoryData category : categoryList){
+                if (!newText.equals("")) {
+                    for (CategoryData category : categoryList) {
 
                     String category_name = category.getName().toLowerCase();
 
-                    if (category_name.contains(newText)){
+                    if (category_name.contains(newText)) {
                         newList.add(category);
                     }
                 }
-                adapter.setFilter(newList);
-                return true;
+                    adapter.setFilter(newList);
+                }else
+                    adapter.setFilter(categoryList);
+
+                return false;
             }
         });
+
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     private void setupRecyclerView() {
@@ -134,11 +127,15 @@ public class Category extends Fragment {
 
     private void setUpSwipeRefreshLayout() {
 
+
         sl.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
 
         sl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+
+                MenuItemCompat.collapseActionView(mSearchAction);
+
                 if(Common.isConnectToTheInternet(getActivity()))
                     new GetCategoryItemsBackgroundTask(getActivity()).execute();
                 else
@@ -149,7 +146,7 @@ public class Category extends Fragment {
         });
     }
 
-    /** Get Home Items **/
+    /** Get HomeData Items **/
     private class GetCategoryItemsBackgroundTask extends AsyncTask<String, Void, String> {
         public ProgressDialog dialog;
         Boolean is_arabic = Common.isArabic;
@@ -172,7 +169,7 @@ public class Category extends Fragment {
                 URL url = new URL(get_category_url);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.setRequestProperty("api_Token", getString(R.string.api_token));
+                httpURLConnection.setRequestProperty("api-token", getString(R.string.api_token));
                 httpURLConnection.setRequestProperty("Content-Type", getString(R.string.content_type));
                 httpURLConnection.setConnectTimeout(7000);
                 httpURLConnection.setReadTimeout(7000);
@@ -198,7 +195,7 @@ public class Category extends Fragment {
                     return sb.toString();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+               Common.showAlert2(getContext(),getString(R.string.warning),e.getMessage());
                 return "";
             }
             return "";
@@ -216,25 +213,29 @@ public class Category extends Fragment {
                 e.printStackTrace();
             }
 
-            for (int i = 0; i < firstJsonArray.length(); i++) {
+
                 try {
-                    JSONObject categories = firstJsonArray.getJSONObject(i);
+                    for (int i = 0; i < firstJsonArray.length(); i++) {
 
-                    CategoryData categoryData = new CategoryData(categories.getString("category_id"),categories.getString("image"),
-                            categories.getString("name"),categories.getString("isSubCat"),categories.getString("isProducts"));
+                        JSONObject categories = firstJsonArray.getJSONObject(i);
 
-                    categoryList.add(categoryData);
+                        CategoryData categoryData = new CategoryData(categories.getString("category_id"), categories.getString("image"),
+                                categories.getString("name"), categories.getString("isSubCat"), categories.getString("isProducts"));
 
-                    // set up the RecyclerView
-                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    adapter = new CategoryAdapter(categoryList);
-                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    recyclerView.setAdapter(adapter);
+                        categoryList.add(categoryData);
+
+                        // set up the RecyclerView
+                        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                        adapter = new CategoryAdapter(categoryList);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                        recyclerView.setAdapter(adapter);
+                    }
 
                 } catch (JSONException e) {
+                    Common.showAlert2(getContext(),getString(R.string.warning),e.getMessage());
                     e.printStackTrace();
                 }
-            }
+
         }
     }
 

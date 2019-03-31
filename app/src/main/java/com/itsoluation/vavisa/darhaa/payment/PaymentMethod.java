@@ -26,12 +26,10 @@ import com.itsoluation.vavisa.darhaa.model.paymentData.CheckoutPageParameters;
 import com.itsoluation.vavisa.darhaa.model.paymentData.ShippingMethodData;
 import com.itsoluation.vavisa.darhaa.model.paymentData.UserSendData;
 import com.itsoluation.vavisa.darhaa.model.paymentData.PaymentMethodData;
-import com.itsoluation.vavisa.darhaa.payment.paymentResult.PaymentResult;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.security.KeyStore;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -46,7 +44,8 @@ import io.reactivex.schedulers.Schedulers;
 public class PaymentMethod extends AppCompatActivity {
 
     @BindView(R.id.rootLayout)
-    RelativeLayout rootLayout;
+    LinearLayout rootLayout;
+
     @BindView(R.id.back_arrow)
     ImageView back_arrow;
     @BindView(R.id.information)
@@ -79,8 +78,8 @@ public class PaymentMethod extends AppCompatActivity {
 
     double total,total2;
 
-    ArrayList<PaymentMethodData> paymentMethods = new ArrayList<>();
-    ArrayList<ShippingMethodData> shippingMethods = new ArrayList<>();
+    ArrayList<PaymentMethodData> paymentMethods;
+    ArrayList<ShippingMethodData> shippingMethods;
 
     UserSendData payment1 = null;
     UserSendData payment2 = null;
@@ -93,13 +92,30 @@ public class PaymentMethod extends AppCompatActivity {
 
         ButterKnife.bind(this);
         progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
 
         Paper.init(this);
 
         if (Common.isArabic) {back_arrow.setRotation(180); }
 
+
+        setupPage();
+
+    }
+
+
+
+    private void setupPage() {
         user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : "0";
         device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        //that's for avoid repeated when came from on back pressed
+        paymentMethods = new ArrayList<>();
+        shippingMethods = new ArrayList<>();
+        shippingRG.removeAllViews();
+        paymentRG.removeAllViews();
+        payment_method_code = "";
+        shipping_method_title = "";
 
         total = Double.parseDouble(getIntent().getStringExtra("total"));
         total2 = total;
@@ -110,8 +126,8 @@ public class PaymentMethod extends AppCompatActivity {
         if(user_id == "0"){
             // if use same address for billing and shipping
             if(getIntent().hasExtra("address2")){
-               payment1 = getIntent().getExtras().getParcelable("address2");
-               payment2 = getIntent().getExtras().getParcelable("address2");
+                payment1 = getIntent().getExtras().getParcelable("address2");
+                payment2 = getIntent().getExtras().getParcelable("address2");
 
             }else {
                 payment1 = getIntent().getExtras().getParcelable("billing_address");
@@ -126,10 +142,13 @@ public class PaymentMethod extends AppCompatActivity {
             payment2 = new UserSendData(device_id,user_id,addressId);
         }
 
-        progressDialog.show();
-        callPaymentMethod();
-        callShippingMethod();
-        callInformationAPI();
+
+        if(Common.isConnectToTheInternet(this)) {
+            callPaymentMethod();
+            callShippingMethod();
+            callInformationAPI();
+        }else
+            Common.errorConnectionMess(this);
 
         shippingRG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -142,7 +161,7 @@ public class PaymentMethod extends AppCompatActivity {
                 shipping_method_cost = shippingMethods.get(checkedIndex).getCost();
 
                 total2= total+Double.parseDouble(shipping_method_cost);
-                payBtn.setText(getResources().getString(R.string.paying_now)+" ( "+String.valueOf(total2)+" ) "+getResources().getString(R.string.kd));
+                payBtn.setText(getResources().getString(R.string.paying_now)+" ( "+String.format("%.3f",total2)+" ) "+getResources().getString(R.string.kd));
 
             }
         });
@@ -157,11 +176,13 @@ public class PaymentMethod extends AppCompatActivity {
                 payment_method_title = paymentMethods.get(checkedIndex).getTitle();
             }
         });
-
     }
+
 
     private void callPaymentMethod() {
 
+        progressDialog.show();
+        try {
         compositeDisposable = new CompositeDisposable();
         compositeDisposable.add(Common.getAPI().paymentMethod(payment1)
                 .subscribeOn(Schedulers.io())
@@ -201,10 +222,16 @@ public class PaymentMethod extends AppCompatActivity {
                         }
                     }
                 }));
+    } catch (Exception e) {
+        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+    }
+
+        progressDialog.dismiss();
 
     }
 
     private void callShippingMethod() {
+        progressDialog.show();
 
         compositeDisposable = new CompositeDisposable();
         compositeDisposable.add(Common.getAPI().shippingMethod(payment2)
@@ -213,6 +240,8 @@ public class PaymentMethod extends AppCompatActivity {
                 .subscribe(new Consumer<JsonElement>() {
                     @Override
                     public void accept(JsonElement response) throws Exception {
+                        progressDialog.dismiss();
+
                         Gson gson = new Gson();
                         String json2 = gson.toJson(response);
 
@@ -227,18 +256,25 @@ public class PaymentMethod extends AppCompatActivity {
                             shippingLN.setVisibility(View.VISIBLE);
                             JSONArray dataArray = new JSONArray(json2);
                             for (int i = 0; i < dataArray.length(); i++) {
-                                JSONObject object1 = dataArray.getJSONObject(i);
-                                ShippingMethodData shippingMethod = new ShippingMethodData();
-                                shippingMethod.setCode(object1.getString("code"));
-                                shippingMethod.setTitle(object1.getString("title"));
-                                shippingMethod.setError(object1.getString("error"));
-                                shippingMethod.setCost(object1.getString("cost"));
-                                shippingMethods.add(shippingMethod);
+                                JSONObject object = dataArray.getJSONObject(i);
+                                JSONArray methodData = object.getJSONArray("quote");
+                                for (int x = 0; i < methodData.length(); i++) {
+                                    JSONObject object1 = methodData.getJSONObject(x);
+
+                                    ShippingMethodData shippingMethod = new ShippingMethodData();
+                                    shippingMethod.setCode(object1.getString("code"));
+                                    shippingMethod.setTitle(object1.getString("title"));
+                                    shippingMethod.setError(object1.getString("error"));
+                                    shippingMethod.setCost(object1.getString("cost"));
+                                    shippingMethods.add(shippingMethod);
+
+                                }
                             }
 
                         }
                         //bind data
                         for (ShippingMethodData paymentMethod: shippingMethods) {
+                            rootLayout.setVisibility(View.VISIBLE);
                             RadioButton radioButton = new RadioButton(PaymentMethod.this);
                             radioButton.setTextColor(getResources().getColor(R.color.black));
                             radioButton.setText(paymentMethod.getTitle()+"( "+paymentMethod.getCost()+getResources().getString(R.string.kd)+" )");
@@ -257,7 +293,6 @@ public class PaymentMethod extends AppCompatActivity {
                 .subscribe(new Consumer<JsonElement>() {
                     @Override
                     public void accept(JsonElement information) throws Exception {
-                     progressDialog.dismiss();
                         String result = information.toString();
 
                         if (!result.contains("error")) {
@@ -324,7 +359,7 @@ public class PaymentMethod extends AppCompatActivity {
                 }
 
 
-                Intent intent = new Intent(this, KnetPage.class);
+                Intent intent = new Intent(this, PaymentPage.class);
                 intent.putExtra("checkout",checkout);
                 startActivity(intent);
 

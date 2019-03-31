@@ -1,7 +1,10 @@
 package com.itsoluation.vavisa.darhaa.payment;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,10 +12,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.itsoluation.vavisa.darhaa.Login;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.adapter.CartAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
@@ -70,6 +75,12 @@ public class Checkout extends AppCompatActivity {
 
         setupRecyclerView();
 
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : "0";
         device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
@@ -81,10 +92,12 @@ public class Checkout extends AppCompatActivity {
             callAPI();
         } else
             Common.errorConnectionMess(this);
+
     }
 
     private void callAPI() {
 
+        try {
         progressDialog.show();
         compositeDisposable = new CompositeDisposable();
         compositeDisposable.add(Common.getAPI().viewCart(user_id, device_id, coupon_code)
@@ -119,6 +132,9 @@ public class Checkout extends AppCompatActivity {
                         }
                     }
                 }));
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
     }
 
     private void setupRecyclerView() {
@@ -129,20 +145,21 @@ public class Checkout extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
+      //  getIntent().removeExtra("couponCode");
     }
 
     @OnClick(R.id.checkoutBtn)
     public void completeOrder(){
+
         if(user_id == "0"){
-            Intent i = new Intent(this, BillingAddress.class);
+            Intent i = new Intent(Checkout.this, BillingAddress.class);
             i.putExtra("total",total_);
             if(getIntent().hasExtra("couponCode"))
                 i.putExtra("couponCode",getIntent().getStringExtra("couponCode"));
             startActivity(i);
 
         }else{
-            Intent i = new Intent(this, Addresses.class);
+            Intent i = new Intent(Checkout.this, Addresses.class);
             i.putExtra("total",total_);
             // true to make address picker in the next activity
             i.putExtra("checkoutAddress",true);
@@ -151,4 +168,5 @@ public class Checkout extends AppCompatActivity {
             startActivity(i);
         }
     }
+
 }

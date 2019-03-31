@@ -47,7 +47,7 @@ public class SubCartegory extends AppCompatActivity {
     CategoryAdapter adapter;
     ArrayList<CategoryData> categoryList;
 
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private CompositeDisposable compositeDisposable;
     ProgressDialog progressDialog;
 
     @Override
@@ -59,31 +59,34 @@ public class SubCartegory extends AppCompatActivity {
 
         if(Common.isArabic){back_arrow.setRotation(180); }
 
+
         title.setText(Html.fromHtml(CurrentCategoryDetails.category_name).toString());
 
         categoryList = new ArrayList<>();
-
+        compositeDisposable = new CompositeDisposable();
         //setup recycler
         setupRecyclerView();
-
         requestData();
-
+        setUpSwipeRefreshLayout();
     }
+
 
     private void requestData() {
         if(Common.isConnectToTheInternet(this)) {
+            try {
             progressDialog.setMessage(getString(R.string.loading));
             progressDialog.show();
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             // this.progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
-            compositeDisposable.add(Common.getAPI().getSubCat("62")
+            compositeDisposable.add(Common.getAPI().getSubCat(CurrentCategoryDetails.category_id)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<JsonElement>() {
                         @Override
                         public void accept(JsonElement jsonElement) throws Exception {
 
+                            categoryList.clear();
                             String result = jsonElement.toString();
                             JSONArray firstJsonArray = null;
                             try {
@@ -99,7 +102,6 @@ public class SubCartegory extends AppCompatActivity {
 
                                     CategoryData categoryData = new CategoryData(categories.getString("category_id"),categories.getString("image"),
                                             categories.getString("name"),categories.getString("isSubCat"),categories.getString("isProducts"));
-
                                     categoryList.add(categoryData);
                                     adapter = new CategoryAdapter(categoryList);
                                     subCat_rec.setAdapter(adapter);
@@ -111,6 +113,10 @@ public class SubCartegory extends AppCompatActivity {
 
                         }
                     }));
+
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
         }else {
             Common.errorConnectionMess(this);
             progressDialog.dismiss();
@@ -120,6 +126,20 @@ public class SubCartegory extends AppCompatActivity {
     private void setupRecyclerView() {
         subCat_rec.setHasFixedSize(false);
         subCat_rec.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+
+    private void setUpSwipeRefreshLayout() {
+        sl.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
+        sl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (adapter != null) {
+                    requestData();
+                }
+                sl.setRefreshing(false);
+            }
+        });
     }
 
     @Override

@@ -24,6 +24,7 @@
         android:background="@color/overLayBackground"
         app:itemHorizontalPadding="18dp"
         app:itemTextColor="@color/brownLight"
+        app:itemIconTint="@color/brownLight"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer"/>
 

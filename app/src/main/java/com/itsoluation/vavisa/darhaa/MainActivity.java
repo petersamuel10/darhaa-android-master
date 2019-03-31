@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.fargments.Category;
-import com.itsoluation.vavisa.darhaa.fargments.ContactSupport;
+import com.itsoluation.vavisa.darhaa.fargments.ContactUS;
 import com.itsoluation.vavisa.darhaa.fargments.Favourite;
 import com.itsoluation.vavisa.darhaa.fargments.Home;
 import com.itsoluation.vavisa.darhaa.fargments.Profile;
@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity
         //init paper
         Paper.init(this);
 
-        Log.i("axccess",Common.current_user.getUserAccessToken());
         chooseFragment(new Home());
         titleTxt.setText(getResources().getText(R.string.home));
 
@@ -65,6 +64,7 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -107,10 +107,13 @@ public class MainActivity extends AppCompatActivity
              Common.current_user = Paper.book("DarHaa").read("currentUser");
             // startActivity(new Intent(this,MainActivity.class));
         }else {
-            if (!Common.isSkip) {
+            if (Paper.book("DarHaa").contains("isSkip")) {
+               // stay home
+            }else{
                 startActivity(new Intent(MainActivity.this, RegisterLogin.class));
                 finish();
             }
+
         }
     }
 
@@ -120,7 +123,10 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            //super.onBackPressed();
+            this.finish();
+            System.exit(0);
+
         }
     }
 
@@ -143,7 +149,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
+        // automatically handle clicks on the HomeData/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
@@ -179,7 +185,7 @@ public class MainActivity extends AppCompatActivity
             //mSearch.setVisible(false);
             titleTxt.setPaddingRelative(0,0,24,0);
         }else if (id == R.id.nav_support) {
-            fragment = new ContactSupport();
+            fragment = new ContactUS();
            // mSearch.setVisible(false);
             titleTxt.setPaddingRelative(0,0,24,0);
         }
@@ -213,5 +219,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onQueryTextChange(String s) {
         return false;
     }
+
+
 
 }

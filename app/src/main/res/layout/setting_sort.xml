@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background2"
+    android:background="@drawable/background"
     tools:context=".view_setting.Sort">
 
     <android.support.v7.widget.Toolbar
@@ -132,7 +132,6 @@
             android:layout_marginTop="100dp"
             android:padding="6dp"
             android:text="@string/apply"
-            android:minHeight="0dp"
             android:background="@drawable/big_button_brown"
             android:textColor="@android:color/white"
             android:textAlignment="center"
@@ -140,14 +139,5 @@
             android:textSize="16sp"/>
 
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/footer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:scaleType="fitXY"
-        android:adjustViewBounds="true"
-        android:src="@drawable/footer" />
 
 </RelativeLayout>

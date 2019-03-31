@@ -84,6 +84,7 @@ public class ForgetPassword extends AppCompatActivity {
 
         this.progressDialog.setMessage(getString(R.string.loading));
         this.progressDialog.show();
+        try {
 
         compositeDisposable.add(Common.getAPI().forgotten(email)
                            .subscribeOn(Schedulers.io())
@@ -127,6 +128,11 @@ public class ForgetPassword extends AppCompatActivity {
                                    }
                                }
                            }));
+
+    } catch (Exception e) {
+        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
     }
+
+}
 
 }

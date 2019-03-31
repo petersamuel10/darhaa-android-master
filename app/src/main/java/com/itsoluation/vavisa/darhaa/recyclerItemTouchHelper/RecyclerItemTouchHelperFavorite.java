@@ -9,10 +9,12 @@ import android.view.View;
 
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerItemTouchHelperListner;
 import com.itsoluation.vavisa.darhaa.adapter.FavoritesAdapter;
+import com.itsoluation.vavisa.darhaa.common.Common;
 
 public class RecyclerItemTouchHelperFavorite extends ItemTouchHelper.SimpleCallback {
 
     private RecyclerItemTouchHelperListner listener;
+
 
     public RecyclerItemTouchHelperFavorite(int dragDirs, int swipeDirs , RecyclerItemTouchHelperListner listener) {
         super(dragDirs, swipeDirs);

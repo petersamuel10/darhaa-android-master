@@ -18,6 +18,7 @@ import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.Register;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.Status;
+import com.itsoluation.vavisa.darhaa.web_service.Controller2;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,6 +64,10 @@ public class ChangePassword extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        if (Common.isArabic) {
+            back_arrow.setRotation(180);
+        }
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
 
@@ -84,7 +89,8 @@ public class ChangePassword extends AppCompatActivity {
     private void callRegisterApi(String newPass_st, String conPass_st, Integer customer_id, String oldPass_st) {
 
         progressDialog.show();
-        compositeDisposable.add(Common.getAPI2().changePassword(newPass_st,conPass_st,customer_id,oldPass_st)
+        try {
+        compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().changePassword(newPass_st,conPass_st,customer_id,oldPass_st)
                            .subscribeOn(Schedulers.io())
                            .observeOn(AndroidSchedulers.mainThread())
                            .subscribe(new Consumer<Status>() {
@@ -99,7 +105,11 @@ public class ChangePassword extends AppCompatActivity {
                                }
                            }));
 
+    } catch (Exception e) {
+        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
     }
+
+}
 
     public boolean validation(String old_st, String new_st, String con_st){
 

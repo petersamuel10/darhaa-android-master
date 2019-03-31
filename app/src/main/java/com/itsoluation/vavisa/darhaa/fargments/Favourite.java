@@ -2,12 +2,10 @@ package com.itsoluation.vavisa.darhaa.fargments;
 
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -16,10 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.JsonElement;
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerItemTouchHelperListner;
+import com.itsoluation.vavisa.darhaa.Login;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.adapter.FavoritesAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
@@ -30,15 +30,20 @@ import com.itsoluation.vavisa.darhaa.recyclerItemTouchHelper.RecyclerItemTouchHe
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.paperdb.Paper;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,6 +58,14 @@ public class Favourite extends Fragment implements RecyclerItemTouchHelperListne
     TextView notFound;
     @BindView(R.id.rootLayout)
     FrameLayout rootLayout;
+    @BindView(R.id.loginLN)
+    LinearLayout loginLN;
+
+    @OnClick(R.id.loginText)
+    public void login() {
+        startActivity(new Intent(getContext(), Login.class));
+    }
+
 
     private CompositeDisposable compositeDisposable;
     FavoritesAdapter adapter;
@@ -68,15 +81,28 @@ public class Favourite extends Fragment implements RecyclerItemTouchHelperListne
 
         ButterKnife.bind(this, view);
         progressDialog = new ProgressDialog(getActivity());
-
-        if (Paper.book("DarHaa").contains("currentUser"))
-            id = Common.current_user.getCustomerInfo().getCustomer_id();
-        setUpSwipeRefreshLayout();
-        setupRecyclerView();
-        requestData();
+        progressDialog.setCancelable(false);
 
         return view;
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        if (Paper.book("DarHaa").contains("currentUser")) {
+            id = Common.current_user.getCustomerInfo().getCustomer_id();
+            setUpSwipeRefreshLayout();
+            setupRecyclerView();
+            requestData();
+            sl.setVisibility(View.VISIBLE);
+            loginLN.setVisibility(View.GONE);
+        } else
+            loginLN.setVisibility(View.VISIBLE);
+
+
+    }
+
 
     private void requestData() {
 
@@ -97,29 +123,38 @@ public class Favourite extends Fragment implements RecyclerItemTouchHelperListne
                                     String result = jsonElement.toString();
 
                                     if (result.contains("error")) {
-                                        JSONObject object = new JSONObject(result);
-                                        Common.showAlert2(getContext(),object.getString("status"),object.getString("message"));
+                                        if (result.contains(getString(R.string.no_data_found)))
+                                            notFound.setVisibility(View.VISIBLE);
+                                        else {
+                                            JSONObject object = new JSONObject(result);
+                                            Common.showAlert2(getContext(), object.getString("status"), object.getString("message"));
+                                        }
                                     } else {
                                         JSONArray jArray = new JSONArray(result);
                                         favList = new ArrayList<>();
-
-                                        for (int i = 0; i < jArray.length(); i++) {
-                                            JSONObject object1 = jArray.getJSONObject(i);
-                                            Products products = new Products();
-                                            products.setProduct_id(object1.getInt("product_id"));
-                                            products.setThumb(object1.getString("thumb"));
-                                            products.setName(object1.getString("name"));
-                                            products.setPrice(object1.getString("price"));
-                                            products.setSpecial(object1.getString("special"));
-                                            favList.add(products);
+                                        if (jArray.length() == 0)
+                                            notFound.setVisibility(View.VISIBLE);
+                                        else {
+                                            for (int i = 0; i < jArray.length(); i++) {
+                                                JSONObject object1 = jArray.getJSONObject(i);
+                                                Products products = new Products();
+                                                products.setProduct_id(object1.getString("product_id"));
+                                                products.setThumb(object1.getString("thumb"));
+                                                products.setName(object1.getString("name"));
+                                                products.setPrice(object1.getString("price"));
+                                                products.setSpecial(object1.getString("special"));
+                                                favList.add(products);
+                                            }
+                                            notFound.setVisibility(View.GONE);
+                                            adapter.addFavList(favList);
+                                            adapter.notifyDataSetChanged();
                                         }
-                                        adapter.addFavList(favList);
-                                        adapter.notifyDataSetChanged();
                                     }
                                 }
                             }));
 
                 } catch (Exception e) {
+                    Common.showAlert2(getContext(), getString(R.string.warning), e.getMessage());
                     Log.d("rrrrrr", e.getMessage());
                 }
 
@@ -157,31 +192,46 @@ public class Favourite extends Fragment implements RecyclerItemTouchHelperListne
     }
 
     @Override
-    public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction, int position) {
-
+    public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction, final int position) {
+        progressDialog.show();
         compositeDisposable = new CompositeDisposable();
-        String product_id = String.valueOf(favList.get(viewHolder.getAdapterPosition()).getProduct_id());
+        final String product_id = String.valueOf(favList.get(viewHolder.getAdapterPosition()).getProduct_id());
         String user_id = String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id());
 
-        if (viewHolder instanceof FavoritesAdapter.ViewHolder) {
+        if (Common.isConnectToTheInternet(getContext())) {
 
-            compositeDisposable.add(Common.getAPI().removeFavorte(product_id, user_id)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<Status>() {
+            try {
+                if (viewHolder instanceof FavoritesAdapter.ViewHolder) {
+                    progressDialog.show();
+                    Call<Status> delete = Common.getAPI().removeFavorte_(product_id, user_id);
+                    delete.enqueue(new Callback<Status>() {
                         @Override
-                        public void accept(Status status) throws Exception {
-                            if (status.getStatus().equals("error"))
-                                Common.showAlert2(getContext(), status.getStatus(), status.getMessage());
-                            else{
-                                Snackbar snackbar = Snackbar.make(rootLayout,status.getMessage(), Snackbar.LENGTH_LONG);
-                                snackbar.show();
-                            }
-                        }
-                    }));
+                        public void onResponse(Call<Status> call, Response<Status> response) {
 
-            adapter.deleteItem(viewHolder.getAdapterPosition());
-            adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
-        }
+                            if (response.body().getStatus().equals("error"))
+                                Common.showAlert2(getContext(), response.body().getStatus(), response.body().getMessage());
+                            else {
+                                progressDialog.dismiss();
+
+                                favList.remove(position);
+                                adapter.addFavList(favList);
+                                if (adapter.getItemCount() == 0) {
+                                    notFound.setVisibility(View.VISIBLE);
+                                }
+                            }
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<Status> call, Throwable t) {
+
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                Common.showAlert2(getContext(), getString(R.string.warning), e.getMessage());
+            }
+        } else
+            Common.errorConnectionMess(getContext());
     }
 }

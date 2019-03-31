@@ -10,6 +10,7 @@ import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,17 +20,19 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
-import com.itsoluation.vavisa.darhaa.profile_fragments.ChangePassword;
-import com.itsoluation.vavisa.darhaa.profile_fragments.EditProfile;
 import com.itsoluation.vavisa.darhaa.Login;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.ProfileData;
 import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.profile_fragments.Addresses;
+import com.itsoluation.vavisa.darhaa.profile_fragments.ChangePassword;
+import com.itsoluation.vavisa.darhaa.profile_fragments.EditProfile;
 import com.itsoluation.vavisa.darhaa.profile_fragments.Language;
 import com.itsoluation.vavisa.darhaa.profile_fragments.Orders;
 import com.itsoluation.vavisa.darhaa.profile_fragments.Terms;
+import com.itsoluation.vavisa.darhaa.web_service.Controller;
+import com.itsoluation.vavisa.darhaa.web_service.Controller2;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -94,7 +97,11 @@ public class Profile extends Fragment implements View.OnClickListener {
     @OnClick(R.id.editBtn)
     public void editProfile(){getContext().startActivity(new Intent(getContext(), EditProfile.class));}
     @OnClick(R.id.loginLN)
-    public void login(){startActivity(new Intent(getContext(),Login.class));}
+    public void login(){
+        Intent i = new Intent(getContext(),Login.class);
+        i.putExtra("first_time",true);
+        startActivity(i);
+    }
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     ProgressDialog progressDialog;
@@ -117,34 +124,31 @@ public class Profile extends Fragment implements View.OnClickListener {
         languageLN.setOnClickListener(this);
         changePasswordLN.setOnClickListener(this);
         termsLN.setOnClickListener(this);
-        if(Paper.book("DarHaa").contains("currentUser")) {
-            contentView.setVisibility(View.GONE);
-            requestData();
-        }
-        else
-            newView();
-
-        scrollView.setVisibility(View.VISIBLE);
-
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
+
         if(Paper.book("DarHaa").contains("currentUser")) {
+            showView();
             contentView.setVisibility(View.GONE);
             requestData();
-        }
-        else
-            newView();
+        } else
+            hideView();
+
+      //  scrollView.setVisibility(View.VISIBLE);
     }
 
     private void requestData() {
+
         if (Common.isConnectToTheInternet(getActivity())) {
+
+            try {
             this.progressDialog.setMessage(getString(R.string.loading));
             this.progressDialog.show();
-            compositeDisposable.add(Common.getAPI2().getProfile(Common.current_user.getCustomerInfo().getCustomer_id())
+            compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().getProfile(Common.current_user.getCustomerInfo().getCustomer_id())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<ProfileData>() {
@@ -153,32 +157,30 @@ public class Profile extends Fragment implements View.OnClickListener {
                             progressDialog.dismiss();
                             contentView.setVisibility(View.VISIBLE);
                             if (profileData.getStatus() != null) {
+                                if(profileData.getMessage().contains("Access Token")) {
+                                    Common.showAlert2(getContext(),getResources().getString(R.string.warning),getResources().getString(R.string.login_in_another_device));
+                                    logout();
+                                    showView();
+                                }else
+                                    Common.showAlert2(getContext(),profileData.getStatus(),profileData.getMessage());
 
-                                AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
-                                builder1.setMessage(profileData.getMessage());
-                                builder1.setTitle(profileData.getStatus());
-                                builder1.setCancelable(false);
-                                builder1.setPositiveButton(
-                                        R.string.ok,
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                dialog.cancel();
-                                            }
-                                        });
-
-                                AlertDialog alert11 = builder1.create();
-                                alert11.show();
                             } else {
                                 first_name = profileData.getFirstname();
                                 last_name = profileData.getLastname();
                                 email = profileData.getEmail();
                                 phone = profileData.getTelephone();
 
-                                name_txt.setText(first_name+" "+last_name);
+                                name_txt.setText(first_name);
                                 email_txt.setText(email);
                                 phone_txt.setText(phone);
 
-                                String profile_image_txt = String.valueOf(first_name.charAt(0))+String.valueOf(last_name.charAt(0));
+
+                                String initials = "";
+                                for (String s : first_name.split(" ")) {
+                                    initials+=s.charAt(0);
+                                }
+
+                                String profile_image_txt = initials.substring(0,2);
 
                                 TextDrawable drawable = TextDrawable.builder()
                                         .beginConfig().textColor(Color.BLACK).toUpperCase()
@@ -192,6 +194,10 @@ public class Profile extends Fragment implements View.OnClickListener {
 
                         }
                     }));
+
+        } catch (Exception e) {
+            Common.showAlert2(getContext(), getString(R.string.warning), e.getMessage());
+        }
 
         } else
             Common.errorConnectionMess(getContext());
@@ -218,30 +224,41 @@ public class Profile extends Fragment implements View.OnClickListener {
         this.progressDialog.setMessage(getString(R.string.loading));
         this.progressDialog.show();
 
-        device_id = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
+        String android_id = Settings.Secure.getString(getContext().getContentResolver(),
+                Settings.Secure.ANDROID_ID);
 
-        compositeDisposable.add(Common.getAPI().logout(Common.current_user.getCustomerInfo().getCustomer_id(), device_id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Status>() {
-                    @Override
-                    public void accept(Status status) throws Exception {
-                        progressDialog.dismiss();
-                        if (status.getStatus().equals("error")) {
-                            Common.showAlert2(getContext(), status.getStatus(), status.getMessage());
-                        } else {
+        if(Common.isConnectToTheInternet(getContext())) {
+            try {
 
-                            Snackbar snackbar = Snackbar.make(contentView, getResources().getString(R.string.logout_successfully), Snackbar.LENGTH_LONG);
-                            snackbar.show();
-                            Paper.book("DarHaa").delete("currentUser");
-                            Common.current_user = null;
-                            newView();
+            compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().logout(Common.current_user.getCustomerInfo().getCustomer_id(), android_id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Status>() {
+                        @Override
+                        public void accept(Status status) throws Exception {
+                            progressDialog.dismiss();
+                            if (status.getStatus().equals("error")) {
+                                Common.showAlert2(getContext(), status.getStatus(), status.getMessage());
+                            } else {
+
+                                Snackbar snackbar = Snackbar.make(contentView, getResources().getString(R.string.logout_successfully), Snackbar.LENGTH_LONG);
+                                snackbar.show();
+                                Paper.book("DarHaa").delete("currentUser");
+                                Common.current_user = null;
+                                hideView();
+                            }
                         }
-                    }
-                }));
+                    }));
+
+            } catch (Exception e) {
+                Common.showAlert2(getContext(), getString(R.string.warning), e.getMessage());
+            }
+        }else
+            Common.errorConnectionMess(getContext());
+
     }
 
-    private void newView() {
+    private void hideView() {
 
         headerLN.setVisibility(View.GONE);
         addressLN.setVisibility(View.GONE);
@@ -250,4 +267,12 @@ public class Profile extends Fragment implements View.OnClickListener {
         loginLN.setVisibility(View.VISIBLE);
     }
 
+    private void showView() {
+
+        headerLN.setVisibility(View.VISIBLE);
+        addressLN.setVisibility(View.VISIBLE);
+        orderLN.setVisibility(View.VISIBLE);
+        changePasswordLN.setVisibility(View.VISIBLE);
+        loginLN.setVisibility(View.GONE);
+    }
 }

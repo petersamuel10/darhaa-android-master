@@ -25,6 +25,11 @@ public class CategoryData {
     @Expose
     private String isProduct ;
 
+    @SerializedName("minimum")
+    @Expose
+    private String minimum;
+
+
 
 
     public CategoryData() {

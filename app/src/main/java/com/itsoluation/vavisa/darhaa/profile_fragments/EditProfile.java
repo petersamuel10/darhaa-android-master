@@ -9,11 +9,13 @@ import android.widget.ImageView;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.Status;
+import com.itsoluation.vavisa.darhaa.web_service.Controller2;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.paperdb.Paper;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
@@ -45,6 +47,14 @@ public class EditProfile extends AppCompatActivity {
 
         if (Common.isArabic) {back_arrow.setRotation(180);}
 
+        Paper.init(this);
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
         name_ed.setText(Common.current_user.getCustomerInfo().getFirstname());
         email_ed.setText(Common.current_user.getCustomerInfo().getEmail());
         phone_ed.setText(Common.current_user.getCustomerInfo().getTelephone());
@@ -68,7 +78,8 @@ public class EditProfile extends AppCompatActivity {
 
     private void callUpdateApi(final String name, final String email, final String phone, Integer user_id) {
 
-        compositeDisposable.add(Common.getAPI2().editProfile(name,email,phone, String.valueOf(user_id))
+try {
+        compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().editProfile(name,email,phone, String.valueOf(user_id))
                            .subscribeOn(Schedulers.io())
                            .observeOn(AndroidSchedulers.mainThread())
                            .subscribe(new Consumer<Status>() {
@@ -77,9 +88,12 @@ public class EditProfile extends AppCompatActivity {
                                    if(status.getStatus().equals("error")){
                                        Common.showAlert2(EditProfile.this,status.getStatus(),status.getMessage());
                                    }else {
+
                                        Common.current_user.getCustomerInfo().setFirstname(name);
                                        Common.current_user.getCustomerInfo().setEmail(email);
                                        Common.current_user.getCustomerInfo().setTelephone(phone);
+
+                                       Paper.book("DarHaa").write("currentUser", Common.current_user);
 
                                        AlertDialog.Builder builder1 = new AlertDialog.Builder(EditProfile.this);
                                        builder1.setMessage(status.getMessage());
@@ -102,7 +116,12 @@ public class EditProfile extends AppCompatActivity {
                                }
                            }));
 
+    } catch (Exception e) {
+        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
     }
+
+
+}
 
     private boolean validate(String name, String email, String phone) {
 
@@ -112,10 +131,7 @@ public class EditProfile extends AppCompatActivity {
         }else if (!email.contains("@") || !email.contains(".com")) {
             Common.showAlert(EditProfile.this,R.string.error,R.string.validate_email);
             return false;
-        } else if (phone_str.length() < 8) {
-                Common.showAlert(EditProfile.this,R.string.error,R.string.validate_phone_number);
-                return false;
-            }else
+        } else
                 return true;
     }
 

@@ -13,7 +13,9 @@
     <color name="brownHint">#EAD7AF</color>
     <color name="grey">#808080</color>
     <color name="greyLight">#55DCDCDC</color>
+    <color name="greyback">#FCFAFA</color>
     <color name="overLayBackground">#F0FFFFFF</color>
+    <color name="backgroundtextImage">#A0FFFFFF</color>
     <color name="overLayBackgroundgrey">#77000000</color>
     <color name="black">#000000</color>
 

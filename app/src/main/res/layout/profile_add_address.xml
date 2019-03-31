@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background2"
+    android:background="@drawable/background"
     tools:context=".profile_fragments.AddAddress">
 
     <android.support.v7.widget.Toolbar
@@ -81,6 +81,7 @@
                     android:background="@drawable/border_blue"
                     android:gravity="center_vertical|start"
                     android:hint="@string/addressName"
+                    android:textColorHint="@color/greyLight"
                     android:inputType="text"
                     android:padding="5dp"
                     android:textColor="@color/black" />
@@ -95,7 +96,21 @@
                     android:textSize="16dp"
                     android:textStyle="bold" />
 
+                <EditText
+                    android:id="@+id/country_ed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/border_blue"
+                    android:gravity="center_vertical"
+                    android:enabled="false"
+                    android:inputType="number"
+                    android:padding="5dp"
+                    android:textColor="@color/black"
+                    android:visibility="gone"/>
+
                 <LinearLayout
+                    android:id="@+id/country_ln"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
@@ -121,7 +136,21 @@
                     android:textSize="16dp"
                     android:textStyle="bold" />
 
+                <EditText
+                    android:id="@+id/area_ed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/border_blue"
+                    android:gravity="center_vertical"
+                    android:enabled="false"
+                    android:inputType="number"
+                    android:padding="5dp"
+                    android:textColor="@color/black"
+                    android:visibility="gone"/>
+
                 <LinearLayout
+                    android:id="@+id/area_ln"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
@@ -147,7 +176,21 @@
                     android:textSize="16dp"
                     android:textStyle="bold" />
 
+                <EditText
+                    android:id="@+id/city_ed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/border_blue"
+                    android:gravity="center_vertical"
+                    android:enabled="false"
+                    android:inputType="number"
+                    android:padding="5dp"
+                    android:textColor="@color/black"
+                    android:visibility="gone"/>
+
                 <LinearLayout
+                    android:id="@+id/city_ln"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
@@ -156,7 +199,6 @@
                     android:paddingTop="5dp"
                     android:paddingEnd="5dp"
                     android:paddingBottom="5dp">
-
                     <Spinner
                         android:id="@+id/city"
                         android:theme="@style/ThemeOverlay.AppCompat.Light"
@@ -181,6 +223,7 @@
                     android:background="@drawable/border_blue"
                     android:gravity="center_vertical"
                     android:hint="@string/postcode"
+                    android:textColorHint="@color/greyLight"
                     android:inputType="number"
                     android:padding="5dp"
                     android:textColor="@color/black" />
@@ -202,6 +245,7 @@
                     android:background="@drawable/border_blue"
                     android:gravity="center_vertical"
                     android:hint="@string/apartment"
+                    android:textColorHint="@color/greyLight"
                     android:inputType="textMultiLine"
                     android:lines="5"
                     android:overScrollMode="always"
@@ -255,12 +299,6 @@
         </RelativeLayout>
     </ScrollView>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:scaleType="fitXY"
-        android:adjustViewBounds="true"
-        android:src="@drawable/footer" />
+
 
 </RelativeLayout>

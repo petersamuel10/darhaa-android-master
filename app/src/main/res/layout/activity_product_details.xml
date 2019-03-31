@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootLayout"
+    style="@style/SplashActivityWithBGImageBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background2"
+    android:background="@drawable/background"
     tools:context=".Product">
 
     <ScrollView
         android:id="@+id/scrollData"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+      >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -36,7 +38,6 @@
                 android:layout_height="350dp"
                 android:adjustViewBounds="true"
                 android:scaleType="fitXY"
-                app:slider_interval="3000"
                 app:slider_loopSlides="true" />
 
             <!-- price and name-->
@@ -409,21 +410,19 @@
                     android:layout_height="1dp"
                     android:background="@color/grey" />
 
-                <TextView
+
+                <WebView
                     android:id="@+id/item_desc_details"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
                     android:layout_marginStart="4dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="4dp"
                     android:layout_marginBottom="14dp"
-                    android:gravity="start"
-                    android:lineSpacingExtra="8dp"
-                    android:padding="4dp"
-                    android:text="White cotton shirt  White cotton shirt  White cotton shirt  White cotton shirt  White cotton shirt  White cotton shirt  White cotton shirt  White cotton shirt  White cotton shirt"
+                    android:background="@android:color/transparent"
+                    android:backgroundTint="@android:color/transparent"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
 
                 <View
                     android:layout_width="fill_parent"
@@ -432,10 +431,37 @@
 
             </LinearLayout>
 
-            <android.support.v4.view.ViewPager
+            <!--attributes-->
+
+            <LinearLayout
+                android:id="@+id/attributes_layout"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/discount_layout"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/discount_txt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="16sp"/>
+
+            </LinearLayout>
+
+          <!--  <android.support.v4.view.ViewPager
                 android:id="@+id/viewpager"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content" />-->
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/related_rec"
@@ -458,14 +484,5 @@
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
         android:src="@drawable/ic_arrow_back" />
-
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/footer" />
 
 </RelativeLayout>

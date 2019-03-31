@@ -5,13 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".payment.KnetPage">
+    tools:context=".payment.PaymentPage">
 
     <WebView
         android:id="@+id/wb_payment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:visibility="visible"/>
+        android:layout_gravity="center"/>
 
 </LinearLayout>

@@ -52,7 +52,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ViewHolder
 
         @BindView(R.id.name)
         TextView name;
-        @BindView(R.id.status)
+        @BindView(R.id.status_)
         TextView status;
         @BindView(R.id.product_num)
         TextView product_num;

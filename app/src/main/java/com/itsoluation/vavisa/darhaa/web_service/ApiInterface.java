@@ -4,7 +4,8 @@ import com.google.gson.JsonElement;
 import com.itsoluation.vavisa.darhaa.model.addToCart.AddToCardData;
 import com.itsoluation.vavisa.darhaa.model.cartData.CartData;
 import com.itsoluation.vavisa.darhaa.model.cartData.EditCart;
-import com.itsoluation.vavisa.darhaa.model.home.Home;
+import com.itsoluation.vavisa.darhaa.model.category_products.CategoryProductData;
+import com.itsoluation.vavisa.darhaa.model.home.HomeData;
 import com.itsoluation.vavisa.darhaa.model.ProfileData;
 import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.model.User;
@@ -20,6 +21,7 @@ import com.itsoluation.vavisa.darhaa.model.paymentData.UserSendData;
 import java.util.ArrayList;
 
 import io.reactivex.Observable;
+import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -32,11 +34,11 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("index.php?route=restapi/register")
     Observable<User> register(@Field("firstname") String firstname, @Field("email") String email, @Field("telephone") String telephone,
-                              @Field("password") String password, @Field("confirm") String confirm);
+                              @Field("password") String password, @Field("confirm") String confirm,@Field("device_id") String device_id);
 
     @FormUrlEncoded
     @POST("index.php?route=restapi/login")
-    Observable<User> login(@Field("email") String email, @Field("password") String password);
+    Observable<User> login(@Field("email") String email, @Field("password") String password,@Field("device_id") String device_id);
 
     @FormUrlEncoded
     @POST("index.php?route=restapi/logout")
@@ -47,7 +49,7 @@ public interface ApiInterface {
     Observable<User> forgotten(@Field("email") String email);
 
     @GET("index.php?route=restapi/home")
-    Observable<Home> home();
+    Observable<HomeData> home();
 
     @GET("index.php?route=restapi/category")
     Observable<JsonElement> getSubCat(@Query("category_id") String category_id);
@@ -59,7 +61,7 @@ public interface ApiInterface {
     Observable<JsonElement> getWishList(@Query("user_id") Integer user_id);
 
     @GET("index.php?route=restapi/address")
-    Observable<ArrayList<AddressGet>> addressBook(@Query("user_id") Integer user_id );
+    Observable<JsonElement> addressBook(@Query("user_id") Integer user_id );
 
     @FormUrlEncoded
     @POST("index.php?route=restapi/checkout/address")
@@ -109,6 +111,10 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("index.php?route=restapi/product/deleteWishlist")
+    Call<Status> removeFavorte_(@Field("product_id") String product_id, @Field("user_id") String user_id);
+
+    @FormUrlEncoded
+    @POST("index.php?route=restapi/product/deleteWishlist")
     Observable<Status> removeFavorte(@Field("product_id") String product_id, @Field("user_id") String user_id);
 
 
@@ -125,7 +131,7 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("index.php?route=restapi/cart/remove")
-    Observable<Status> deleteCart(@Field("cart_id") String cart_id,@Field("user_id") String user_id, @Field("device_id") String device_id);
+    Call<Status> deleteCart(@Field("cart_id") String cart_id, @Field("user_id") String user_id, @Field("device_id") String device_id);
 
     @POST("index.php?route=restapi/cart/edit")
     Observable<Status> editCart(@Body EditCart editCart);
@@ -145,6 +151,16 @@ public interface ApiInterface {
 
     @POST("index.php?route=restapi/checkout/confirm")
     Observable<CheckoutProductPage> checkoutProductPage(@Body CheckoutPageParameters data);
+
+
+    @GET("index.php?route=restapi/product")
+    Observable<CategoryProductData> get_product_pagination(@Query("category_id") String category_id, @Query("sort") String sort, @Query("order") String order,
+                                                           @Query("price_range") String price_range, @Query("limit") String limit, @Query("page") String page,
+                                                           @Query("search") String search, @Query("user_id") String user_id);
+
+    @GET("index.php?route=restapi/product")
+    Observable<CategoryProductData> get_product_search(@Query("category_id") String category_id,@Query("order") String order, @Query("limit") String limit, @Query("page") String page,
+                                                           @Query("search") String search ,@Query("user_id") String user_id);
 
 
 }

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.itsoluation.vavisa.darhaa.CategoryProducts;
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerViewItemClickListener;
 import com.itsoluation.vavisa.darhaa.R;
@@ -105,7 +106,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         public void bindData(String image){
 
-            Picasso.with(context).load(image).into(category_image);
+            Glide.with(context).load(image).into(category_image);
         }
 
         // allows clicks events to be caught

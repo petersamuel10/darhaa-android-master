@@ -80,7 +80,7 @@ public class BillingAddress extends AppCompatActivity implements AdapterView.OnI
     List<String> area_name_list;
     List<String> cities_name_list;
 
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    CompositeDisposable compositeDisposable;
     String user_name,email,postcode,phone,company_name,address_details,city_name,
             country_id,zone_id,device_id,country_,zone;
 
@@ -95,21 +95,25 @@ public class BillingAddress extends AppCompatActivity implements AdapterView.OnI
         progressDialog = new ProgressDialog(BillingAddress.this);
         progressDialog.setCancelable(false);
 
-        device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        if (Common.isArabic) { back_arrow.setRotation(180); }
 
-        if (Common.isArabic) {
-            back_arrow.setRotation(180);
-        }
+        country_spinner.setOnItemSelectedListener(this);
+        area_spinner.setOnItemSelectedListener(this);
+        city_spinner.setOnItemSelectedListener(this);
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        compositeDisposable = new CompositeDisposable();
+        device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
         if (Common.isConnectToTheInternet(this)) {
             getCountries();
         } else
             Common.errorConnectionMess(BillingAddress.this);
-
-
-        country_spinner.setOnItemSelectedListener(this);
-        area_spinner.setOnItemSelectedListener(this);
-        city_spinner.setOnItemSelectedListener(this);
     }
 
     private void getCountries() {
@@ -117,6 +121,7 @@ public class BillingAddress extends AppCompatActivity implements AdapterView.OnI
         countryArrayList = new ArrayList<>();
         country_name_list = new ArrayList<>();
 
+try {
         Observable<ArrayList<Countries>> apiCountry = Common.getAPI().getCountries().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
         apiCountry.subscribe(new Observer<ArrayList<Countries>>() {
@@ -151,6 +156,9 @@ public class BillingAddress extends AppCompatActivity implements AdapterView.OnI
                 country_spinner.setAdapter(country_adapter);
             }
         });
+    } catch (Exception e) {
+        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+    }
     }
 
     private void getArea(String country_id, String country_code) {
@@ -285,12 +293,6 @@ public class BillingAddress extends AppCompatActivity implements AdapterView.OnI
         if (TextUtils.isEmpty(phone)) {
             Snackbar snackbar = Snackbar.make(rootLayout, R.string.enterPhone, Snackbar.LENGTH_LONG);
             snackbar.show();
-            return false;
-        }
-
-        if (phone.length() < 8) {
-            Snackbar snackbar2 = Snackbar.make(rootLayout, R.string.validate_phone_number, Snackbar.LENGTH_LONG);
-            snackbar2.show();
             return false;
         }
 

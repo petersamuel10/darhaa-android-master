@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-public class Home {
+public class HomeData {
 
     @SerializedName("recent_category")
     @Expose
@@ -15,10 +15,10 @@ public class Home {
     @Expose
     private ArrayList<CategoryData> categories;
 
-    public Home() {
+    public HomeData() {
     }
 
-    public Home(CategoryData recent_category, ArrayList<CategoryData> categories) {
+    public HomeData(CategoryData recent_category, ArrayList<CategoryData> categories) {
         this.recent_category = recent_category;
         this.categories = categories;
     }

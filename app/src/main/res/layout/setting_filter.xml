@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background2"
+    android:background="@drawable/background"
     tools:context=".view_setting.Filter">
 
     <android.support.v7.widget.Toolbar
@@ -75,14 +75,15 @@
                 android:layout_marginTop="30dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
-                app:gap="1"
+                app:gap="0.25"
+                app:steps="1"
                 app:bar_color="#8990C4"
-                app:bar_highlight_color="#2434AD"
+                app:bar_highlight_color="#000"
                 app:left_thumb_color="@color/brownLight"
                 app:right_thumb_color="@color/blueHint"
                 app:left_thumb_color_pressed="@color/brown"
                 app:right_thumb_color_pressed="@color/blue"
-                app:data_type="_integer"/>
+                app:data_type="_float"/>
 
             <RelativeLayout
                 android:layout_below="@+id/rangeSeekbar"
@@ -123,7 +124,6 @@
             android:layout_marginTop="100dp"
             android:padding="6dp"
             android:text="@string/apply"
-            android:minHeight="0dp"
             android:background="@drawable/big_button_brown"
             android:textColor="@android:color/white"
             android:textAlignment="center"
@@ -133,13 +133,6 @@
     </LinearLayout>
 
 
-    <ImageView
-        android:id="@+id/footer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:scaleType="fitXY"
-        android:adjustViewBounds="true"
-        android:src="@drawable/footer" />
+
 
 </RelativeLayout>

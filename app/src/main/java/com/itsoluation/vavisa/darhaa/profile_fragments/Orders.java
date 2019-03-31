@@ -22,6 +22,7 @@ import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.adapter.OrdersAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.orders.OrdersData;
+import com.itsoluation.vavisa.darhaa.web_service.Controller2;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -79,7 +80,8 @@ public class Orders extends AppCompatActivity {
 
         progressDialog.show();
         user_id = String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id());
-        compositeDisposable.add(Common.getAPI2().getOrders(user_id)
+        try {
+        compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().getOrders(user_id)
                            .subscribeOn(Schedulers.io())
                            .observeOn(AndroidSchedulers.mainThread())
                            .subscribe(new Consumer<OrdersData>() {
@@ -89,13 +91,18 @@ public class Orders extends AppCompatActivity {
                                    if(ordersData.getStatus() !=null)
                                        Common.showAlert2(Orders.this,ordersData.getStatus(),ordersData.getMessage());
                                    else{
-                                       Log.i("nnnn", String.valueOf(ordersData.getOrders().get(0).getName()));
+                                     //  Log.i("nnnn", String.valueOf(ordersData.getOrders().get(0).getName()));
                                        adapter = new OrdersAdapter(ordersData.getOrders());
                                        orders_rec.setAdapter(adapter);
                                    }
                                }
                            }));
+
+    } catch (Exception e) {
+        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
     }
+
+}
 
     @Override
     public void onBackPressed() {

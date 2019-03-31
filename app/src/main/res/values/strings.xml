@@ -8,7 +8,7 @@
     <string name="action_settings" translatable="false">Settings</string>
     <string name="home">Home</string>
     <string name="category">Categories</string>
-    <string name="favourite">Favorites</string>
+    <string name="favourite">Wishlist</string>
     <string name="profile">Profile</string>
     <string name="login">Login</string>
     <string name="register">Register</string>
@@ -22,7 +22,7 @@
 
     <string name="order">Orders</string>
     <string name="addresses">Addresses</string>
-    <string name="language">Language</string>
+    <string name="language">Languages</string>
     <string name="terms">Terms &amp; Conditions</string>
 
 
@@ -39,11 +39,11 @@
     <string name="have_account">Already have an account ? Login here</string>
     <string name="missing_required_data">Please fill missing field</string>
     <string name="edit">Edit</string>
-    <string name="no_favourite">Favourite list is empty.</string>
+    <string name="no_favourite">You have not added any items to your wishlist!</string>
     <string name="logout">Logout</string>
     <string name="setting">Settings</string>
     <string name="appointment">Appointments</string>
-    <string name="support">Contact support</string>
+    <string name="contact_us">Contact us</string>
     <string name="arabic">العربية</string>
     <string name="edit_porfile">Edit your profile</string>
     <string name="yes">Yes</string>
@@ -51,7 +51,7 @@
     <string name="save">Save</string>
     <string name="addressName">Address name</string>
     <string name="phone">Phone number</string>
-    <string name="city">City :</string>
+    <string name="city">City</string>
     <string name="governorate">governorate</string>
     <string name="Block">Block</string>
     <string name="building">Building</string>
@@ -60,7 +60,7 @@
     <string name="apartment">Apartment</string>
     <string name="add_address">Add address</string>
     <string name="add_address_successfully">addresss addeed successfully</string>
-    <string name="invalid_name">fullname field is required</string>
+    <string name="invalid_name">full name field is required</string>
     <string name="not_match">password and confirm not match</string>
     <string name="mobile_missing">Fill mobile field</string>
     <string name="change_password">Change password</string>
@@ -76,7 +76,6 @@
     <string name="incorrect_password">Incorrect password</string>
     <string name="my_details">My details</string>
     <string name="notification">Notification</string>
-    <string name="forget_Password">Forget Password</string>
     <string name="recreate_password">Recreate password</string>
     <string name="please_enter_email">Please enter email that you are using for registering to get an informations to recreate password</string>
     <string name="send_link">link send to your email to recreate password</string>
@@ -130,7 +129,7 @@
     <string name="price">Price: </string>
     <string name="tops">Products</string>
     <string name="add_cart">Add to cart</string>
-    <string name="wishList">Wish List</string>
+    <string name="wishList">Wishlist</string>
     <string name="share">Share</string>
     <string name="description">Description</string>
     <string name="addPrint">ADD PRINT</string>
@@ -149,18 +148,17 @@
     <string name="success">Success</string>
     <string name="loading">Loading...</string>
     <string name="passwords_do_not_match">Passwords do not match.</string>
-    <string name="validate_phone_number">Please enter a valid phone number.</string>
     <string name="validate_email">Please enter a valid email address.</string>
 
     <!-- AsyncTask related strings -->
     <string name="content_type" translatable="false">application/x-www-form-urlencoded</string>
     <string name="api_token" translatable="false">16aac5b8216f1134770e665a8d</string>
-    <string name="register_api" translatable="false">http://templates.vavisa-kw.com/darhaa/index.php?route=restapi/register</string>
-    <string name="login_api" translatable="false">http://templates.vavisa-kw.com/darhaa/index.php?route=restapi/login</string>
-    <string name="home_items_api" translatable="false">http://templates.vavisa-kw.com/darhaa/index.php?route=restapi/home</string>
-    <string name="category_items_api" translatable="false">http://templates.vavisa-kw.com/darhaa_new/index.php?route=restapi/category</string>
-    <string name="category_products_api" translatable="false">http://templates.vavisa-kw.com/darhaa_new/index.php?route=restapi/product</string>
-    <string name="product_details_api" translatable="false">http://templates.vavisa-kw.com/darhaa_new/index.php?route=restapi/product/productdetails</string>
+    <string name="register_api" translatable="false">http://173.231.196.229/~hvavisa/darhaa/index.php?route=restapi/register</string>
+    <string name="login_api" translatable="false">http://173.231.196.229/~hvavisa/darhaa/index.php?route=restapi/login</string>
+    <string name="home_items_api" translatable="false">http://173.231.196.229/~hvavisa/darhaa/index.php?route=restapi/home</string>
+    <string name="category_items_api" translatable="false">http://173.231.196.229/~hvavisa/darhaa/index.php?route=restapi/category</string>
+    <string name="category_products_api" translatable="false">http://173.231.196.229/~hvavisa/darhaa/index.php?route=restapi/product</string>
+    <string name="product_details_api" translatable="false">http://173.231.196.229/~hvavisa/darhaa/index.php?route=restapi/product/productdetails</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
@@ -176,21 +174,21 @@
     <string name="select_country_first">Please select country</string>
     <string name="select_area_first">Please select area</string>
     <string name="enter_address_desc">Please enter address description</string>
-    <string name="title">Title :</string>
+    <string name="title">Title</string>
     <string name="enter_title">Please enter title</string>
     <string name="items">items</string>
     <string name="minimum_number">This is minimum number</string>
-    <string name="out_of_stock">!Out of stock</string>
+    <string name="out_of_stock">Out of stock</string>
     <string name="password_less">Password less than 6 letter</string>
     <string name="max_number">This is max number</string>
     <string name="required" translatable="false">required</string>
     <string name="option_id" translatable="false">option_id</string>
     <string name="please_enter">Please enter</string>
     <string name="sku">"SKU: "</string>
-    <string name="verify">Verify</string>
+    <string name="verify">Validate</string>
     <string name="coupon_successfully">Coupon applied successfully</string>
-    <string name="sub_total">Sub-Total</string>
-    <string name="total">Total</string>
+    <string name="sub_total">Sub-Total : </string>
+    <string name="total">Total :</string>
     <string name="you_get_discount">You will get</string>
     <string name="enter_coupon_code">Enter coupon code</string>
     <string name="options">Options:</string>
@@ -198,10 +196,10 @@
     <string name="please_enter_shipping_method">Please enter shipping method :</string>
     <string name="please_enter_payment_method">"Please enter payment method : "</string>
     <string name="your_order_completed_successfuly">Your order completed successfuly</string>
-    <string name="payment_Id">"PaymentID : "</string>
+    <string name="payment_Id">"Payment id : "</string>
     <string name="result">"Result : "</string>
     <string name="done">Done</string>
-    <string name="there_is_no_item_in_cart">There is no item in cart!</string>
+    <string name="there_is_no_item_in_cart">Your cart is empty!</string>
     <string name="congratulation">Congratulation</string>
     <string name="user_name_">User name</string>
     <string name="adding_billing_address">Adding biiling address</string>
@@ -209,17 +207,17 @@
     <string name="use_same_address_for_delivery">Use same address for delivery</string>
     <string name="paying_now">Paying now</string>
     <string name="order_info">Order Info</string>
-    <string name="order_id">Order Id :</string>
+    <string name="order_id">Order id :</string>
     <string name="added_date">Added date :</string>
     <string name="payment_address">Payment address :</string>
     <string name="payment_method">Payment method :</string>
     <string name="shipping_method">Shipping method :</string>
     <string name="shipping_address">Shipping address :</string>
     <string name="payment_info">Payment Info</string>
-    <string name="reference_id">Reference Id</string>
-    <string name="payment_id">Payment Id :</string>
-    <string name="transfer_id">Transfer Id</string>
-    <string name="product_info">Product Info</string>
+    <string name="reference_id">Reference id</string>
+    <string name="payment_id">Payment id :</string>
+    <string name="transfer_id">Transfer id</string>
+    <string name="product_info">Products Info</string>
     <string name="item">Item</string>
     <string name="history">History</string>
     <string name="totals">Totals</string>
@@ -230,4 +228,22 @@
     <string name="no">no</string>
     <string name="model">Model :</string>
     <string name="coupon">Coupon</string>
+    <string name="call">Call</string>
+    <string name="send_email">Send email</string>
+    <string name="call_to">Call to</string>
+    <string name="validate_phone_number">validate phone number</string>
+    <string name="please_login">Please login</string>
+    <string name="order_payment_failed">Your order failded,\n Please try again later.</string>
+    <string name="failed">Failed</string>
+    <string name="login_in_another_device">You are loging in another device</string>
+    <string name="take">Take</string>
+    <string name="or_more_for">or more for</string>
+    <string name="each">each</string>
+    <string name="send">Send</string>
+    <string name="please_login_to_view_wishlist">Please login to view your wishlist</string>
+    <string name="click_here_to_login">Click here to login</string>
+    <string name="continue_as_guest">Continue as guest</string>
+    <string name="no_data_found">No Data</string>
+    <string name="product_name">Product name :</string>
+    <string name="comment">Comment :</string>
 </resources>

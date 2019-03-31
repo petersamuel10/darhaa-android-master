@@ -12,37 +12,37 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.Transformation;
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerViewItemClickListener;
 import com.itsoluation.vavisa.darhaa.Product;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.CurrentProductDetails;
+import com.itsoluation.vavisa.darhaa.model.category_products.CategoryProductData;
+import com.itsoluation.vavisa.darhaa.model.favorite.Products;
+import com.itsoluation.vavisa.darhaa.model.home.CategoryData;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import io.reactivex.disposables.CompositeDisposable;
+
 public class CategoryProductAdapter extends RecyclerView.Adapter<CategoryProductAdapter.ViewHolder> {
 
-    private String[] products_ids, products_thumbs, products_names, products_prices, products_specials, products_minimums;
-    private ArrayList<Boolean> products_wishList,products_stock;
+    ArrayList<Products> productData;
     Context context;
     Boolean isRelated;
-    private LayoutInflater mInflater;
-    public RecyclerViewItemClickListener mClickListener;
 
-    // data is passed into the constructor
-    public CategoryProductAdapter(Context context, String[] ids, String[] thumbs, String[] names, String[] prices, String[] specials,
-                                  String[] minimums, ArrayList<Boolean> wishLists, ArrayList<Boolean> stocks, boolean isRelated) {
-        this.mInflater = LayoutInflater.from(context);
-        this.products_ids = ids;
-        this.products_thumbs = thumbs;
-        this.products_names = names;
-        this.products_prices = prices;
-        this.products_specials = specials;
-        this.products_minimums = minimums;
-        this.products_wishList = wishLists;
-        this.products_stock = stocks;
-        this.context = context;
+    public RecyclerViewItemClickListener mClickListener;
+    public CompositeDisposable compositeDisposable;
+
+
+    public CategoryProductAdapter(ArrayList<Products> productData, boolean isRelated) {
+        this.productData = productData;
         this.isRelated = isRelated;
+    }
+
+    public CategoryProductAdapter() {
     }
 
     // inflates the cell layout from xml when needed
@@ -53,50 +53,35 @@ public class CategoryProductAdapter extends RecyclerView.Adapter<CategoryProduct
 
        // that is for show in the recycler view of related products
        if(isRelated)
-            view = mInflater.inflate(R.layout.item_product_related, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product_related, parent, false);
         else
-            view = mInflater.inflate(R.layout.item_product, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
+
+        context = parent.getContext();
         return new ViewHolder(view);
     }
     
     // binds the data to the TextView in each cell
     @Override
-    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        holder.product_name.setText(products_names[position]);
-        holder.product_price.setText(products_prices[position]+" "+ context.getResources().getString(R.string.kd));
-        if(!products_specials[position].equals("false")){
-            holder.product_price.setPaintFlags(holder.product_price.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            holder.special_price.setVisibility(View.VISIBLE);
-            holder.special_price.setText(products_specials[position]+" "+context.getResources().getString(R.string.kd));
-        }
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
 
-        if(!products_stock.get(position)){
-            holder.special_price.setVisibility(View.VISIBLE);
-            holder.special_price.setText(context.getResources().getString(R.string.out_of_stock));
-        }
-        Picasso.with(context).load(products_thumbs[position]).into(holder.product_image);
+        holder.bind(productData.get(position));
 
-        if(products_wishList.get(position).toString().equals("true"))
-            holder.product_wish.setImageResource(R.drawable.ic_fav);
-
-
-        /*
-        holder.setItemClickListener(new RecyclerViewItemClickListener() {
-            @Override
-            public void onClick(View view, int position,int products_ids[position]) {
-                CurrentProductDetails.product_id = products_ids[position];
-                CurrentProductDetails.product_name = products_names[position];
-                context.startActivity(new Intent(context, Product.class));
-            }
-        });
-        */
-
+       /* if(isRelated)
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CurrentProductDetails.product_id = productData.get(position).getProduct_id();
+                    CurrentProductDetails.product_name = productData.get(position).getName();
+                    context.startActivity(new Intent(context, Product.class));
+                }
+            });*/
     }
 
     // total number of cells
     @Override
     public int getItemCount() {
-        return products_ids.length;
+        return productData.size();
     }
 
     // stores and recycles views as they are scrolled off screen
@@ -117,30 +102,58 @@ public class CategoryProductAdapter extends RecyclerView.Adapter<CategoryProduct
             product_wish.setOnClickListener(this);
         }
 
+        public void bind(Products product){
+
+            product_name.setText(product.getName());
+            product_price.setText(product.getPrice()+" "+ context.getResources().getString(R.string.kd));
+            if(!product.getSpecial().equals("false")){
+                product_price.setPaintFlags(product_price.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                special_price.setVisibility(View.VISIBLE);
+                special_price.setText(product.getSpecial()+" "+context.getResources().getString(R.string.kd));
+            }
+
+            if(!product.getStock()){
+                special_price.setVisibility(View.VISIBLE);
+                special_price.setText(context.getResources().getString(R.string.out_of_stock));
+            }
+            Glide.with(context).load(product.getThumb()).into(product_image);
+
+            if(product.getWishList())
+                product_wish.setImageResource(R.drawable.ic_fav);
+            else
+                product_wish.setImageResource(R.drawable.ic_fav_border);
+
+        }
+
         @Override
         public void onClick(View view) {
-           // Log.i("fdsa","gfugeuif");
             if(view == itemView){
-                Log.i("bnnnn22","guig");
                 if (mClickListener != null) {
-                    mClickListener.onClick(view, getAdapterPosition(), products_ids[getAdapterPosition()], products_names[getAdapterPosition()], 0);
+                    mClickListener.onClick(view, getAdapterPosition(), productData.get(getAdapterPosition()).getProduct_id()
+                            , productData.get(getAdapterPosition()).getName(), 0);
                 }
             }else if (view.getId() == R.id.ic_wish) {
-                    Log.i("bnnnn","guig");
                     if (mClickListener != null)
-                        mClickListener.onClick(view, getAdapterPosition(), products_ids[getAdapterPosition()], null, 1);
+                        mClickListener.onClick(view, getAdapterPosition(),productData.get(getAdapterPosition()).getProduct_id() , null, 1);
 
                 }
         }
     }
 
-    // convenience method for getting data at click position
-    public String getItem(int id) {
-        return products_ids[id];
-    }
-
     public void setItemClickListener(RecyclerViewItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
+    }
+
+    public void setFilter(ArrayList<Products> categoryList_){
+
+        productData = new ArrayList<>();
+        productData.addAll(categoryList_);
+        notifyDataSetChanged();
+    }
+
+    public void clearList(){
+        productData = new ArrayList<>();
+        notifyDataSetChanged();
     }
 
 }

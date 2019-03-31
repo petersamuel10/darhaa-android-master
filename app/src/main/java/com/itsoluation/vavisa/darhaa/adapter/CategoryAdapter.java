@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerViewItemClickListener;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.CategoryProducts;
@@ -47,11 +48,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         holder.category_name.setText(Html.fromHtml(categoryList.get(position).getName()));
-        Picasso.with(context).load(categoryList.get(position).getImage()).into(holder.category_image);
+        Glide.with(context).load(categoryList.get(position).getImage()).into(holder.category_image);
 
         if(categoryList.get(position).getIsSubCat().equals("false")){
             holder.category_prods.setText(categoryList.get(position).getIsProduct()+" "+ context.getResources().getString(R.string.items));
-        }
+        }else
+            holder.category_prods.setText("");
 
 
         holder.setItemClickListener(new RecyclerViewItemClickListener() {
@@ -59,10 +61,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             public void onClick(View view, int position, String product_id, String product_name, int flag) {
                 CurrentCategoryDetails.category_name = categoryList.get(position).getName();
                 CurrentCategoryDetails.category_id = categoryList.get(position).getCategory_id();
-                if(categoryList.get(position).getIsSubCat().equals("false"))
+                if(categoryList.get(position).getIsSubCat().equals("false")) {
                     context.startActivity(new Intent(context, CategoryProducts.class));
-                else
+                }
+                else {
                     context.startActivity(new Intent(context, SubCartegory.class));
+                }
             }
         });
     }
