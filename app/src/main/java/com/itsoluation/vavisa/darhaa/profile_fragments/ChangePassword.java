@@ -2,20 +2,14 @@ package com.itsoluation.vavisa.darhaa.profile_fragments;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.google.gson.JsonElement;
-import com.itsoluation.vavisa.darhaa.Login;
-import com.itsoluation.vavisa.darhaa.Product;
 import com.itsoluation.vavisa.darhaa.R;
-import com.itsoluation.vavisa.darhaa.Register;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.web_service.Controller2;
@@ -23,7 +17,6 @@ import com.itsoluation.vavisa.darhaa.web_service.Controller2;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
@@ -43,7 +36,7 @@ public class ChangePassword extends AppCompatActivity {
     ImageView back_arrow;
 
     @OnClick(R.id.saveBtn_)
-    public void changePass(){
+    public void changePass() {
         changePassword();
     }
 
@@ -52,7 +45,7 @@ public class ChangePassword extends AppCompatActivity {
         onBackPressed();
     }
 
-    String oldPass_st,newPass_st,conPass_st;
+    String oldPass_st, newPass_st, conPass_st;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     ProgressDialog progressDialog;
@@ -78,9 +71,9 @@ public class ChangePassword extends AppCompatActivity {
         newPass_st = newPass.getText().toString();
         conPass_st = conPass.getText().toString();
 
-        if(validation(oldPass_st,newPass_st,conPass_st)){
-            if(Common.isConnectToTheInternet(this))
-                callRegisterApi(newPass_st,conPass_st,Common.current_user.getCustomerInfo().getCustomer_id(),oldPass_st);
+        if (validation(oldPass_st, newPass_st, conPass_st)) {
+            if (Common.isConnectToTheInternet(this))
+                callRegisterApi(newPass_st, conPass_st, Common.current_user.getCustomerInfo().getCustomer_id(), oldPass_st);
             else
                 Common.errorConnectionMess(this);
         }
@@ -90,28 +83,48 @@ public class ChangePassword extends AppCompatActivity {
 
         progressDialog.show();
         try {
-        compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().changePassword(newPass_st,conPass_st,customer_id,oldPass_st)
-                           .subscribeOn(Schedulers.io())
-                           .observeOn(AndroidSchedulers.mainThread())
-                           .subscribe(new Consumer<Status>() {
-                               @Override
-                               public void accept(Status status) throws Exception {
+            compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().changePassword(newPass_st, conPass_st, customer_id, oldPass_st)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Status>() {
+                        @Override
+                        public void accept(Status status) throws Exception {
+                            progressDialog.dismiss();
 
-                                   progressDialog.dismiss();
-                                   Common.showAlert2(ChangePassword.this,status.getStatus(),status.getMessage());
-                                   oldPass.setText("");
-                                   newPass.setText("");
-                                   conPass.setText("");
-                               }
-                           }));
+                            if (status.getStatus().contains("error")) {
+                                Common.showAlert2(ChangePassword.this, status.getStatus(), status.getMessage());
+                                oldPass.setText("");
+                                newPass.setText("");
+                                conPass.setText("");
+                            } else {
 
-    } catch (Exception e) {
-        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+                                AlertDialog.Builder builder1 = new AlertDialog.Builder(ChangePassword.this);
+                                builder1.setMessage(status.getMessage());
+                                builder1.setTitle(status.getStatus());
+                                builder1.setCancelable(false);
+                                builder1.setPositiveButton(
+                                        R.string.ok,
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                dialog.cancel();
+                                                finish();
+                                            }
+                                        });
+
+                                AlertDialog alert11 = builder1.create();
+                                alert11.show();
+
+                            }
+                        }
+                    }));
+
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
+
     }
 
-}
-
-    public boolean validation(String old_st, String new_st, String con_st){
+    public boolean validation(String old_st, String new_st, String con_st) {
 
         /** check if fields are empty **/
         if (old_st.equals("") || new_st.equals("") || con_st.equals("")) {

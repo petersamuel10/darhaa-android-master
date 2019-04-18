@@ -10,7 +10,6 @@ import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +30,6 @@ import com.itsoluation.vavisa.darhaa.profile_fragments.EditProfile;
 import com.itsoluation.vavisa.darhaa.profile_fragments.Language;
 import com.itsoluation.vavisa.darhaa.profile_fragments.Orders;
 import com.itsoluation.vavisa.darhaa.profile_fragments.Terms;
-import com.itsoluation.vavisa.darhaa.web_service.Controller;
 import com.itsoluation.vavisa.darhaa.web_service.Controller2;
 
 import butterknife.BindView;
@@ -105,7 +103,8 @@ public class Profile extends Fragment implements View.OnClickListener {
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     ProgressDialog progressDialog;
-    String device_id,first_name,last_name,email,phone;
+    String first_name,last_name,email,phone;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -118,6 +117,12 @@ public class Profile extends Fragment implements View.OnClickListener {
             logout.setRotationY(180);
             ic_phone.setRotationY(180);
         }
+        if(Paper.book("DarHaa").contains("currentUser")) {
+            showView();
+            contentView.setVisibility(View.GONE);
+            requestData();
+        } else
+            hideView();
 
         addressLN.setOnClickListener(this);
         orderLN.setOnClickListener(this);
@@ -130,15 +135,12 @@ public class Profile extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
-
         if(Paper.book("DarHaa").contains("currentUser")) {
-            showView();
-            contentView.setVisibility(View.GONE);
-            requestData();
-        } else
-            hideView();
-
-      //  scrollView.setVisibility(View.VISIBLE);
+            name_txt.setText(Common.current_user.getCustomerInfo().getFirstname());
+            email_txt.setText(Common.current_user.getCustomerInfo().getEmail());
+            phone_txt.setText(Common.current_user.getCustomerInfo().getTelephone());
+            setCharacters();
+        }
     }
 
     private void requestData() {
@@ -157,7 +159,7 @@ public class Profile extends Fragment implements View.OnClickListener {
                             progressDialog.dismiss();
                             contentView.setVisibility(View.VISIBLE);
                             if (profileData.getStatus() != null) {
-                                if(profileData.getMessage().contains("Access Token")) {
+                                if(profileData.getMessage().contains(getString(R.string.access_token))) {
                                     Common.showAlert2(getContext(),getResources().getString(R.string.warning),getResources().getString(R.string.login_in_another_device));
                                     logout();
                                     showView();
@@ -166,7 +168,6 @@ public class Profile extends Fragment implements View.OnClickListener {
 
                             } else {
                                 first_name = profileData.getFirstname();
-                                last_name = profileData.getLastname();
                                 email = profileData.getEmail();
                                 phone = profileData.getTelephone();
 
@@ -175,21 +176,7 @@ public class Profile extends Fragment implements View.OnClickListener {
                                 phone_txt.setText(phone);
 
 
-                                String initials = "";
-                                for (String s : first_name.split(" ")) {
-                                    initials+=s.charAt(0);
-                                }
-
-                                String profile_image_txt = initials.substring(0,2);
-
-                                TextDrawable drawable = TextDrawable.builder()
-                                        .beginConfig().textColor(Color.BLACK).toUpperCase()
-                                        .withBorder(8).bold().fontSize(160).endConfig()
-                                        .buildRoundRect(profile_image_txt, Color.WHITE,300);
-
-                             //   Toast.makeText(getContext(), "//"+profile_image_txt.toUpperCase(), Toast.LENGTH_SHORT).show();
-
-                                profile_image.setImageDrawable(drawable);
+                               setCharacters();
                             }
 
                         }
@@ -203,6 +190,25 @@ public class Profile extends Fragment implements View.OnClickListener {
             Common.errorConnectionMess(getContext());
     }
 
+    private void  setCharacters(){
+
+        String initials = "";
+        for (String s : name_txt.getText().toString().split(" ")) {
+            initials+=s.charAt(0);
+        }
+
+        if(initials.length()>2)
+            initials = initials.substring(0,2);
+
+        TextDrawable drawable = TextDrawable.builder()
+                .beginConfig().textColor(Color.BLACK).toUpperCase()
+                .withBorder(8).bold().fontSize(160).endConfig()
+                .buildRoundRect(initials, Color.WHITE,300);
+
+        //   Toast.makeText(getContext(), "//"+profile_image_txt.toUpperCase(), Toast.LENGTH_SHORT).show();
+
+        profile_image.setImageDrawable(drawable);
+    }
     @Override
     public void onClick(View v) {
 

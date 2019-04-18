@@ -3,7 +3,7 @@ package com.itsoluation.vavisa.darhaa;
 import android.content.Context;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import ss.com.bannerslider.ImageLoadingService;
 
@@ -16,16 +16,16 @@ class PicassoImageLoadingService implements ImageLoadingService {
 
     @Override
     public void loadImage(String url, ImageView imageView) {
-        Picasso.with(context).load(url).into(imageView);
+        Glide.with(context).load(url).placeholder(R.drawable.placeholder).into(imageView);
     }
 
     @Override
     public void loadImage(int resource, ImageView imageView) {
-        Picasso.with(context).load(resource).into(imageView);
+        Glide.with(context).load(resource).placeholder(R.drawable.placeholder).into(imageView);
     }
 
     @Override
     public void loadImage(String url, int placeHolder, int errorDrawable, ImageView imageView) {
-        Picasso.with(context).load(url).placeholder(placeHolder).error(errorDrawable).into(imageView);
+        Glide.with(context).load(url).placeholder(R.drawable.placeholder).error(errorDrawable).into(imageView);
     }
 }

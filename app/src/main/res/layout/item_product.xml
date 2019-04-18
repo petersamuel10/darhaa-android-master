@@ -102,7 +102,21 @@
             android:textColor="@android:color/holo_red_dark"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:visibility="gone" />
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/item_stock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="4dp"
+            android:gravity="start"
+            android:text="@string/out_of_stock"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

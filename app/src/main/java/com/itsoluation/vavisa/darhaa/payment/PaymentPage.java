@@ -176,7 +176,6 @@ public class PaymentPage extends AppCompatActivity {
         Common.showAlert2(this, getString(R.string.warning), e.getMessage());
     }
 
-
 }
 
     public void setLanguage(String lang)

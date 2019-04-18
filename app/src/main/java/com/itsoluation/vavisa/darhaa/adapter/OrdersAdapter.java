@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.model.orders.Orders;
-import com.itsoluation.vavisa.darhaa.model.orders.OrdersData;
 import com.itsoluation.vavisa.darhaa.profile_fragments.OrderDetails;
 
 import java.util.ArrayList;

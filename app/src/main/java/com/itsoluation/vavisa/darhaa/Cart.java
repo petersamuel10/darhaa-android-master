@@ -53,7 +53,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Cart extends AppCompatActivity implements CartInterface, RecyclerItemTouchHelperListner  {
+public class Cart extends AppCompatActivity implements CartInterface, RecyclerItemTouchHelperListner {
 
     @BindView(R.id.rootLayout)
     RelativeLayout rootLayout;
@@ -66,7 +66,7 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
     @BindView(R.id.no_item)
     TextView no_item_txt;
 
-    HashMap<String,String> changesCarts = new HashMap<>();
+    HashMap<String, String> changesCarts = new HashMap<>();
 
     @OnClick(R.id.back_arrow)
     public void setBack() {
@@ -109,34 +109,45 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
             Common.errorConnectionMess(this);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // get user_id after come from login activity
+        user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : "0";
+
+    }
 
     private void callAPI() {
 
         progressDialog.show();
         try {
-        compositeDisposable = new CompositeDisposable();
-        compositeDisposable.add(Common.getAPI().viewCart(user_id, device_id, null)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<CartData>() {
-                    @Override
-                    public void accept(CartData cartList) throws Exception {
-                        progressDialog.dismiss();
-                        if (cartList.getStatus() != null) {
-                           // Common.showAlert2(Cart.this, cartList.getStatus(), cartList.getMessage());
-                            no_item_txt.setVisibility(View.VISIBLE);
-                        } else {
-                            cartData = cartList;
-                            adapter = new CartAdapter(false,cartData.getProducts());
-                            adapter.setListener(onCartListener);
-                            cart_rec.setAdapter(adapter);
-                            cartBtn.setVisibility(View.VISIBLE);
+            compositeDisposable = new CompositeDisposable();
+            compositeDisposable.add(Common.getAPI().viewCart(user_id, device_id, null)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<CartData>() {
+                        @Override
+                        public void accept(CartData cartList) throws Exception {
+                            progressDialog.dismiss();
+                            if (cartList.getStatus() != null) {
+                                if (cartList.getStatus().contains("error")) {
+                                    Common.showAlert2(Cart.this, cartList.getStatus(), cartList.getMessage());
+                                    no_item_txt.setVisibility(View.VISIBLE);
+                                } else
+                                    no_item_txt.setVisibility(View.VISIBLE);
+                            } else {
+                                cartData = cartList;
+                                adapter = new CartAdapter(false, cartData.getProducts());
+                                adapter.setListener(onCartListener);
+                                cart_rec.setAdapter(adapter);
+                                cartBtn.setVisibility(View.VISIBLE);
+                            }
                         }
-                    }
-                }));
-    } catch (Exception e) {
-        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
-    }
+                    }));
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
 
 
     }
@@ -189,7 +200,8 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
                 }
             }
 
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
 
         try {
 
@@ -199,17 +211,17 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
 
             if (flag == 1) {
                 // coupon
-                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(rootLayout.getWindowToken(), 0);
 
                 //get coupon code
                 coupon = coupon_ed.getText().toString();
-                if(coupon.equals(""))
-                    Common.showAlert2(Cart.this,getResources().getString(R.string.warning),getResources().getString(R.string.enter_coupon_code));
+                if (coupon.equals(""))
+                    Common.showAlert2(Cart.this, getResources().getString(R.string.warning), getResources().getString(R.string.enter_coupon_code));
                 else {
                     if (Common.isConnectToTheInternet(this))
                         verifyCoupon(coupon, verify, coupon_ed);
-                     else
+                    else
                         Common.errorConnectionMess(this);
                 }
             }
@@ -223,41 +235,41 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
 
         progressDialog.show();
         try {
-        compositeDisposable = new CompositeDisposable();
-        compositeDisposable.add(Common.getAPI().checkCoupon(user_id, coupon)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<JsonElement>() {
-                    @Override
-                    public void accept(JsonElement jsonElement) throws Exception {
-                        progressDialog.dismiss();
+            compositeDisposable = new CompositeDisposable();
+            compositeDisposable.add(Common.getAPI().checkCoupon(user_id, coupon)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<JsonElement>() {
+                        @Override
+                        public void accept(JsonElement jsonElement) throws Exception {
+                            progressDialog.dismiss();
 
-                        String result = jsonElement.toString();
-                        JSONObject object = new JSONObject(result);
-                        if(object.getString("status").equals("error"))
-                            Common.showAlert2(Cart.this, object.getString("status"),object.getString("message"));
-                        else {
-                            if (object.getString("status").equals("success")) {
-                                JSONObject result_ = object.getJSONObject("result");
-                                coupon_code = result_.getString("code");
-                                String name = result_.getString("name");
+                            String result = jsonElement.toString();
+                            JSONObject object = new JSONObject(result);
+                            if (object.getString("status").equals("error"))
+                                Common.showAlert2(Cart.this, object.getString("status"), object.getString("message"));
+                            else {
+                                if (object.getString("status").equals("success")) {
+                                    JSONObject result_ = object.getJSONObject("result");
+                                    coupon_code = result_.getString("code");
+                                    String name = result_.getString("name");
 
-                                Common.showAlert2(Cart.this, object.getString("status"),object.getString("message")+"\n"
-                                        +getResources().getString(R.string.you_get_discount)+name+".");
+                                    Common.showAlert2(Cart.this, object.getString("status"), object.getString("message") + "\n"
+                                            + getResources().getString(R.string.you_get_discount) + name + ".");
 
-                                coupon_ed.setText(getResources().getString(R.string.coupon_successfully));
-                                coupon_ed.setBackgroundColor(getResources().getColor(R.color.grey));
-                                coupon_ed.setEnabled(false);
-                                verify.setEnabled(false);
+                                    coupon_ed.setText(getResources().getString(R.string.coupon_successfully));
+                                    coupon_ed.setBackgroundColor(getResources().getColor(R.color.grey));
+                                    coupon_ed.setEnabled(false);
+                                    verify.setEnabled(false);
+                                }
                             }
                         }
-                    }
-                }));
-    } catch (Exception e) {
-        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
-    }
+                    }));
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
 
-}
+    }
 
     //delete cart
     @Override
@@ -304,16 +316,16 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
     }
 
     @OnClick(R.id.cartBtn)
-    public void checkout(){
+    public void checkout() {
 
-        if(user_id.equals("0")) {
-                showAlert();
-        }else {
-         checkoutMethod();
+        if (user_id.equals("0")) {
+            showAlert();
+        } else {
+            checkoutMethod();
         }
     }
 
-    public void checkoutMethod(){
+    public void checkoutMethod() {
         // check if there is any changes of product quantity
         if (!changesCarts.isEmpty()) {
             EditCart editCart = new EditCart();
@@ -328,7 +340,7 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
 
             editCart.setQuantity(quantityList);
 
-            if(Common.isConnectToTheInternet(this))
+            if (Common.isConnectToTheInternet(this))
                 callAPIToEditCart(editCart);
             else
                 Common.errorConnectionMess(this);
@@ -351,9 +363,9 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
 
         // set the custom dialog components - text, image and button
 
-        TextView login =  dialog.findViewById(R.id.login_alert);
+        TextView login = dialog.findViewById(R.id.login_alert);
         TextView addAddress = dialog.findViewById(R.id.add_address_alert);
-        TextView cancel =  dialog.findViewById(R.id.cancel_alert);
+        TextView cancel = dialog.findViewById(R.id.cancel_alert);
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -385,7 +397,7 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
 
     private void callAPIToEditCart(EditCart editCart) {
 
-         final Status status_ = new Status();
+        final Status status_ = new Status();
 
         Observable<Status> editCartInterface = Common.getAPI().editCart(editCart).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -409,12 +421,12 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
 
             @Override
             public void onComplete() {
-                if(status_.getStatus().equals("error"))
-                    Common.showAlert2(Cart.this,status_.getStatus(),status_.getMessage());
+                if (status_.getStatus().equals("error"))
+                    Common.showAlert2(Cart.this, status_.getStatus(), status_.getMessage());
                 else {
                     Intent i = new Intent(Cart.this, Checkout.class);
-                    if(!coupon_code.equals(""))
-                        i.putExtra("couponCode",coupon_code);
+                    if (!coupon_code.equals(""))
+                        i.putExtra("couponCode", coupon_code);
 
                     startActivity(i);
                 }

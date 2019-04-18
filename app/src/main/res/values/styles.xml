@@ -51,7 +51,14 @@
         <item name="android:listDivider">@color/blueLight</item>
         <item name="android:layout_margin">2dp</item>
         <item name="colorControlHighlight">@android:color/transparent</item>
-
     </style>
+
+        <style name="AlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+            <item name="android:background">#f3f3f3</item>
+            <item name="android:textColor">@color/blue</item>
+            <item name="android:textColorPrimary">#000</item>
+        </style>
+
+
 
 </resources>

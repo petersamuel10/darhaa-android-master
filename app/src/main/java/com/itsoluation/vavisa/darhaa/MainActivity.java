@@ -14,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -32,15 +31,15 @@ import butterknife.ButterKnife;
 import io.paperdb.Paper;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener ,SearchView.OnQueryTextListener{
+        implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
 
     //@BindView(R.id.action_search)
-   // ImageView ic_search;
+    // ImageView ic_search;
 
 
     Fragment fragment = null;
     TextView titleTxt;
-    MenuItem mSearch,mCart;
+    MenuItem mSearch, mCart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,42 +73,39 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void setLanguage(String lang)
-    {
+    public void setLanguage(String lang) {
         Locale locale = new Locale(lang);
         Locale.setDefault(locale);
         Configuration config = new Configuration();
-        config.locale= locale;
-        getBaseContext().getResources().updateConfiguration(config,getBaseContext().getResources().getDisplayMetrics());
-        Paper.book("DarHaa").write("language",lang);
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+        Paper.book("DarHaa").write("language", lang);
 
     }
 
-    public void loadLocal()
-    {
+    public void loadLocal() {
         Paper.init(this);
         String lan = Paper.book("DarHaa").read("language");
         if (!TextUtils.isEmpty(lan)) {
             setLanguage(lan);
-            if(lan.contentEquals("ar"))
+            if (lan.contentEquals("ar"))
                 Common.isArabic = true;
 
             checkAuthontication();
-        }
-        else {
+        } else {
             startActivity(new Intent(MainActivity.this, ChooseLanguage.class));
             finish();
         }
     }
 
     private void checkAuthontication() {
-        if(Paper.book("DarHaa").contains("currentUser")) {
-             Common.current_user = Paper.book("DarHaa").read("currentUser");
+        if (Paper.book("DarHaa").contains("currentUser")) {
+            Common.current_user = Paper.book("DarHaa").read("currentUser");
             // startActivity(new Intent(this,MainActivity.class));
-        }else {
+        } else {
             if (Paper.book("DarHaa").contains("isSkip")) {
-               // stay home
-            }else{
+                // stay home
+            } else {
                 startActivity(new Intent(MainActivity.this, RegisterLogin.class));
                 finish();
             }
@@ -155,7 +151,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_cart) {
-            startActivity(new Intent(this,Cart.class));
+            startActivity(new Intent(this, Cart.class));
             return true;
         }
 
@@ -169,28 +165,28 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            fragment = new  Home();
-          //  mSearch.setVisible(false);
-            titleTxt.setPaddingRelative(0,0,24,0);
+            fragment = new Home();
+            //  mSearch.setVisible(false);
+            titleTxt.setPaddingRelative(0, 0, 24, 0);
         } else if (id == R.id.nav_category) {
-            fragment = new  Category();
-           // mSearch.setVisible(true);
-            titleTxt.setPaddingRelative(8,0,0,0);
+            fragment = new Category();
+            // mSearch.setVisible(true);
+            titleTxt.setPaddingRelative(8, 0, 0, 0);
         } else if (id == R.id.nav_favourite) {
             fragment = new Favourite();
-          //  mSearch.setVisible(false);
-            titleTxt.setPaddingRelative(0,0,24,0);
+            //  mSearch.setVisible(false);
+            titleTxt.setPaddingRelative(0, 0, 24, 0);
         } else if (id == R.id.nav_profile) {
             fragment = new Profile();
             //mSearch.setVisible(false);
-            titleTxt.setPaddingRelative(0,0,24,0);
-        }else if (id == R.id.nav_support) {
+            titleTxt.setPaddingRelative(0, 0, 24, 0);
+        } else if (id == R.id.nav_support) {
             fragment = new ContactUS();
-           // mSearch.setVisible(false);
-            titleTxt.setPaddingRelative(0,0,24,0);
+            // mSearch.setVisible(false);
+            titleTxt.setPaddingRelative(0, 0, 24, 0);
         }
 
-       // item.setChecked(true);
+        // item.setChecked(true);
 
         titleTxt.setText(item.getTitle());
 
@@ -219,7 +215,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onQueryTextChange(String s) {
         return false;
     }
-
 
 
 }

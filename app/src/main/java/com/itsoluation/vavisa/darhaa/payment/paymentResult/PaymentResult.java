@@ -4,9 +4,10 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.ImageView;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.itsoluation.vavisa.darhaa.MainActivity;
@@ -34,6 +35,15 @@ public class PaymentResult extends AppCompatActivity {
     TextView result_txt;
     @BindView(R.id.total)
     TextView total_txt;
+    @BindView(R.id.knet_titles)
+    LinearLayout knet_titles;
+    @BindView(R.id.knet_info)
+    LinearLayout knet_info;
+    @BindView(R.id.order_title)
+    TextView order_title;
+    @BindView(R.id.order_id)
+    TextView order_id_txt;
+
 
     private CompositeDisposable compositeDisposable;
     ProgressDialog progressDialog;
@@ -51,18 +61,37 @@ public class PaymentResult extends AppCompatActivity {
         ButterKnife.bind(this);
         progressDialog = new ProgressDialog(this);
 
+        if(getIntent().getExtras().containsKey("status")){
         if(getIntent().getStringExtra("status").equals("\"1\"")){
+            order_title.setVisibility(View.GONE);
+            order_id_txt.setVisibility(View.GONE);
             status_txt.setText(R.string.congratulation);
             status_txt.setTextColor(getResources().getColor(R.color.blue));
             message_txt.setText(R.string.your_order_completed_successfuly);
-        }else {
+            payment_id_txt.setText(getIntent().getStringExtra("paymentId"));
+            date_txt.setText(getIntent().getStringExtra("date"));
+            result_txt.setText(getIntent().getStringExtra("result"));
+        }else if(getIntent().getStringExtra("status").equals("\"0\"")){
+            order_title.setVisibility(View.GONE);
+            order_id_txt.setVisibility(View.GONE);
             status_txt.setText(R.string.order_payment_failed);
             status_txt.setTextColor(Color.RED);
             message_txt.setText(R.string.order_payment_failed);
+            payment_id_txt.setText(getIntent().getStringExtra("paymentId"));
+            date_txt.setText(getIntent().getStringExtra("date"));
+            result_txt.setText(getIntent().getStringExtra("result"));
         }
-        payment_id_txt.setText(getIntent().getStringExtra("paymentId"));
-        date_txt.setText(getIntent().getStringExtra("date"));
-        result_txt.setText(getIntent().getStringExtra("result"));
+    }else if(getIntent().getExtras().containsKey("order_id")){
+            knet_info.setVisibility(View.GONE);
+            knet_titles.setVisibility(View.GONE);
+            order_title.setVisibility(View.VISIBLE);
+            order_id_txt.setVisibility(View.VISIBLE);
+
+            order_id_txt.setText(getIntent().getStringExtra("order_id"));
+
+        }
+
+
         total_txt.setText(getIntent().getStringExtra("total"));
     }
 

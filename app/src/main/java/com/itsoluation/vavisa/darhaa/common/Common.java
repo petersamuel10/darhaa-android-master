@@ -2,28 +2,17 @@ package com.itsoluation.vavisa.darhaa.common;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.provider.Settings;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.TextView;
 
-import com.itsoluation.vavisa.darhaa.Login;
 import com.itsoluation.vavisa.darhaa.R;
-import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.model.User;
-import com.itsoluation.vavisa.darhaa.model.address.address.AddressDetails;
-import com.itsoluation.vavisa.darhaa.model.address.address.AddressGet;
-import com.itsoluation.vavisa.darhaa.payment.BillingAddress;
-import com.itsoluation.vavisa.darhaa.payment.Checkout;
 import com.itsoluation.vavisa.darhaa.web_service.ApiInterface;
 import com.itsoluation.vavisa.darhaa.web_service.Controller;
-import com.itsoluation.vavisa.darhaa.web_service.Controller2;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -34,11 +23,8 @@ public class Common {
 
     public static boolean isArabic = false;
     public static User current_user;
-    public static AddressDetails currentAddress;
     public static boolean isEditAddress = false;
-    public static String address_id = null;
     public static boolean showAddrDetails = false;
-   // public static String userAccessToken ="";
 
 
 

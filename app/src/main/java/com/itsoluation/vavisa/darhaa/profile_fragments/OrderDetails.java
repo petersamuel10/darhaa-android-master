@@ -1,28 +1,24 @@
 package com.itsoluation.vavisa.darhaa.profile_fragments;
 
 import android.app.ProgressDialog;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.itsoluation.vavisa.darhaa.R;
-import com.itsoluation.vavisa.darhaa.adapter.OrdersAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.cartData.Options;
-import com.itsoluation.vavisa.darhaa.model.orders.OrdersData;
 import com.itsoluation.vavisa.darhaa.web_service.Controller2;
 
 import org.json.JSONArray;
@@ -35,12 +31,16 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class OrderDetails extends AppCompatActivity {
+
+    @BindView(R.id.scrollView)
+    ScrollView scrollView;
 
     //order information
     @BindView(R.id.order_id)
@@ -57,12 +57,20 @@ public class OrderDetails extends AppCompatActivity {
     TextView shipping_method_txt;
 
     //payment info
+    @BindView(R.id.p1)
+    TextView reference_id_title;
     @BindView(R.id.reference_id)
     TextView reference_id_txt;
+    @BindView(R.id.p2)
+    TextView payment_id_title;
     @BindView(R.id.payment_id)
     TextView payment_id_txt;
+    @BindView(R.id.p3)
+    TextView transfer_id_title;
     @BindView(R.id.transfer_id)
     TextView transfer_txt;
+    @BindView(R.id.p4)
+    TextView result_title;
     @BindView(R.id.result)
     TextView result_txt;
     @BindView(R.id.price)
@@ -91,7 +99,6 @@ public class OrderDetails extends AppCompatActivity {
     @OnClick(R.id.back_arrow)
     public void setBack() {onBackPressed(); }
 
-    private CompositeDisposable compositeDisposable;
     ProgressDialog progressDialog;
 
     String user_id ,order_id;
@@ -125,26 +132,58 @@ public class OrderDetails extends AppCompatActivity {
     private void callAPI() {
 
         progressDialog.show();
-        compositeDisposable = new CompositeDisposable();
-        compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().getOrderDetails(user_id,order_id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<JsonElement>() {
-                    @Override
-                    public void accept(JsonElement jsonElement) throws Exception {
-                        progressDialog.dismiss();
-                        String result = jsonElement.toString();
-                        Log.i("rrrrr",result);
+
+        try {
+
+            Observable<JsonElement> orderDetails = new Controller2(Common.current_user.getUserAccessToken())
+                    .getAPI().getOrderDetails(user_id, order_id).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+
+            orderDetails.subscribe(new Observer<JsonElement>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+
+                }
+
+                @Override
+                public void onNext(JsonElement jsonElement) {
+                    progressDialog.dismiss();
+                    String result = jsonElement.toString();
+                    scrollView.setVisibility(View.VISIBLE);
+
+                    try {
 
                         if (result.contains("error")) {
-                            JSONObject object = new JSONObject(result);
-                            Common.showAlert2(OrderDetails.this,object.getString("status"),object.getString("message"));
+                            JSONObject object = null;
+
+                            object = new JSONObject(result);
+
+                            Common.showAlert2(OrderDetails.this, object.getString("status"), object.getString("message"));
                         } else {
                             JSONObject object = new JSONObject(result);
                             bindData(object);
                         }
-                        }
-                }));
+                    }catch (Exception e) {
+                        Common.showAlert2(OrderDetails.this, getString(R.string.error), getString(R.string.missing_data));
+                    }
+
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    progressDialog.dismiss();
+                    Common.showAlert2(OrderDetails.this, getString(R.string.error), getString(R.string.missing_data));
+                }
+
+                @Override
+                public void onComplete() {
+
+                }
+            });
+
+        }catch (Exception e){
+            Common.showAlert2(this,getString(R.string.error),getString(R.string.missing_data));
+        }
 
     }
 
@@ -152,6 +191,7 @@ public class OrderDetails extends AppCompatActivity {
 
         try {
 
+            scrollView.setVisibility(View.VISIBLE);
             //order info
             order_id_txt.setText(object.getString("order_id"));
             added_date_txt.setText(object.getString("date_added"));
@@ -162,13 +202,42 @@ public class OrderDetails extends AppCompatActivity {
 
             // payment info
             JSONObject payment_info = object.getJSONObject("payment_info");
-            reference_id_txt.setText(payment_info.getString("refID"));
-            payment_id_txt.setText(payment_info.getString("payment_id"));
-            result_txt.setText(payment_info.getString("result"));
+
+            String refId = payment_info.getString("refID");
+            String payment_id = payment_info.getString("payment_id");
+            String transID = payment_info.getString("transID");
+            String result = payment_info.getString("result");
+
+            if(!refId.equals("null"))
+                reference_id_txt.setText(refId);
+            else {
+                reference_id_txt.setVisibility(View.GONE);
+                reference_id_title.setVisibility(View.GONE);
+            }
+
+            if(!payment_id.equals("null"))
+                payment_id_txt.setText(payment_id);
+            else {
+                payment_id_txt.setVisibility(View.GONE);
+                payment_id_title.setVisibility(View.GONE);
+            }
+
+            if(!transID.equals("null"))
+                transfer_txt.setText(transID);
+            else {
+                transfer_txt.setVisibility(View.GONE);
+                transfer_id_title.setVisibility(View.GONE);
+            }
+
+            if(!result.equals("null"))
+                result_txt.setText(result);
+            else {
+                result_txt.setVisibility(View.GONE);
+                result_title.setVisibility(View.GONE);
+            }
+
             price_txt.setText(payment_info.getString("amount")+" "+getResources().getString(R.string.kd));
 
-            if(payment_info.getString("transID")!=null)
-                transfer_txt.setText(payment_info.getString("transID"));
 
             // products info
             JSONArray products_info = object.getJSONArray("products");

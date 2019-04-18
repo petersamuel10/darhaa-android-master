@@ -71,14 +71,18 @@ public class Home extends Fragment {
                                .subscribe(new Consumer<HomeData>() {
                                    @Override
                                    public void accept(HomeData home) throws Exception {
-                                      categories = new ArrayList<>();
-                                       categories.addAll(home.getCategories());
-                                       //fist HomeData item
-                                       categories.add(0,home.getRecent_category());
-                                       homeAdapter.addHomeList(categories);
-                                       homeAdapter.notifyDataSetChanged();
-                                       progressDialog.dismiss();
-
+                                       if(home.getStatus() !=null ){
+                                           progressDialog.dismiss();
+                                           Common.showAlert2(getContext(),home.getStatus(), home.getMessage());
+                                       }else {
+                                           categories = new ArrayList<>();
+                                           categories.addAll(home.getCategories());
+                                           //fist HomeData item
+                                           categories.add(0, home.getRecent_category());
+                                           homeAdapter.addHomeList(categories);
+                                           homeAdapter.notifyDataSetChanged();
+                                           progressDialog.dismiss();
+                                       }
                                    }
                                }));
 

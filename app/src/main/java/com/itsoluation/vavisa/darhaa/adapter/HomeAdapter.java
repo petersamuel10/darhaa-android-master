@@ -18,7 +18,6 @@ import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.CurrentCategoryDetails;
 import com.itsoluation.vavisa.darhaa.fargments.SubCartegory;
 import com.itsoluation.vavisa.darhaa.model.home.CategoryData;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -105,8 +104,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         }
 
         public void bindData(String image){
-
-            Glide.with(context).load(image).into(category_image);
+                Glide.with(context).load(image).placeholder(R.drawable.placeholder).into(category_image);
         }
 
         // allows clicks events to be caught

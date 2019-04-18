@@ -51,9 +51,9 @@ public class Category extends Fragment {
 
     ProgressDialog progressDialog;
 
-    ArrayList<CategoryData> categoryList;
+    ArrayList<CategoryData> categoryList = new ArrayList<>();
     RecyclerView recyclerView;
-    CategoryAdapter adapter;
+    CategoryAdapter adapter = new CategoryAdapter();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,7 +62,7 @@ public class Category extends Fragment {
         View view = inflater.inflate(R.layout.fragment_category, container, false);
 
         progressDialog = new ProgressDialog(getActivity());
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
 
         setUpSwipeRefreshLayout();
         recyclerView = view.findViewById(R.id.recyclerView);
@@ -72,7 +72,7 @@ public class Category extends Fragment {
 
         setHasOptionsMenu(true);
 
-        if(Common.isConnectToTheInternet(getActivity()))
+        if (Common.isConnectToTheInternet(getActivity()))
             new GetCategoryItemsBackgroundTask(getActivity()).execute();
         else
             Common.errorConnectionMess(getContext());
@@ -102,14 +102,14 @@ public class Category extends Fragment {
                 if (!newText.equals("")) {
                     for (CategoryData category : categoryList) {
 
-                    String category_name = category.getName().toLowerCase();
+                        String category_name = category.getName().toLowerCase();
 
-                    if (category_name.contains(newText)) {
-                        newList.add(category);
+                        if (category_name.contains(newText)) {
+                            newList.add(category);
+                        }
                     }
-                }
                     adapter.setFilter(newList);
-                }else
+                } else
                     adapter.setFilter(categoryList);
 
                 return false;
@@ -136,7 +136,7 @@ public class Category extends Fragment {
 
                 MenuItemCompat.collapseActionView(mSearchAction);
 
-                if(Common.isConnectToTheInternet(getActivity()))
+                if (Common.isConnectToTheInternet(getActivity()))
                     new GetCategoryItemsBackgroundTask(getActivity()).execute();
                 else
                     Common.errorConnectionMess(getContext());
@@ -146,7 +146,7 @@ public class Category extends Fragment {
         });
     }
 
-    /** Get HomeData Items **/
+    /*** Get HomeData Items**/
     private class GetCategoryItemsBackgroundTask extends AsyncTask<String, Void, String> {
         public ProgressDialog dialog;
         Boolean is_arabic = Common.isArabic;
@@ -195,7 +195,7 @@ public class Category extends Fragment {
                     return sb.toString();
                 }
             } catch (IOException e) {
-               Common.showAlert2(getContext(),getString(R.string.warning),e.getMessage());
+                Common.showAlert2(getContext(), getString(R.string.warning), e.getMessage());
                 return "";
             }
             return "";
@@ -206,12 +206,24 @@ public class Category extends Fragment {
             if (dialog != null && dialog.isShowing())
                 dialog.dismiss();
 
-            JSONArray firstJsonArray = null;
-            try {
-                firstJsonArray = new JSONArray(result);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+
+            if(result.contains("error")){
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    String message = jsonObject.getString("message");
+                    Common.showAlert2(getContext(), getString(R.string.error), message);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }else {
+                JSONArray firstJsonArray = null;
+                try {
+                    firstJsonArray = new JSONArray(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
 
                 try {
@@ -232,9 +244,10 @@ public class Category extends Fragment {
                     }
 
                 } catch (JSONException e) {
-                    Common.showAlert2(getContext(),getString(R.string.warning),e.getMessage());
+                    Common.showAlert2(getContext(), getString(R.string.warning), e.getMessage());
                     e.printStackTrace();
                 }
+            }
 
         }
     }

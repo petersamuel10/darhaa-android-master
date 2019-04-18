@@ -1,9 +1,9 @@
 package com.itsoluation.vavisa.darhaa.profile_fragments;
 
-import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.app.ProgressDialog;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import com.itsoluation.vavisa.darhaa.R;
@@ -11,6 +11,8 @@ import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.web_service.Controller2;
 import com.rengwuxian.materialedittext.MaterialEditText;
+
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,11 +34,14 @@ public class EditProfile extends AppCompatActivity {
     @BindView(R.id.edPhone)
     MaterialEditText phone_ed;
 
-    String name_str,email_str,phone_str;
+    String name_str, email_str, phone_str;
     CompositeDisposable compositeDisposable = new CompositeDisposable();
+    ProgressDialog progressDialog;
 
     @OnClick(R.id.back_arrow)
-    public void setBack() {onBackPressed(); }
+    public void setBack() {
+        onBackPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +49,11 @@ public class EditProfile extends AppCompatActivity {
         setContentView(R.layout.profile_edit_profile);
 
         ButterKnife.bind(this);
+        progressDialog = new ProgressDialog(this);
 
-        if (Common.isArabic) {back_arrow.setRotation(180);}
+        if (Common.isArabic) {
+            back_arrow.setRotation(180);
+        }
 
         Paper.init(this);
 
@@ -54,7 +62,10 @@ public class EditProfile extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
+        if (Common.isArabic)
+            setLanguage("ar");
+        else
+            setLanguage("en");
         name_ed.setText(Common.current_user.getCustomerInfo().getFirstname());
         email_ed.setText(Common.current_user.getCustomerInfo().getEmail());
         phone_ed.setText(Common.current_user.getCustomerInfo().getTelephone());
@@ -64,80 +75,72 @@ public class EditProfile extends AppCompatActivity {
     public void update() {
         name_str = name_ed.getText().toString();
         email_str = email_ed.getText().toString();
-        phone_str =  phone_ed.getText().toString();
+        phone_str = phone_ed.getText().toString();
 
-        if (validate(name_str,email_str,phone_str)){
-                if (Common.isConnectToTheInternet(this))
-                    callUpdateApi(name_str, email_str, phone_str ,Common.current_user.getCustomerInfo().getCustomer_id());
-                else
-                    Common.errorConnectionMess(this);
+        if (validate(name_str, email_str, phone_str)) {
+            if (Common.isConnectToTheInternet(this))
+                callUpdateApi(name_str, email_str, phone_str, Common.current_user.getCustomerInfo().getCustomer_id());
+            else
+                Common.errorConnectionMess(this);
 
         }
 
     }
 
     private void callUpdateApi(final String name, final String email, final String phone, Integer user_id) {
+        progressDialog.show();
+        try {
+            compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().editProfile(name, email, phone, String.valueOf(user_id))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Status>() {
+                        @Override
+                        public void accept(Status status) throws Exception {
+                            progressDialog.dismiss();
+                            if (status.getStatus().equals("error")) {
+                                Common.showAlert2(EditProfile.this, status.getStatus(), status.getMessage());
+                            } else {
 
-try {
-        compositeDisposable.add(new Controller2(Common.current_user.getUserAccessToken()).getAPI().editProfile(name,email,phone, String.valueOf(user_id))
-                           .subscribeOn(Schedulers.io())
-                           .observeOn(AndroidSchedulers.mainThread())
-                           .subscribe(new Consumer<Status>() {
-                               @Override
-                               public void accept(Status status) throws Exception {
-                                   if(status.getStatus().equals("error")){
-                                       Common.showAlert2(EditProfile.this,status.getStatus(),status.getMessage());
-                                   }else {
+                                Common.current_user.getCustomerInfo().setFirstname(name);
+                                Common.current_user.getCustomerInfo().setEmail(email);
+                                Common.current_user.getCustomerInfo().setTelephone(phone);
 
-                                       Common.current_user.getCustomerInfo().setFirstname(name);
-                                       Common.current_user.getCustomerInfo().setEmail(email);
-                                       Common.current_user.getCustomerInfo().setTelephone(phone);
+                                Paper.book("DarHaa").write("currentUser", Common.current_user);
+                                finish();
 
-                                       Paper.book("DarHaa").write("currentUser", Common.current_user);
+                            }
 
-                                       AlertDialog.Builder builder1 = new AlertDialog.Builder(EditProfile.this);
-                                       builder1.setMessage(status.getMessage());
-                                       builder1.setTitle(status.getStatus());
-                                       builder1.setCancelable(false);
-                                       builder1.setPositiveButton(
-                                               R.string.ok,
-                                               new DialogInterface.OnClickListener() {
-                                                   public void onClick(DialogInterface dialog, int id) {
-                                                       dialog.cancel();
-                                                       finish();
-                                                   }
-                                               });
+                        }
+                    }));
 
-                                       AlertDialog alert11 = builder1.create();
-                                       alert11.show();
-
-                                   }
-
-                               }
-                           }));
-
-    } catch (Exception e) {
-        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
     }
-
-
-}
 
     private boolean validate(String name, String email, String phone) {
 
         if (name.equals("") || email.equals("") || phone.equals("")) {
-            Common.showAlert(EditProfile.this,R.string.error,R.string.missing_required_data);
+            Common.showAlert(EditProfile.this, R.string.error, R.string.missing_required_data);
             return false;
-        }else if (!email.contains("@") || !email.contains(".com")) {
-            Common.showAlert(EditProfile.this,R.string.error,R.string.validate_email);
+        } else if (!email.contains("@")) {
+            Common.showAlert(EditProfile.this, R.string.error, R.string.validate_email);
             return false;
         } else
-                return true;
+            return true;
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    public void setLanguage(String lang) {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        this.getResources().updateConfiguration(config, this.getResources().getDisplayMetrics());
     }
 }

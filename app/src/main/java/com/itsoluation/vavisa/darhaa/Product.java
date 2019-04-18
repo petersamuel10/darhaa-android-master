@@ -4,21 +4,24 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.StringDef;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -46,6 +49,7 @@ import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.model.addToCart.AddToCardData;
 import com.itsoluation.vavisa.darhaa.model.addToCart.Options;
 import com.itsoluation.vavisa.darhaa.model.favorite.Products;
+import com.itsoluation.vavisa.darhaa.singleton.InterfaceProduct;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,7 +75,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import ss.com.bannerslider.Slider;
 
-public class Product extends AppCompatActivity implements View.OnClickListener , RecyclerViewItemClickListener {
+public class Product extends AppCompatActivity implements View.OnClickListener, RecyclerViewItemClickListener {
 
     @BindView(R.id.rootLayout)
     RelativeLayout rootLayout;
@@ -93,16 +97,22 @@ public class Product extends AppCompatActivity implements View.OnClickListener ,
     TextView item_manf;
     @BindView(R.id.item_price_special)
     TextView special_price;
+    @BindView(R.id.item_stock)
+    TextView item_stock;
     @BindView(R.id.item_sku)
     TextView item_sku;
+    @BindView(R.id.seller_details)
+    ConstraintLayout seller_details_layout;
+    @BindView(R.id.seller_name)
+    TextView seller_name_txt;
     @BindView(R.id.related_rec)
     RecyclerView related_rec;
     @BindView(R.id.product_options)
     LinearLayout product_options;
     @BindView(R.id.attributes_layout)
     LinearLayout attributes_layout;
-    @BindView(R.id.discount_txt)
-    TextView discount_txt;
+    @BindView(R.id.discount_layout)
+    LinearLayout discount_layout;
     @BindView(R.id.addCardBtn)
     Button addCart;
 
@@ -114,7 +124,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener ,
     ArrayList<Products> relativeProductsList;
     RecyclerViewItemClickListener recyclerListener;
 
-    static String current_product_id;
+    static String current_product_id, seller_name, seller_email, seller_phone;
     private int amount = 1;
 
     com.itsoluation.vavisa.darhaa.expandableAdapter.ExpandableListAdapter expandable_adapter;
@@ -128,18 +138,65 @@ public class Product extends AppCompatActivity implements View.OnClickListener ,
     String product_id, minimum;
     String user_id;
     Boolean wishList;
-    Double price ,totalPrice;
+    Double price, totalPrice;
     AddToCardData addCard;
+    Products current_product;
 
     ArrayList<Options> cartOptions;
+
     @OnClick(R.id.back_arrow)
-    public void setBack(){onBackPressed();}
+    public void setBack() {
+        onBackPressed();
+    }
+
+    @OnClick(R.id.seller_phone)
+    public void call() {
+        final AlertDialog.Builder builder1 = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
+        builder1.setMessage(getResources().getString(R.string.call_to) + " " + seller_phone);
+        builder1.setPositiveButton(
+                getString(R.string.call),
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int id) {
+                        boolean call = getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
+                        if (call) {
+                            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + seller_phone));
+                            startActivity(intent);
+                            dialog.cancel();
+                        }
+                    }
+                });
+
+        builder1.setNegativeButton(
+                getString(R.string.cancel),
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
+    @OnClick(R.id.seller_email)
+    public void sendEmail() {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("message/");
+        i.putExtra(Intent.EXTRA_EMAIL, new String[]{seller_email});
+        i.putExtra(Intent.EXTRA_SUBJECT, "subject of email");
+        i.putExtra(Intent.EXTRA_TEXT, "body of email");
+        try {
+            startActivity(i);
+        } catch (android.content.ActivityNotFoundException ex) {
+        }
+    }
 
     @OnClick(R.id.addCardBtn)
-    public void addOrder(){
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(rootLayout.getWindowToken(),0);
-        if(Common.isConnectToTheInternet(this))
+    public void addOrder() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(rootLayout.getWindowToken(), 0);
+        if (Common.isConnectToTheInternet(this))
             addToCart();
         else
             Common.errorConnectionMess(this);
@@ -149,10 +206,10 @@ public class Product extends AppCompatActivity implements View.OnClickListener ,
 
         cartOptions = new ArrayList<>();
         addCard = new AddToCardData();
-        if(getCartOPtions()) {
+        if (getCartOPtions()) {
             addCard.setOptions(cartOptions);
 
-            if(user_id == null)
+            if (user_id == null)
                 user_id = String.valueOf(0);
             addCard.setUser_id(String.valueOf(user_id));
             addCard.setQuantity(item_amount.getText().toString());
@@ -160,38 +217,38 @@ public class Product extends AppCompatActivity implements View.OnClickListener ,
             addCard.setDevice_id(Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
 
             progressDialog.show();
-try {
-            compositeDisposable.add(Common.getAPI().addToCart(addCard).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<Status>() {
-                        @Override
-                        public void accept(Status status) throws Exception {
-                            progressDialog.dismiss();
-                            if(status.getStatus().equals("error"))
-                                Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
-                            else {
-                                Snackbar snackbar = Snackbar.make(rootLayout, status.getMessage(), Snackbar.LENGTH_LONG);
-                                snackbar.show();
+            try {
+                compositeDisposable.add(Common.getAPI().addToCart(addCard).subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<Status>() {
+                            @Override
+                            public void accept(Status status) throws Exception {
+                                progressDialog.dismiss();
+                                if (status.getStatus().equals("error"))
+                                    Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
+                                else {
+                                    Snackbar snackbar = Snackbar.make(rootLayout, status.getMessage(), Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                }
                             }
-                        }
-                    }));
-        } catch (Exception e) {
-            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
-        }
+                        }));
+            } catch (Exception e) {
+                Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+            }
 
-    }
+        }
 
     }
 
     private boolean getCartOPtions() {
 
-        for (EditText ed: editTexts) {
-            if(ed.getText().toString().equals("")){
-                if(Boolean.parseBoolean(ed.getTag(R.string.required).toString())){
-                    Toast.makeText(this, getResources().getString(R.string.warning)+" : "+getResources().getString(R.string.please_enter) +" "+ ed.getHint().toString(), Toast.LENGTH_SHORT).show();
+        for (EditText ed : editTexts) {
+            if (ed.getText().toString().equals("")) {
+                if (Boolean.parseBoolean(ed.getTag(R.string.required).toString())) {
+                    Toast.makeText(this, getResources().getString(R.string.warning) + " : " + getResources().getString(R.string.please_enter) + " " + ed.getHint().toString(), Toast.LENGTH_SHORT).show();
                     return false;
                 }
-            }else{
+            } else {
                 Options option = new Options();
                 option.setId(ed.getTag(R.string.option_id).toString());
                 option.setValue(ed.getText().toString());
@@ -202,18 +259,17 @@ try {
         for (Map.Entry<String, List<String>> entry : OptionsSelection.optionsSelection.entrySet()) {
             String key = entry.getKey();
             List<String> value = entry.getValue();
-            if(value.get(0).equals("true")){
-                if(value.size()>2){
+            if (value.get(0).equals("true")) {
+                if (value.size() > 2) {
 
                     Options option = new Options();
                     option.setId(key);
                     option.setValue(value.get(2));
                     cartOptions.add(option);
 
-                }else
-                {
-                    Toast.makeText(this, getResources().getString(R.string.warning)+" : "+
-                                    getResources().getString(R.string.please_enter) +" "+ value.get(1),
+                } else {
+                    Toast.makeText(this, getResources().getString(R.string.warning) + " : " +
+                                    getResources().getString(R.string.please_enter) + " " + value.get(1),
                             Toast.LENGTH_SHORT).show();
                     return false;
                 }
@@ -225,7 +281,7 @@ try {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(Common.isArabic)
+        if (Common.isArabic)
             setLanguage("ar");
         else
             setLanguage("en");
@@ -236,17 +292,19 @@ try {
         progressDialog.setCancelable(false);
 
         OptionsSelection.optionsSelection.clear();
-        if(Common.isArabic){
+        if (Common.isArabic) {
             back_arrow.setRotation(180);
         }
 
         user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : null;
 
         product_id = CurrentProductDetails.product_id;
+        current_product = getIntent().getParcelableExtra("product_");
         ic_add.setOnClickListener(this);
         ic_remove.setOnClickListener(this);
         ic_fav.setOnClickListener(this);
         ic_share.setOnClickListener(this);
+
 
         recyclerListener = this;
         item_price = findViewById(R.id.item_price);
@@ -254,17 +312,30 @@ try {
         item_desc_details = findViewById(R.id.item_desc_details);
         slider = findViewById(R.id.banner_slider1);
 
-        if(Common.isConnectToTheInternet(this))
-            new GetItemDetailsBackgroundTask(this).execute();
-        else
-            Common.errorConnectionMess(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
         user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : null;
+
+        editTexts = new ArrayList<>();
+        expandableListViews = new ArrayList<>();
+
+        product_options.removeAllViews();
+        attributes_layout.removeAllViews();
+        discount_layout.removeAllViews();
+
+        OptionsSelection.optionsSelection.clear();
+        if (Common.isArabic)
+            setLanguage("ar");
+        else
+            setLanguage("en");
+
+        if (Common.isConnectToTheInternet(this))
+            new GetItemDetailsBackgroundTask(this).execute();
+        else
+            Common.errorConnectionMess(this);
     }
 
     private void share() {
@@ -283,28 +354,38 @@ try {
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.ic_share:
                 share();
                 break;
             case R.id.ic_add:
                 amount++;
-                totalPrice +=price;
-                item_price.setText(String.format(Locale.US, "%.3f", totalPrice));
-                item_amount.setText(String.valueOf(amount));
-                break;
-            case R.id.ic_remove:
-                if(amount == Integer.parseInt(minimum)) {
-                    Common.showAlert(this, R.string.warning, R.string.minimum_number);
-                }else {
-                    amount--;
-                    totalPrice -=price;
+                totalPrice += price;
+                if (special_price.getVisibility() == View.VISIBLE) {
+                    special_price.setText(String.format(Locale.US, "%.3f", totalPrice));
+                    item_amount.setText(String.valueOf(amount));
+                } else {
                     item_price.setText(String.format(Locale.US, "%.3f", totalPrice));
                     item_amount.setText(String.valueOf(amount));
                 }
                 break;
+            case R.id.ic_remove:
+                if (amount == Integer.parseInt(minimum)) {
+                    Common.showAlert(this, R.string.warning, R.string.minimum_number);
+                } else {
+                    amount--;
+                    totalPrice -= price;
+                    if (special_price.getVisibility() == View.VISIBLE) {
+                        special_price.setText(String.format(Locale.US, "%.3f", totalPrice));
+                        item_amount.setText(String.valueOf(amount));
+                    } else {
+                        item_price.setText(String.format(Locale.US, "%.3f", totalPrice));
+                        item_amount.setText(String.valueOf(amount));
+                    }
+                }
+                break;
             case R.id.ic_fav:
-                if(user_id !=null)
+                if (user_id != null)
                     setFavorite();
                 else
                     showAlert();
@@ -314,70 +395,84 @@ try {
     }
 
     private void setFavorite() {
-        if(wishList) {
-            removeFav(product_id,ic_fav);
+        if (wishList) {
+            removeFav(product_id, ic_fav);
             wishList = false;
-        }else{
-            addFav(product_id,ic_fav);
+        } else {
+            addFav(product_id, ic_fav);
             wishList = true;
         }
     }
 
     private void addFav(String product_id, ImageView ic_fav) {
-        if(Common.isConnectToTheInternet(this)) {
+        if (Common.isConnectToTheInternet(this)) {
             ic_fav.setImageResource(R.drawable.ic_fav);
-            try {
-            compositeDisposable.add(Common.getAPI().addFavorte(product_id, user_id)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<Status>() {
-                        @Override
-                        public void accept(Status status) throws Exception {
-                            if (status.getStatus().equals("error")) {
-                                Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
-                            }
-                        }
-                    }));
-        } catch (Exception e) {
-            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
-        }
 
-    }else
+            // current product come from category only not from related
+            if (current_product != null) {
+                current_product.setWishList(true);
+                InterfaceProduct.getInstance().setPosition(getIntent().getExtras().getInt("position"));
+                InterfaceProduct.getInstance().setProduct(current_product);
+            }
+            try {
+                compositeDisposable.add(Common.getAPI().addFavorte(product_id, user_id)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<Status>() {
+                            @Override
+                            public void accept(Status status) throws Exception {
+                                if (status.getStatus().equals("error")) {
+                                    Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
+                                }
+                            }
+                        }));
+            } catch (Exception e) {
+                Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+            }
+
+        } else
             Common.errorConnectionMess(this);
     }
-    private void removeFav(String product_id, ImageView ic_fav) {
-        if(Common.isConnectToTheInternet(this)) {
-            ic_fav.setImageResource(R.drawable.ic_fav_border);
-            try {
-            compositeDisposable.add(Common.getAPI().removeFavorte(product_id, user_id)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<Status>() {
-                        @Override
-                        public void accept(Status status) throws Exception {
-                            if (status.getStatus().equals("error")) {
-                                Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
-                            }
-                        }
-                    }));
-        } catch (Exception e) {
-            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
-        }
 
-    }else
+    private void removeFav(String product_id, ImageView ic_fav) {
+        if (Common.isConnectToTheInternet(this)) {
+            ic_fav.setImageResource(R.drawable.ic_fav_border);
+            // current product come from category only not from related
+            if (current_product != null) {
+                current_product.setWishList(false);
+                InterfaceProduct.getInstance().setPosition(getIntent().getExtras().getInt("position"));
+                InterfaceProduct.getInstance().setProduct(current_product);
+            }
+            try {
+                compositeDisposable.add(Common.getAPI().removeFavorte(product_id, user_id)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<Status>() {
+                            @Override
+                            public void accept(Status status) throws Exception {
+                                if (status.getStatus().equals("error")) {
+                                    Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
+                                }
+                            }
+                        }));
+            } catch (Exception e) {
+                Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+            }
+
+        } else
             Common.errorConnectionMess(this);
 
     }
 
     @Override
     public void onClick(View view, int position, String product_id, String product_name, int flag) {
-        if(flag == 0){
+        if (flag == 0) {
             CurrentProductDetails.product_id = product_id;
             CurrentProductDetails.product_name = product_name;
             startActivity(new Intent(this, Product.class));
-        }else if(flag == 1){
-            if(user_id !=null)
-                setFavoriteRelate(position,view);
+        } else if (flag == 1) {
+            if (user_id != null)
+                setFavoriteRelate(position, view);
             else
                 showAlert();
 
@@ -386,13 +481,13 @@ try {
 
 
     private void setFavoriteRelate(int position, View view) {
-            if (relativeProductsList.get(position).getWishList()){
-                removeFav(relativeProductsList.get(position).getProduct_id(), ((ImageView)view));
-                relativeProductsList.get(position).setWishList(false);
-            }else{
-                addFav(relativeProductsList.get(position).getProduct_id(), ((ImageView)view));
-                relativeProductsList.get(position).setWishList(true);
-            }
+        if (relativeProductsList.get(position).getWishList()) {
+            removeFav(relativeProductsList.get(position).getProduct_id(), ((ImageView) view));
+            relativeProductsList.get(position).setWishList(false);
+        } else {
+            addFav(relativeProductsList.get(position).getProduct_id(), ((ImageView) view));
+            relativeProductsList.get(position).setWishList(true);
+        }
 
     }
 
@@ -405,8 +500,8 @@ try {
 
         // set the custom dialog components - text, image and button
 
-        TextView login =  dialog.findViewById(R.id.login_alert_btn);
-        TextView cancel =  dialog.findViewById(R.id.cancel_alert_btn);
+        TextView login = dialog.findViewById(R.id.login_alert_btn);
+        TextView cancel = dialog.findViewById(R.id.cancel_alert_btn);
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -426,7 +521,9 @@ try {
         dialog.show();
     }
 
-    /** Get Item Details Items **/
+    /**
+     * Get Item Details Items
+     **/
     private class GetItemDetailsBackgroundTask extends AsyncTask<String, Void, String> {
         public ProgressDialog dialog;
         Boolean is_arabic = Common.isArabic;
@@ -437,7 +534,7 @@ try {
             this.dialog = new ProgressDialog(activity);
             linear = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
                     RelativeLayout.LayoutParams.WRAP_CONTENT);
-            linear.setMargins(0,0,0,12);
+            linear.setMargins(0, 0, 0, 12);
         }
 
         @Override
@@ -451,12 +548,12 @@ try {
 
             String get_product_details_url;
             Integer user_id = null;
-            if(Common.current_user !=null) {
+            if (Common.current_user != null) {
                 user_id = Common.current_user.getCustomerInfo().getCustomer_id();
-                get_product_details_url = getString(R.string.product_details_api)+ "&product_id=" + product_id+ "&user_id=" + user_id;
+                get_product_details_url = getString(R.string.product_details_api) + "&product_id=" + product_id + "&user_id=" + user_id;
 
-            }else
-                get_product_details_url = getString(R.string.product_details_api)+ "&product_id=" + product_id;
+            } else
+                get_product_details_url = getString(R.string.product_details_api) + "&product_id=" + product_id;
 
             try {
                 URL url = new URL(get_product_details_url);
@@ -509,172 +606,208 @@ try {
                 e.printStackTrace();
             }
 
-            try {
+            if (TextUtils.isEmpty(result)) {
+                Common.showAlert2(Product.this, getString(R.string.error), getString(R.string.missing_data));
+            } else {
 
-                scrollView.setVisibility(View.VISIBLE);
+                try {
 
-                String product_id = firstJsonObject.getString("product_id");
-                String manufacturer = firstJsonObject.getString("manufacturer");
-                String description = Html.fromHtml(firstJsonObject.getString("description")).toString();
-              //  Spanned description = Html.fromHtml(firstJsonObject.getString("description").replaceAll("\\n\\n","").replaceAll("\\r",""));
-                //String description = descriptionSpanned.toString().replaceAll("\\n\\n","\n");
+                    scrollView.setVisibility(View.VISIBLE);
 
-                String name = firstJsonObject.getString("name");
-                String special = firstJsonObject.getString("special");
-                Boolean stock = firstJsonObject.getBoolean("stock");
-                String mainImage = firstJsonObject.getString("mainImage");
-                JSONArray images = firstJsonObject.getJSONArray("images");
-                minimum = firstJsonObject.getString("minimum");
-                wishList = firstJsonObject.getBoolean("wishList");
-                price = Double.parseDouble(firstJsonObject.getString("price"));
-                String sku = firstJsonObject.getString("sku");
+                    String product_id = firstJsonObject.getString("product_id");
+                    String manufactur = firstJsonObject.getString("manufacturer");
+                    String description = firstJsonObject.getString("description");
+                    item_desc_details.loadDataWithBaseURL(null, description, "text/html", "utf-8", null);
 
-                if(manufacturer.equals("null")) {
-                    item_manf.setVisibility(View.GONE);
-                }
-                else
-                    item_manf.setText(manufacturer);
-                if(wishList)
-                    ic_fav.setImageResource(R.drawable.ic_fav);
-                item_name.setText(name);
-                item_price.setText(String.format(Locale.US, "%.3f", price));
-                totalPrice = price;
+                    String name = firstJsonObject.getString("name");
+                    String special = firstJsonObject.getString("special");
+                    Boolean stock = firstJsonObject.getBoolean("stock");
+                    String mainImage = firstJsonObject.getString("mainImage");
+                    JSONArray images = firstJsonObject.getJSONArray("images");
+                    minimum = firstJsonObject.getString("minimum");
+                    wishList = firstJsonObject.getBoolean("wishList");
+                    price = Double.parseDouble(firstJsonObject.getString("price"));
+                    //  String sku = firstJsonObject.getString("sku");
 
-                if(!special.equals("false")){
-                    item_price.setPaintFlags(item_price.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                    special_price.setText(special+" "+getResources().getString(R.string.kd));
-                    special_price.setVisibility(View.VISIBLE);
-                }
+                    if (manufactur.equals("null")) {
+                        item_manf.setVisibility(View.GONE);
+                    } else
+                        item_manf.setText(manufactur);
+                    if (wishList)
+                        ic_fav.setImageResource(R.drawable.ic_fav);
+                    item_name.setText(name);
+                    item_price.setText(String.format(Locale.US, "%.3f", price));
 
-                if(!stock){
-                    addCart.setVisibility(View.GONE);
-                    special_price.setText(getResources().getString(R.string.out_of_stock));
-                    special_price.setVisibility(View.VISIBLE);
+                    if (!special.equals("false")) {
+                        item_price.setPaintFlags(item_price.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                        special_price.setText(special + " " + getResources().getString(R.string.kd));
+                        special_price.setVisibility(View.VISIBLE);
+                        price = Double.parseDouble(special);
+                    } else {
+                        special_price.setVisibility(View.GONE);
+                        price = Double.parseDouble(firstJsonObject.getString("price"));
+                    }
 
-                }
+                    totalPrice = price;
+                    if (!stock) {
+                        addCart.setVisibility(View.GONE);
+                        product_options.setVisibility(View.GONE);
+                        item_stock.setVisibility(View.VISIBLE);
 
-                if(!sku.equals("")){
+                    } else
+                        item_stock.setVisibility(View.GONE);
+
+                /*if(!sku.equals("")){
                     item_sku.setVisibility(View.VISIBLE);
                     item_sku.setText(getResources().getString(R.string.sku) +": "+sku);
-                }
+                }*/
 
-                item_amount.setText(minimum);
-                amount = Integer.parseInt(minimum);
+                    item_amount.setText(minimum);
+                    amount = Integer.parseInt(minimum);
+           /*     String mime = "text/html";
+                String encoding = "utf-8";
+                item_desc_details.getSettings().setJavaScriptEnabled(true);
+                item_desc_details.loadDataWithBaseURL(null, description, mime, encoding, null);
                 item_desc_details.setBackgroundColor(0x00000000);
-                item_desc_details.loadData(description , "text/html; charset=UTF-8", null);
-                //item_desc_details.setText(description);
-                current_product_id = product_id;
+               // item_desc_details.loadData(description , "text/html; charset=UTF-8", null);
+                //item_desc_details.setText(description);*/
+                    current_product_id = product_id;
 
 
-                ArrayList<String> side_images = new ArrayList<>();
-                side_images.add(mainImage);
-                try {
-                    for (int i = 0; i < images.length(); i++) {
-                        JSONObject jsonObject = images.getJSONObject(i);
-                        String image = jsonObject.getString("image");
-                        side_images.add(image);
+                    ArrayList<String> side_images = new ArrayList<>();
+                    side_images.add(mainImage);
+                    try {
+                        for (int i = 0; i < images.length(); i++) {
+                            JSONObject jsonObject = images.getJSONObject(i);
+                            String image = jsonObject.getString("image");
+                            side_images.add(image);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
 
-                slider.setAdapter(new MainSliderAdapter(Product.this, side_images));
+                    slider.setAdapter(new MainSliderAdapter(Product.this, side_images));
 
-                Slider.init(new PicassoImageLoadingService(Product.this));
+                    Slider.init(new PicassoImageLoadingService(Product.this));
 
+                    try {
 
-                JSONArray discounts = firstJsonObject.getJSONArray("discounts");
+                        JSONObject seller_details = firstJsonObject.getJSONObject("seller_detail");
+                        if (seller_details.length() == 0)
+                            seller_details_layout.setVisibility(View.GONE);
+                        else {
+                            seller_details_layout.setVisibility(View.VISIBLE);
+                            seller_name = seller_details.getString("seller_name");
+                            seller_email = seller_details.getString("seller_email");
+                            seller_phone = seller_details.getString("seller_phone");
 
-                try {
-                   for (int i = 0; i < discounts.length(); i++) {
-                       JSONObject discount_item = discounts.getJSONObject(i);
-                       String discount_quantity = discount_item.getString("quantity");
-                       String discount_price = discount_item.getString("price");
-
-                       discount_txt.setText(R.string.take+" "+discount_quantity+" "+R.string.or_more_for+" "+ discount_price+" "+R.string.each);
-
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                JSONArray options = firstJsonObject.getJSONArray("options");
-                try {
-                    // TODO: ask what can options array contain so that you can know what to add for strings
-                    for (int i = 0; i < options.length(); i++) {
-
-                        JSONObject option_product = options.getJSONObject(i);
-                        String option_type = option_product.getString("type");
-                        String option_name = option_product.getString("name");
-                        String option_id = option_product.getString("product_option_id");
-                        Boolean option_required = (option_product.getString("required").equals("1"))? true : false ;
-                        JSONArray option_options = option_product.getJSONArray("product_option_value");
-
-                        if(option_type.equals("text"))
-                            createEditText(option_name,option_required,option_id);
-
-                        if (option_type.equals("select"))
-                            createCheck(option_name,option_options,false,option_required,option_id);
-
-                        if (option_type.equals("checkbox"))
-                            createCheck(option_name,option_options,true,option_required,option_id);
-
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-
-
-                JSONArray attribute_groups = firstJsonObject.getJSONArray("attribute_groups");
-
-                try {
-                    for (int i = 0; i < attribute_groups.length(); i++) {
-
-                        JSONObject attribut_item = attribute_groups.getJSONObject(i);
-
-                        attributes_layout.setVisibility(View.VISIBLE);
-                        //title
-                        createTextTitle(attributes_layout,attribut_item.getString("name"),true);
-                        JSONArray attributes = attribut_item.getJSONArray("attribute");
-                        for (int x = 0; x < attributes.length(); x++){
-
-                            JSONObject attribut2 = attributes.getJSONObject(x);
-                            //attribute name
-                            createTextTitle(attributes_layout,attribut2.getString("name")+": "+attribut2.getString("text"),false);
+                            seller_name_txt.setText(getString(R.string.by) + " " + seller_name);
                         }
 
-
+                    } catch (Exception e) {
                     }
+
+                    JSONArray discounts = firstJsonObject.getJSONArray("discounts");
+
+                    try {
+                        for (int i = 0; i < discounts.length(); i++) {
+
+                            discount_layout.setVisibility(View.VISIBLE);
+
+                            JSONObject discount_item = discounts.getJSONObject(i);
+                            String discount_quantity = discount_item.getString("quantity");
+                            String discount_price = discount_item.getString("price");
+
+                            String text = getString(R.string.take) + " " + discount_quantity + " " + getString(R.string.or_more_for) + " " +
+                                    discount_price + " " + getString(R.string.each);
+
+                            createTextTitle(discount_layout, text, true, true);
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    JSONArray options = firstJsonObject.getJSONArray("options");
+                    try {
+                        // TODO: ask what can options array contain so that you can know what to add for strings
+                        for (int i = 0; i < options.length(); i++) {
+
+                            JSONObject option_product = options.getJSONObject(i);
+                            String option_type = option_product.getString("type");
+                            String option_name = option_product.getString("name");
+                            String option_id = option_product.getString("product_option_id");
+                            Boolean option_required = (option_product.getString("required").equals("1")) ? true : false;
+                            JSONArray option_options = option_product.getJSONArray("product_option_value");
+
+                            if (option_type.equals("text"))
+                                createEditText(option_name, option_required, option_id);
+
+                            if (option_type.equals("select"))
+                                createCheck(option_name, option_options, false, option_required, option_id);
+
+                            if (option_type.equals("radio"))
+                                createCheck(option_name, option_options, false, option_required, option_id);
+
+                            if (option_type.equals("checkbox"))
+                                createCheck(option_name, option_options, true, option_required, option_id);
+
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
+                    JSONArray attribute_groups = firstJsonObject.getJSONArray("attribute_groups");
+
+                    try {
+                        for (int i = 0; i < attribute_groups.length(); i++) {
+
+                            JSONObject attribut_item = attribute_groups.getJSONObject(i);
+
+                            attributes_layout.setVisibility(View.VISIBLE);
+                            //title
+                            createTextTitle(attributes_layout, attribut_item.getString("name"), true, false);
+                            JSONArray attributes = attribut_item.getJSONArray("attribute");
+                            for (int x = 0; x < attributes.length(); x++) {
+
+                                JSONObject attribut2 = attributes.getJSONObject(x);
+                                //attribute name
+                                createTextTitle(attributes_layout, attribut2.getString("name") + ": " + attribut2.getString("text"), false, false);
+                            }
+
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    // related products
+                    JSONArray relatedProducts = firstJsonObject.getJSONArray("relatedProducts");
+                    setRelatedProduct(relatedProducts);
+
+
                 } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                    // This means no product details are found
+                    try {
+                        Log.i("mmmm", e.getMessage());
+                        String status = firstJsonObject.getString("status");
+                        String message = firstJsonObject.getString("message");
 
-                // related products
-                JSONArray relatedProducts = firstJsonObject.getJSONArray("relatedProducts");
-                setRelatedProduct(relatedProducts);
-
-
-            } catch (JSONException e) {
-                // This means no product details are found
-                try {
-                    Log.i("mmmm",e.getMessage());
-                    String status = firstJsonObject.getString("status");
-                    String message = firstJsonObject.getString("message");
-
-                    if (status.equals("error")) {
-                        Common.showAlert2(Product.this,status,message);
+                        if (status.equals("error")) {
+                            Common.showAlert2(Product.this, status, message);
+                        }
+                    } catch (JSONException e1) {
+                        e1.printStackTrace();
+                        Common.showAlert2(Product.this, "error", e1.getMessage());
                     }
-                } catch (JSONException e1) {
-                    e1.printStackTrace();
-                    Common.showAlert2(Product.this,"error",e1.getMessage());
                 }
             }
         }
 
         private void createCheck(String option_name, final JSONArray option_options, boolean isCK, Boolean isRequired, final String option_id) {
 
-            final ExpandableListView expandableListView  = new ExpandableListView(Product.this);
+            final ExpandableListView expandableListView = new ExpandableListView(Product.this);
             expandableListView.setLayoutParams(linear);
 
             expandableListView.setBackground(getResources().getDrawable(R.drawable.border_blue));
@@ -693,8 +826,11 @@ try {
                 for (int x = 0; x < option_options.length(); x++) {
                     JSONObject option_child = option_options.getJSONObject(x);
                     String name = option_child.getString("name");
+                    String price = option_child.getString("price");
+                    String price_prefix = option_child.getString("price_prefix");
+                    String title = name + " (" + price_prefix + price + ")";
                     String id = option_child.getString("product_option_value_id");
-                    childList.add(name);
+                    childList.add(title);
                     childListId.add(id);
 
                 }
@@ -702,9 +838,9 @@ try {
                 e.printStackTrace();
             }
 
-            expandableListDetail.put(expandableListTitle.get(0),childList);
+            expandableListDetail.put(expandableListTitle.get(0), childList);
 
-            expandable_adapter = new ExpandableListAdapter(Product.this,expandableListTitle,expandableListDetail,isCK ,isRequired,option_id,childListId);
+            expandable_adapter = new ExpandableListAdapter(Product.this, expandableListTitle, expandableListDetail, isCK, isRequired, option_id, childListId);
 
             expandableListView.setAdapter(expandable_adapter);
 
@@ -749,7 +885,7 @@ try {
         private void setRelatedProduct(JSONArray relatedProducts_) {
 
             try {
-                 relativeProductsList = new ArrayList<>();
+                relativeProductsList = new ArrayList<>();
 
                 for (int i = 0; i < relatedProducts_.length(); i++) {
                     JSONObject object = relatedProducts_.getJSONObject(i);
@@ -771,10 +907,10 @@ try {
 
                 related_rec.setHasFixedSize(false);
 
-                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(Product.this,LinearLayoutManager.HORIZONTAL,false);
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(Product.this, LinearLayoutManager.HORIZONTAL, false);
                 related_rec.setLayoutManager(linearLayoutManager);
 
-                adapter = new CategoryProductAdapter(relativeProductsList,true);
+                adapter = new CategoryProductAdapter(relativeProductsList, true);
                 adapter.setItemClickListener(recyclerListener);
 
                 related_rec.setAdapter(adapter);
@@ -788,11 +924,11 @@ try {
 
             RelativeLayout.LayoutParams linear = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
                     RelativeLayout.LayoutParams.WRAP_CONTENT);
-            linear.setMargins(0,0,0,12);
+            linear.setMargins(0, 0, 0, 12);
             EditText note = new EditText(Product.this);
             note.setBackground(getResources().getDrawable(R.drawable.border_blue));
             note.setGravity(Gravity.CENTER_HORIZONTAL);
-            note.setPadding(4,30,4,30);
+            note.setPadding(4, 30, 4, 30);
             // note.setLayoutParams(linear);
             note.setHint(option_name);
             note.setTextSize(20);
@@ -802,8 +938,8 @@ try {
             note.setLines(1);
 
 
-            if (required){
-                note.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_star,0,0,0);
+            if (required) {
+                note.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_star, 0, 0, 0);
                 note.setCompoundDrawablePadding(24);
             }
 
@@ -811,15 +947,15 @@ try {
             product_options.addView(note);
             editTexts.add(note);
 
-            note.setTag(R.string.required,required);
-            note.setTag(R.string.option_id,option_id);
+            note.setTag(R.string.required, required);
+            note.setTag(R.string.option_id, option_id);
         }
 
-        private void createTextTitle(LinearLayout layout, String attribute_name, Boolean isTitle) {
+        private void createTextTitle(LinearLayout layout, String attribute_name, Boolean isTitle, Boolean isDiscount) {
 
             RelativeLayout.LayoutParams linear = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
                     RelativeLayout.LayoutParams.WRAP_CONTENT);
-            linear.setMargins(4,4,4,4);
+            linear.setMargins(4, 4, 4, 4);
 
             TextView attribute = new TextView(Product.this);
             attribute.setGravity(Gravity.START);
@@ -829,15 +965,20 @@ try {
             attribute.setText(attribute_name);
 
 
-            if (isTitle){
+            if (isTitle) {
                 attribute.setTextSize(22);
-                attribute.setPadding(4,30,4,4);
-                attribute.setTextColor(Product.this.getResources().getColor(R.color.brownLight));
-            }else {
-                attribute.setTextSize(14);
-                attribute.setPadding(4,2,4,4);
+                attribute.setPadding(4, 30, 4, 4);
+                if (isDiscount) {
+                    attribute.setTextColor(Product.this.getResources().getColor(R.color.colorAccent));
+                    attribute.setPadding(4, 4, 4, 4);
+                } else
+                    attribute.setTextColor(Product.this.getResources().getColor(R.color.blue));
+            } else if (!isTitle) {
+                attribute.setTextSize(16);
+                attribute.setPadding(16, 2, 16, 4);
                 attribute.setTextColor(Product.this.getResources().getColor(R.color.black));
             }
+
 
             layout.addView(attribute);
 
@@ -880,13 +1021,13 @@ try {
         }
 
     }
-    public void setLanguage(String lang)
-    {
+
+    public void setLanguage(String lang) {
         Locale locale = new Locale(lang);
         Locale.setDefault(locale);
         Configuration config = new Configuration();
-        config.locale= locale;
-        getBaseContext().getResources().updateConfiguration(config,getBaseContext().getResources().getDisplayMetrics());
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
     }
 
 }

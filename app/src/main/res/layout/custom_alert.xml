@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/corner_blue">
+
+    <TextView
+        android:id="@+id/login_alert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/blueLight"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:text="@string/login"
+        android:gravity="center"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/blue"/>
+
+    <TextView
+        android:id="@+id/add_address_alert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/blue"
+        android:gravity="center"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:text="@string/continue_as_guest"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/blue"/>
+
+    <TextView
+        android:id="@+id/cancel_alert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/cancel"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:textColor="@color/blue"
+        android:gravity="center"/>
+
+</LinearLayout>

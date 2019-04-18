@@ -3,10 +3,8 @@ package com.itsoluation.vavisa.darhaa.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +12,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.itsoluation.vavisa.darhaa.CategoryProducts;
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerViewItemClickListener;
 import com.itsoluation.vavisa.darhaa.R;
-import com.itsoluation.vavisa.darhaa.CategoryProducts;
 import com.itsoluation.vavisa.darhaa.common.CurrentCategoryDetails;
 import com.itsoluation.vavisa.darhaa.fargments.SubCartegory;
 import com.itsoluation.vavisa.darhaa.model.home.CategoryData;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -29,6 +26,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     private ArrayList<CategoryData> categoryList;
     Context context;
+
+    public CategoryAdapter() {
+    }
 
     public CategoryAdapter(ArrayList<CategoryData> categoryList) {
         this.categoryList = categoryList;
@@ -48,7 +48,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         holder.category_name.setText(Html.fromHtml(categoryList.get(position).getName()));
-        Glide.with(context).load(categoryList.get(position).getImage()).into(holder.category_image);
+
+        Glide.with(context).load(categoryList.get(position).getImage()).placeholder(context.getResources().getDrawable(R.drawable.placeholder)).into(holder.category_image);
 
         if(categoryList.get(position).getIsSubCat().equals("false")){
             holder.category_prods.setText(categoryList.get(position).getIsProduct()+" "+ context.getResources().getString(R.string.items));

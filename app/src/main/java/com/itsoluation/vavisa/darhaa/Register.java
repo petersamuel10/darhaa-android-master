@@ -38,18 +38,19 @@ public class Register extends AppCompatActivity {
     @BindView(R.id.edConfirmPass)
     EditText confirm_field;
 
-    String full_name_str, email_str, phone_str, password_str, confirm_str,device_id;
+    String full_name_str, email_str, phone_str, password_str, confirm_str, device_id;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     ProgressDialog progressDialog;
 
     @OnClick(R.id.have_account)
-    public void loginActivity(){
-        startActivity(new Intent(Register.this,Login.class));
+    public void loginActivity() {
+        startActivity(new Intent(Register.this, Login.class));
         finish();
     }
+
     @OnClick(R.id.registerBtn)
-    public void register(){
+    public void register() {
         makeRegisteration();
     }
 
@@ -69,7 +70,7 @@ public class Register extends AppCompatActivity {
     private void makeRegisteration() {
 
         //hide keyboard when click button
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(register_btn.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
 
         full_name_str = String.valueOf(full_name_field.getText());
@@ -79,12 +80,12 @@ public class Register extends AppCompatActivity {
         confirm_str = String.valueOf(confirm_field.getText());
 
         /** check if fields are empty **/
-        if (full_name_str.equals("") || email_str.equals("")||phone_str.equals("") || password_str.equals("") || confirm_str.equals("")) {
-            Common.showAlert(this,R.string.error,R.string.fill_fields_to_continue);
+        if (full_name_str.equals("") || email_str.equals("") || phone_str.equals("") || password_str.equals("") || confirm_str.equals("")) {
+            Common.showAlert(this, R.string.error, R.string.fill_fields_to_continue);
         } else {
             /** validate email **/
-            if (!email_str.contains("@") || !email_str.contains(".com")) {
-                Common.showAlert(this,R.string.error,R.string.validate_email);
+            if (!email_str.contains("@")) {
+                Common.showAlert(this, R.string.error, R.string.validate_email);
             } else {
                 /** validate phone number **/
                 if (phone_str.equals("")) {
@@ -94,18 +95,18 @@ public class Register extends AppCompatActivity {
                     if (password_str.length() >= 6 || confirm_str.length() >= 6) {
                         /** check if passwords match **/
                         if (password_str.equals(confirm_str)) {
-                            if(Common.isConnectToTheInternet(this))
-                                callRegisterApi(full_name_str,email_str,phone_str,password_str,confirm_str);
+                            if (Common.isConnectToTheInternet(this))
+                                callRegisterApi(full_name_str, email_str, phone_str, password_str, confirm_str);
                             else
                                 Common.errorConnectionMess(this);
                             // new RegisterBackgroundTask(User.this).execute();
                         } else {
                             /** passwords do not match **/
-                            Common.showAlert(this,R.string.error,R.string.passwords_do_not_match);
+                            Common.showAlert(this, R.string.error, R.string.passwords_do_not_match);
                         }
                     } else {
                         /** password is less than 6 characters **/
-                        Common.showAlert(this,R.string.error,R.string.password_less);
+                        Common.showAlert(this, R.string.error, R.string.password_less);
                     }
                 }
             }
@@ -118,23 +119,23 @@ public class Register extends AppCompatActivity {
         this.progressDialog.show();
 
 
-        compositeDisposable.add(new Controller().getAPI().register(name,email,phone,password,confirm,device_id)
-                           .subscribeOn(Schedulers.io())
-                           .observeOn(AndroidSchedulers.mainThread())
-                           .subscribe(new Consumer<User>() {
-                               @Override
-                               public void accept(User user) throws Exception {
-                                   progressDialog.dismiss();
-                                   if (user.getStatus().equals("error")) {
-                                       Common.showAlert(Register.this,R.string.error,R.string.email_already_registered);
-                                   }else {
-                                       Common.current_user = user;
-                                       Paper.book("DarHaa").write("currentUser",Common.current_user);
-                                       startActivity(new Intent(Register.this,MainActivity.class));
-                                       finish();
-                                   }
-                               }
-                           }));
+        compositeDisposable.add(new Controller().getAPI().register(name, email, phone, password, confirm, device_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<User>() {
+                    @Override
+                    public void accept(User user) throws Exception {
+                        progressDialog.dismiss();
+                        if (user.getStatus().equals("error")) {
+                            Common.showAlert(Register.this, R.string.error, R.string.email_already_registered);
+                        } else {
+                            Common.current_user = user;
+                            Paper.book("DarHaa").write("currentUser", Common.current_user);
+                            startActivity(new Intent(Register.this, MainActivity.class));
+                            finish();
+                        }
+                    }
+                }));
 
     }
 

@@ -1,12 +1,11 @@
 package com.itsoluation.vavisa.darhaa.profile_fragments;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.Common;
@@ -19,11 +18,11 @@ import io.paperdb.Paper;
 public class Language extends AppCompatActivity implements View.OnClickListener {
 
     @BindView(R.id.english)
-    RelativeLayout english;
+    ConstraintLayout english;
     @BindView(R.id.true_english)
     ImageView true_english;
     @BindView(R.id.arabic)
-    RelativeLayout arabic;
+    ConstraintLayout arabic;
     @BindView(R.id.true_arabic)
     ImageView true_arabic;
     @BindView(R.id.back_arrow)
@@ -59,16 +58,16 @@ public class Language extends AppCompatActivity implements View.OnClickListener 
         {
             true_english.setVisibility(View.VISIBLE);
             true_arabic.setVisibility(View.GONE);
+            setLan();
         }else if (v == arabic ){
 
             true_arabic.setVisibility(View.VISIBLE);
             true_english.setVisibility(View.GONE);
+            setLan();
         }
-
 
     }
 
-    @OnClick(R.id.lanApply)
     public void setLan()
     {
         if(true_arabic.getVisibility() == View.VISIBLE){
@@ -91,5 +90,6 @@ public class Language extends AppCompatActivity implements View.OnClickListener 
         super.onBackPressed();
         finish();
     }
+
 
 }

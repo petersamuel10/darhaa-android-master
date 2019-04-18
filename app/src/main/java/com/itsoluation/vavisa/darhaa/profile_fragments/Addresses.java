@@ -3,14 +3,15 @@ package com.itsoluation.vavisa.darhaa.profile_fragments;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.gson.JsonElement;
 import com.itsoluation.vavisa.darhaa.Interface.AddressClicked;
@@ -18,9 +19,7 @@ import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.adapter.AddressAdapter;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.Status;
-import com.itsoluation.vavisa.darhaa.model.address.address.AddressDetails;
 import com.itsoluation.vavisa.darhaa.model.address.address.AddressGet;
-import com.itsoluation.vavisa.darhaa.model.favorite.Products;
 import com.itsoluation.vavisa.darhaa.payment.PaymentMethod;
 import com.itsoluation.vavisa.darhaa.web_service.Controller2;
 
@@ -28,7 +27,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,6 +42,8 @@ public class Addresses extends AppCompatActivity implements AddressClicked {
     RecyclerView address_rec;
     @BindView(R.id.back_arrow)
     ImageView back_arrow;
+    @BindView(R.id.no_item)
+    TextView no_data;
 
     @OnClick(R.id.ic_add_address)
     public void addAddress(){
@@ -103,6 +103,9 @@ try {
 
                                    if (result.contains("error")) {
                                            JSONObject object = new JSONObject(result);
+                                       if(result.contains(getString(R.string.no_data)))
+                                           no_data.setVisibility(View.VISIBLE);
+                                       else
                                            Common.showAlert2(Addresses.this, object.getString("status"), object.getString("message"));
                                    }else {
 
@@ -122,6 +125,9 @@ try {
                                            }
                                            adapter.addAddress(list);
                                            adapter.notifyDataSetChanged();
+
+                                       no_data.setVisibility(View.GONE);
+                                       address_rec.setVisibility(View.VISIBLE);
 
                                    }
 

@@ -80,8 +80,6 @@
                     android:layout_marginBottom="10dp"
                     android:background="@drawable/border_blue"
                     android:gravity="center_vertical|start"
-                    android:hint="@string/addressName"
-                    android:textColorHint="@color/greyLight"
                     android:inputType="text"
                     android:padding="5dp"
                     android:textColor="@color/black" />
@@ -222,8 +220,6 @@
                     android:layout_marginBottom="10dp"
                     android:background="@drawable/border_blue"
                     android:gravity="center_vertical"
-                    android:hint="@string/postcode"
-                    android:textColorHint="@color/greyLight"
                     android:inputType="number"
                     android:padding="5dp"
                     android:textColor="@color/black" />
@@ -244,8 +240,6 @@
                     android:layout_marginBottom="10dp"
                     android:background="@drawable/border_blue"
                     android:gravity="center_vertical"
-                    android:hint="@string/apartment"
-                    android:textColorHint="@color/greyLight"
                     android:inputType="textMultiLine"
                     android:lines="5"
                     android:overScrollMode="always"

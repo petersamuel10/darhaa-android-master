@@ -2,14 +2,12 @@ package com.itsoluation.vavisa.darhaa.profile_fragments;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,9 +22,7 @@ import android.widget.TextView;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.Status;
-import com.itsoluation.vavisa.darhaa.model.address.address.AddressAdd;
 import com.itsoluation.vavisa.darhaa.model.address.address.AddressDetails;
-import com.itsoluation.vavisa.darhaa.model.address.address.AddressGet;
 import com.itsoluation.vavisa.darhaa.model.address.address.Countries;
 import com.itsoluation.vavisa.darhaa.model.address.address.areaAndCity.Area;
 import com.itsoluation.vavisa.darhaa.model.address.address.areaAndCity.AreaAndCities;
@@ -362,20 +358,10 @@ try {
                             .subscribe(new Consumer<Status>() {
                                 @Override
                                 public void accept(Status status) throws Exception {
-                                    AlertDialog.Builder builder1 = new AlertDialog.Builder(AddAddress.this);
-                                    builder1.setMessage(status.getMessage());
-                                    builder1.setTitle(status.getStatus());
-                                    builder1.setCancelable(false);
-                                    builder1.setPositiveButton(
-                                            R.string.ok,
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    dialog.cancel();
-                                                }
-                                            });
-
-                                    AlertDialog alert11 = builder1.create();
-                                    alert11.show();
+                                   if(status.getStatus() == "error")
+                                       Common.showAlert2(AddAddress.this,status.getStatus(),status.getMessage());
+                                   else
+                                       finish();
                                 }
                             }));
 
@@ -419,7 +405,7 @@ try {
             Common.showAlert(AddAddress.this, R.string.error, R.string.enter_address_desc);
             return false;
         } else if (TextUtils.isEmpty(postcode_)) {
-            postcode = null;
+            postcode = "";
         }
 
         return true;

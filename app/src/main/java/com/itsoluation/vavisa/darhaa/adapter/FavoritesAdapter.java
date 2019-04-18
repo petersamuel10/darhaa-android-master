@@ -17,7 +17,6 @@ import com.itsoluation.vavisa.darhaa.Product;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.CurrentProductDetails;
 import com.itsoluation.vavisa.darhaa.model.favorite.Products;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -45,7 +44,8 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.View
 
         holder.item_price.setText(favoritesList.get(position).getPrice()+" "+mContext.getResources().getString(R.string.kd));
         holder.item_name.setText(favoritesList.get(position).getName());
-        Glide.with(mContext).load(favoritesList.get(position).getThumb()).into(holder.fav_image);
+        Glide.with(mContext).load(favoritesList.get(position).getThumb())
+                .placeholder(mContext.getResources().getDrawable(R.drawable.placeholder)).into(holder.fav_image);
 
         holder.setItemClickListener(new RecyclerViewItemClickListener() {
             @Override

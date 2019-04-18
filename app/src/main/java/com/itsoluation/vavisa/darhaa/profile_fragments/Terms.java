@@ -1,26 +1,20 @@
 package com.itsoluation.vavisa.darhaa.profile_fragments;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.SpannableString;
-import android.text.Spanned;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.WebView;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.JsonElement;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.Common;
-import com.itsoluation.vavisa.darhaa.payment.PaymentMethod;
-import com.itsoluation.vavisa.darhaa.view_setting.Filter;
 
 import org.json.JSONObject;
+
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,6 +53,15 @@ public class Terms extends AppCompatActivity {
     getData();
 }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(Common.isArabic)
+            setLanguage("ar");
+        else
+            setLanguage("en");
+    }
+
     private void getData() {
         if(Common.isConnectToTheInternet(this)) {
             callAPI();
@@ -80,10 +83,10 @@ public class Terms extends AppCompatActivity {
 
                         if (!result.contains("error")) {
                             JSONObject object = new JSONObject(result);
-                            String description = Html.fromHtml(object.getString("description")).toString();
+                            String description = object.getString("description");
                             Log.d("desc",description);
                             terms_txt.setBackgroundColor(0x00000000);
-                            terms_txt.loadData(description , "text/html; charset=UTF-8", null);
+                            terms_txt.loadDataWithBaseURL(null, description, "text/html", "utf-8", null);
                         }else{
                             JSONObject object = new JSONObject(result);
                             Common.showAlert2(Terms.this,object.getString("status"),object.getString("message"));
@@ -97,7 +100,14 @@ public class Terms extends AppCompatActivity {
 
     }
 
-
+    public void setLanguage(String lang)
+    {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale= locale;
+        getBaseContext().getResources().updateConfiguration(config,getBaseContext().getResources().getDisplayMetrics());
+    }
 
     @Override
     public void onBackPressed() {

@@ -1,9 +1,9 @@
 package com.itsoluation.vavisa.darhaa;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
 public class Welcome extends AppCompatActivity {
     Handler handler = new Handler();

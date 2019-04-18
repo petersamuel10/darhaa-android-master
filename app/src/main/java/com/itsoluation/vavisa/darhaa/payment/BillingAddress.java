@@ -19,7 +19,6 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.address.address.AddressAdd;
@@ -284,7 +283,7 @@ try {
             snackbar.show();
             return false;
         }
-        if (!email.contains("@") || !email.contains(".com")) {
+        if (!email.contains("@")) {
             Snackbar snackbar2 = Snackbar.make(rootLayout, R.string.error_invalid_email, Snackbar.LENGTH_LONG);
             snackbar2.show();
             return false;

@@ -1,9 +1,12 @@
 package com.itsoluation.vavisa.darhaa.model.favorite;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Products {
+public class Products implements Parcelable {
     @SerializedName("product_id")
     @Expose
     private String product_id;
@@ -62,6 +65,30 @@ public class Products {
     }
 
 
+    protected Products(Parcel in) {
+        product_id = in.readString();
+        thumb = in.readString();
+        name = in.readString();
+        price = in.readString();
+        special = in.readString();
+        minimum = in.readString();
+        byte tmpStock = in.readByte();
+        stock = tmpStock == 0 ? null : tmpStock == 1;
+        byte tmpWishList = in.readByte();
+        wishList = tmpWishList == 0 ? null : tmpWishList == 1;
+    }
+
+    public static final Creator<Products> CREATOR = new Creator<Products>() {
+        @Override
+        public Products createFromParcel(Parcel in) {
+            return new Products(in);
+        }
+
+        @Override
+        public Products[] newArray(int size) {
+            return new Products[size];
+        }
+    };
 
     public String getProduct_id() {
         return product_id;
@@ -125,5 +152,22 @@ public class Products {
 
     public void setMinimum(String minimum) {
         this.minimum = minimum;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(product_id);
+        dest.writeString(thumb);
+        dest.writeString(name);
+        dest.writeString(price);
+        dest.writeString(special);
+        dest.writeString(minimum);
+        dest.writeByte((byte) (stock == null ? 0 : stock ? 1 : 2));
+        dest.writeByte((byte) (wishList == null ? 0 : wishList ? 1 : 2));
     }
 }

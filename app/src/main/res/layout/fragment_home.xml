@@ -25,9 +25,7 @@
                         android:id="@+id/home_rec"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:nestedScrollingEnabled="false"
-                        android:paddingBottom="150dp"
-                        android:clipToPadding="false"/>
+                        android:nestedScrollingEnabled="false"/>
 
 
         </android.support.v4.widget.SwipeRefreshLayout>

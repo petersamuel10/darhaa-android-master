@@ -2,13 +2,11 @@ package com.itsoluation.vavisa.darhaa.view_setting;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.itsoluation.vavisa.darhaa.CategoryProducts;
@@ -54,7 +52,6 @@ public class Sort extends AppCompatActivity {
                 int radioButtonID = radioButtonGroup.getCheckedRadioButtonId();
                 View radioButton = radioButtonGroup.findViewById(radioButtonID);
                 int idx = radioButtonGroup.indexOfChild(radioButton);
-                CategoryProducts.filter_type = "order";
 
                 if (idx == 0) { // A - Z
                     CategoryProducts.filter_value = "ASC";

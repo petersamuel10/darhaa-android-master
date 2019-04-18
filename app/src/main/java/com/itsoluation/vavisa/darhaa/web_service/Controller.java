@@ -5,7 +5,6 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.itsoluation.vavisa.darhaa.common.Common;
-import com.itsoluation.vavisa.darhaa.profile_fragments.Language;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.io.IOException;

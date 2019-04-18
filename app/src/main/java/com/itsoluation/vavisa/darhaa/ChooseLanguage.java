@@ -1,11 +1,8 @@
 package com.itsoluation.vavisa.darhaa;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-
-import com.itsoluation.vavisa.darhaa.common.Common;
+import android.support.v7.app.AppCompatActivity;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;

@@ -62,6 +62,13 @@
                 android:layout_height="wrap_content"
                 android:gravity="start">
 
+                <LinearLayout
+                    android:id="@+id/knet_titles"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="start">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -89,6 +96,17 @@
                     android:gravity="center_vertical"
                     android:text="@string/result"/>
 
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/order_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize = "16sp"
+                    android:textColor="@color/brownLight"
+                    android:gravity="center_vertical"
+                    android:text="@string/order_id"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -98,16 +116,21 @@
                     android:gravity="center_vertical"
                     android:text="@string/total"/>
 
-
-
             </LinearLayout>
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="2dp"
+                android:layout_marginStart="4dp"
                 android:gravity="start">
+
+                <LinearLayout
+                    android:id="@+id/knet_info"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="start">
 
                 <TextView
                     android:id="@+id/paymentId"
@@ -135,6 +158,16 @@
                     android:textColor="@color/black"
                     android:gravity="center_vertical"
                     android:text="gbujtutyiuj"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/order_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize = "16sp"
+                    android:textColor="@color/black"
+                    android:gravity="center_vertical"
+                    android:text="gbujtutyiuj"/>
 
                 <TextView
                     android:id="@+id/total"
@@ -149,6 +182,8 @@
             </LinearLayout>
 
         </LinearLayout>
+
+
 
             <Button
                 android:id="@+id/doneBtn"

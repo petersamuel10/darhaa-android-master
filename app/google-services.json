@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "820310464690",
+    "firebase_url": "https://darhaa-c8283.firebaseio.com",
+    "project_id": "darhaa-c8283",
+    "storage_bucket": "darhaa-c8283.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:820310464690:android:7a943314cd6c4a35",
+        "android_client_info": {
+          "package_name": "com.itsoluation.vavisa.darhaa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDr1nAYVDunnSDbTFQ16MX9PZzr-x9KWl0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "820310464690-amtdd6drroc6eboea8gp1v1geek2g0ag.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

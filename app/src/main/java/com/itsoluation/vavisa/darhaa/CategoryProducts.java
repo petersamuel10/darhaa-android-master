@@ -31,6 +31,7 @@ import com.itsoluation.vavisa.darhaa.common.CurrentProductDetails;
 import com.itsoluation.vavisa.darhaa.model.Status;
 import com.itsoluation.vavisa.darhaa.model.category_products.CategoryProductData;
 import com.itsoluation.vavisa.darhaa.model.favorite.Products;
+import com.itsoluation.vavisa.darhaa.singleton.InterfaceProduct;
 import com.itsoluation.vavisa.darhaa.view_setting.Filter;
 import com.itsoluation.vavisa.darhaa.view_setting.Sort;
 
@@ -44,7 +45,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class CategoryProducts extends AppCompatActivity implements RecyclerViewItemClickListener {
+public class CategoryProducts extends AppCompatActivity implements RecyclerViewItemClickListener, InterfaceProduct.OnProductWishChanges {
 
     @BindView(R.id.back_arrow)
     ImageView back_arrow;
@@ -75,13 +76,13 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
     }
 
     public static String user_id;
-    public static String filter_type = "order";
     public static String filter_value = "ASC";
     public static String filter_value_price = "";
     public static String sort_type = "p.sort_order";
-    public static String category_price_min_value = "0";
-    public static String category_price_max_value = "0";
+    public static String category_price_min_value = "0.000";
+    public static String category_price_max_value = "0.000";
     public ArrayList<Products> productsArrayList;
+    public static ArrayList<Products> productsListFirstPage;
 
     RecyclerViewItemClickListener itemClickListener;
     CategoryProductAdapter adapter;
@@ -96,37 +97,41 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
     public final static int REQUEST_FILTER = 2;
     String search_str = "";
     MenuItem mSearch;
+    boolean isFirstCall = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category_products);
         ButterKnife.bind(this);
-        if (Common.isArabic) { back_arrow.setRotation(180); }
+        if (Common.isArabic) {
+            back_arrow.setRotation(180);
+        }
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
 
+        //that is for favourite in product and listen in category product when on back pressed
+        InterfaceProduct.getInstance().setmListener(this);
+
+        // that's for empty search call bind first page
+        // put here to prevent call in start after go back from sort and filter
+        isFirstCall = true;
 
         setSupportActionBar(toolbar);
         itemClickListener = this;
         recyclerView = findViewById(R.id.rvNumbers);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
-        setUpSwipeRefreshLayout();
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : "0";
         title.setText(Html.fromHtml(CurrentCategoryDetails.category_name).toString());
 
         productsArrayList = new ArrayList<>();
         categoryProductData = new CategoryProductData();
+        productsListFirstPage = new ArrayList<>();
         adapter = new CategoryProductAdapter();
+
 
         setup_for_call_api();
 
@@ -151,16 +156,27 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
                 }
             }
         });
+
+        setUpSwipeRefreshLayout();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // get user_id after come from login activity
+        user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : "0";
     }
 
     public void setup_for_call_api() {
-            page = 1;
-            totalPages = 1;
-            //disable progress when write search text
-            if(search_str.equals(""))
-                progressDialog.show();
+        page = 1;
+        totalPages = 1;
+        //disable progress when write search text
+        if (search_str.equals(""))
+            progressDialog.show();
 
-            callAPI(true);
+        callAPI(true);
     }
 
     private void setUpSwipeRefreshLayout() {
@@ -172,7 +188,6 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
             public void onRefresh() {
                 if (adapter != null) {
                     MenuItemCompat.collapseActionView(mSearch);
-                    filter_type = "order";
                     filter_value = "ASC";
                     filter_value_price = "";
                     sort_type = "p.sort_order";
@@ -187,63 +202,75 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
     }
 
     private void callAPI(final boolean load) {
-        if(Common.isConnectToTheInternet(this)){
+        if (Common.isConnectToTheInternet(this)) {
 
-        compositeDisposable = new CompositeDisposable();
-        try {
-        compositeDisposable.add(Common.getAPI().get_product_pagination(CurrentCategoryDetails.category_id, sort_type,
-                CategoryProducts.filter_value, CategoryProducts.filter_value_price, "10", String.valueOf(page), search_str, user_id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<CategoryProductData>() {
-                    @Override
-                    public void accept(CategoryProductData categoryProducts) throws Exception {
+            compositeDisposable = new CompositeDisposable();
+            try {
+                compositeDisposable.add(Common.getAPI().get_product_pagination(CurrentCategoryDetails.category_id, sort_type,
+                        CategoryProducts.filter_value, CategoryProducts.filter_value_price, "10", String.valueOf(page), search_str, user_id)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<CategoryProductData>() {
+                            @Override
+                            public void accept(CategoryProductData categoryProducts) throws Exception {
+                                if (categoryProducts.getStatus() != null) {
 
-                        if (categoryProducts.getProducts().size() == 0) {
-                            productsArrayList.clear();
-                            adapter.clearList();
-                            progressDialog.dismiss();
-                        } else {
+                                    progressDialog.dismiss();
+                                    Common.showAlert2(CategoryProducts.this, categoryProducts.getStatus(), categoryProducts.getMessage());
+                                } else {
+                                    // that's to save first page list to display when empty search
+                                    if (isFirstCall) {
+                                        productsListFirstPage.addAll(categoryProducts.getProducts());
+                                        category_price_min_value = categoryProducts.getMinPrice();
+                                        category_price_max_value = categoryProducts.getMaxPrice();
+                                        isFirstCall = false;
+                                    }
 
-                            if (load) {
-                                productsArrayList.clear();
-                                adapter.clearList();
+                                    if (categoryProducts.getProducts().size() == 0) {
+                                        productsArrayList.clear();
+                                        adapter.clearList();
+                                        progressDialog.dismiss();
+                                    } else {
+
+                                        if (load) {
+                                            productsArrayList.clear();
+                                            adapter.clearList();
+                                        }
+
+                                        productsArrayList.addAll(categoryProducts.getProducts());
+                                        adapter = new CategoryProductAdapter(productsArrayList, false);
+                                        categoryProductData.setProducts(productsArrayList);
+                                        categoryProductData.setProductPerPage(categoryProducts.getProductPerPage());
+                                        categoryProductData.setPage(categoryProducts.getPage());
+                                        categoryProductData.setLimit(10);
+                                        categoryProductData.setMinPrice(categoryProducts.getMinPrice());
+                                        categoryProductData.setMaxPrice(categoryProducts.getMaxPrice());
+
+
+                                        adapter.setItemClickListener(itemClickListener);
+
+                                        if (page == 1) {
+                                            recyclerView.setAdapter(adapter);
+                                            totalPages = categoryProducts.getTotalPages();
+                                            categoryProductData.setTotalProducts(categoryProducts.getTotalProducts());
+                                            categoryProductData.setTotalPages(categoryProducts.getTotalPages());
+                                        } else
+                                            adapter.notifyDataSetChanged();
+
+                                        progressBar.setVisibility(View.GONE);
+                                        progressDialog.dismiss();
+                                    }
+                                }
                             }
+                        }));
+            } catch (Exception e) {
+                Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+            }
 
-                            productsArrayList.addAll(categoryProducts.getProducts());
-                            adapter = new CategoryProductAdapter(productsArrayList, false);
-                            categoryProductData.setProducts(productsArrayList);
-                            categoryProductData.setProductPerPage(categoryProducts.getProductPerPage());
-                            categoryProductData.setPage(categoryProducts.getPage());
-                            categoryProductData.setLimit(10);
-                            categoryProductData.setMinPrice(categoryProducts.getMinPrice());
-                            categoryProductData.setMaxPrice(categoryProducts.getMaxPrice());
-
-                            category_price_min_value = categoryProducts.getMinPrice();
-                            category_price_max_value = categoryProducts.getMaxPrice();
-
-                            adapter.setItemClickListener(itemClickListener);
-
-                            if (page == 1) {
-                                recyclerView.setAdapter(adapter);
-                                totalPages = categoryProducts.getTotalPages();
-                                categoryProductData.setTotalProducts(categoryProducts.getTotalProducts());
-                                categoryProductData.setTotalPages(categoryProducts.getTotalPages());
-                            } else
-                                adapter.notifyDataSetChanged();
-
-
-                            progressBar.setVisibility(View.GONE);
-                            progressDialog.dismiss();
-                        }
-                    }
-                }));
-        } catch (Exception e) {
-            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        } else {
+            progressDialog.dismiss();
+            Common.errorConnectionMess(this);
         }
-
-    }else
-        Common.errorConnectionMess(this);
     }
 
     @Override
@@ -262,11 +289,19 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
 
                 return false;
             }
+
             @Override
             public boolean onQueryTextChange(String s) {
 
                 search_str = s.toLowerCase().trim();
-                setup_for_call_api();
+                filter_value = "ASC";
+                filter_value_price = "";
+                sort_type = "p.sort_order";
+                if (search_str.length() > 0)
+                    setup_for_call_api();
+                else
+                    adapter.setFilter(productsListFirstPage);
+
                 return false;
             }
         });
@@ -279,7 +314,10 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
         if (flag == 0) {
             CurrentProductDetails.product_id = product_id;
             CurrentProductDetails.product_name = product_name;
-            startActivity(new Intent(this, Product.class));
+            Intent i = new Intent(this, Product.class);
+            i.putExtra("product_", productsArrayList.get(position));
+            i.putExtra("position", position);
+            startActivity(i);
         } else if (flag == 1) {
             if (!user_id.equals("0"))
                 setFavorite(position, view);
@@ -294,60 +332,62 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
                 removeFav(position, view);
             else
                 addFav(position, view);
-        }else
+        } else
             Common.errorConnectionMess(this);
 
     }
+
     private void addFav(final int position, final View view) {
         ((ImageView) view).setImageResource(R.drawable.ic_fav);
         productsArrayList.get(position).setWishList(true);
-try {
-        compositeDisposable = new CompositeDisposable();
-        compositeDisposable.add(Common.getAPI().addFavorte(productsArrayList.get(position).getProduct_id(), user_id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Status>() {
-                    @Override
-                    public void accept(Status status) throws Exception {
-                        if (status.getStatus().equals("error")) {
-                            Common.showAlert2(CategoryProducts.this, status.getStatus(), status.getMessage());
-                        }/*else {
+        try {
+            compositeDisposable = new CompositeDisposable();
+            compositeDisposable.add(Common.getAPI().addFavorte(productsArrayList.get(position).getProduct_id(), user_id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Status>() {
+                        @Override
+                        public void accept(Status status) throws Exception {
+                            if (status.getStatus().equals("error")) {
+                                Common.showAlert2(CategoryProducts.this, status.getStatus(), status.getMessage());
+                            }/*else {
                             ((ImageView)view).setImageResource(R.drawable.ic_fav);
                             productsArrayList.get(position).setWishList(true);
                         }*/
-                    }
-                }));
+                        }
+                    }));
 
-    } catch (Exception e) {
-        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
+
+
     }
 
-
-}
     private void removeFav(final int position, final View view) {
         ((ImageView) view).setImageResource(R.drawable.ic_fav_border);
         productsArrayList.get(position).setWishList(false);
-try {
-        compositeDisposable = new CompositeDisposable();
-        compositeDisposable.add(Common.getAPI().removeFavorte(productsArrayList.get(position).getProduct_id(), user_id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Status>() {
-                    @Override
-                    public void accept(Status status) throws Exception {
-                        if (status.getStatus().equals("error")) {
-                            Common.showAlert2(CategoryProducts.this, status.getStatus(), status.getMessage());
-                        } else {
+        try {
+            compositeDisposable = new CompositeDisposable();
+            compositeDisposable.add(Common.getAPI().removeFavorte(productsArrayList.get(position).getProduct_id(), user_id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<Status>() {
+                        @Override
+                        public void accept(Status status) throws Exception {
+                            if (status.getStatus().equals("error")) {
+                                Common.showAlert2(CategoryProducts.this, status.getStatus(), status.getMessage());
+                            } else {
                            /* ((ImageView)view).setImageResource(R.drawable.ic_fav_border);
                             productsArrayList.get(position).setWishList(false);*/
+                            }
                         }
-                    }
-                }));
-    } catch (Exception e) {
-        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
-    }
+                    }));
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
 
-}
+    }
 
     private void showAlert() {
 
@@ -394,13 +434,37 @@ try {
         switch (requestCode) {
             case REQUEST_SORT:
                 search_str = "";
+                filter_value_price = "";
                 MenuItemCompat.collapseActionView(mSearch);
+                setup_for_call_api();
                 break;
             case REQUEST_FILTER:
                 search_str = "";
+                filter_value = "ASC";
                 MenuItemCompat.collapseActionView(mSearch);
+                setup_for_call_api();
                 break;
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        filter_value = "ASC";
+        filter_value_price = "";
+        sort_type = "p.sort_order";
+        super.onBackPressed();
+
+    }
+
+    //update ui when you wish in product details and come back again
+    @Override
+    public void wishChanged() {
+
+        Products products = InterfaceProduct.getInstance().getProduct();
+        int position = InterfaceProduct.getInstance().getPosition();
+
+        productsArrayList.set(position, products);
+        adapter.notifyItemChanged(position);
+
+    }
 }

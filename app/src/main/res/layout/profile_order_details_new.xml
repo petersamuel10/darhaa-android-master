@@ -33,7 +33,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolBar">
+        app:layout_constraintTop_toBottomOf="@+id/toolBar"
+        android:visibility="gone">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/rootLayout"
@@ -152,16 +153,17 @@
 
                 <TextView
                     android:id="@+id/payment_address"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:text="sdghiodhfgiodhfioghdfiohngiodfhgidfighdifhgigidhighdofghioghidfo"
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toEndOf="@+id/order3"
                     app:layout_constraintTop_toBottomOf="@+id/added_date"
-                    app:layout_constraintWidth_percent="0.6" />
+                    app:layout_constraintWidth_percent="0.55" />
 
                 <TextView
                     android:id="@+id/order4"
@@ -209,7 +211,7 @@
 
                 <TextView
                     android:id="@+id/shipping_address"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:gravity="center_vertical"
@@ -219,7 +221,7 @@
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toEndOf="@+id/order5"
                     app:layout_constraintTop_toBottomOf="@+id/payment_method"
-                    app:layout_constraintWidth_percent="0.6" />
+                    app:layout_constraintWidth_percent="0.55" />
 
                 <TextView
                     android:id="@+id/order6"
@@ -341,7 +343,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/p2"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/p1"
+                    app:layout_constraintStart_toEndOf="@+id/p2"
                     app:layout_constraintTop_toTopOf="@+id/p2"
                     app:layout_constraintWidth_percent="0.6" />
 
@@ -370,7 +372,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/p3"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/p2"
+                    app:layout_constraintStart_toEndOf="@+id/p3"
                     app:layout_constraintTop_toTopOf="@+id/p3"
                     app:layout_constraintWidth_percent="0.6" />
 
@@ -399,7 +401,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/p4"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/p3"
+                    app:layout_constraintStart_toEndOf="@+id/p4"
                     app:layout_constraintTop_toTopOf="@+id/p4"
                     app:layout_constraintWidth_percent="0.6" />
 
@@ -430,7 +432,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/p5"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toEndOf="@+id/p4"
+                    app:layout_constraintStart_toEndOf="@+id/p5"
                     app:layout_constraintTop_toTopOf="@+id/p5"
                     app:layout_constraintWidth_percent="0.6" />
 

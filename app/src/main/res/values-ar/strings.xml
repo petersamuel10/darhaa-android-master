@@ -8,7 +8,7 @@
     <string name="register">تسجيل</string>
     <string name="skip">تخطى</string>
     <string name="dont_have_account">ليس لديك حساب ؟قم بالتسجيل هنا</string>
-    <string name="already_havr_account">بالفعل قمت بالتسجسل من قبل؟ قم بتسجيل الدخول من هنا</string>
+    <string name="already_havr_account">بالفعل قمت بالتسجيل من قبل؟ قم بتسجيل الدخول من هنا</string>
     <string name="address_name">الاسم</string>
     <string name="email">البريد الالكترونى</string>
     <string name="password">كلمة المرور</string>
@@ -168,7 +168,7 @@
     <string name="please_enter_payment_method">الرجاء اختيار طريقه الدفع :</string>
     <string name="your_order_completed_successfuly">تم طلبك بنجاح</string>
     <string name="result">"النتيجة : "</string>
-    <string name="payment_Id">"كود الدفع : "</string>
+    <string name="payment_Id">"رقم الدفع : "</string>
     <string name="done">تم</string>
     <string name="there_is_no_item_in_cart">سلة المشتريات فارغة!</string>
     <string name="congratulation">تهنئة</string>
@@ -178,7 +178,7 @@
     <string name="use_same_address_for_delivery">استخدام نفس العنوان للتوصيل</string>
     <string name="paying_now">ادفع الان</string>
     <string name="order_info">بيانات الطلب</string>
-    <string name="order_id">"كود الطلب : "</string>
+    <string name="order_id">"رقم الطلب : "</string>
     <string name="payment_method">"طريقة الدفع : "</string>
     <string name="payment_address">"عنوان الدفع : "</string>
     <string name="added_date">"تاريخ الطلب : "</string>
@@ -216,5 +216,11 @@
     <string name="no_data_found">لايوجد بيانات</string>
     <string name="product_name">اسم المنتج :</string>
     <string name="comment">ملاحظة</string>
+    <string name="access_token">رمز دخول المستخدم</string>
+    <string name="your_address_list_is_empty">قائمة العناوين فارغة</string>
+    <string name="no_data">لايوجد بيانات</string>
+    <string name="pay_on_delivery">الدفع عند التوصيل</string>
+    <string name="by">بواسطة:</string>
+    <string name="missing_data">لا توجد بيانات</string>
 
 </resources>

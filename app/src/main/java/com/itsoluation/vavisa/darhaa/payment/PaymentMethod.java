@@ -2,10 +2,10 @@ package com.itsoluation.vavisa.darhaa.payment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -23,9 +22,11 @@ import com.google.gson.JsonElement;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.common.Common;
 import com.itsoluation.vavisa.darhaa.model.paymentData.CheckoutPageParameters;
+import com.itsoluation.vavisa.darhaa.model.paymentData.CheckoutProductPage;
+import com.itsoluation.vavisa.darhaa.model.paymentData.PaymentMethodData;
 import com.itsoluation.vavisa.darhaa.model.paymentData.ShippingMethodData;
 import com.itsoluation.vavisa.darhaa.model.paymentData.UserSendData;
-import com.itsoluation.vavisa.darhaa.model.paymentData.PaymentMethodData;
+import com.itsoluation.vavisa.darhaa.payment.paymentResult.PaymentResult;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -35,7 +36,6 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.paperdb.Paper;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
@@ -80,6 +80,7 @@ public class PaymentMethod extends AppCompatActivity {
 
     ArrayList<PaymentMethodData> paymentMethods;
     ArrayList<ShippingMethodData> shippingMethods;
+    CheckoutPageParameters checkout = null;
 
     UserSendData payment1 = null;
     UserSendData payment2 = null;
@@ -94,7 +95,6 @@ public class PaymentMethod extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
 
-        Paper.init(this);
 
         if (Common.isArabic) {back_arrow.setRotation(180); }
 
@@ -161,7 +161,10 @@ public class PaymentMethod extends AppCompatActivity {
                 shipping_method_cost = shippingMethods.get(checkedIndex).getCost();
 
                 total2= total+Double.parseDouble(shipping_method_cost);
-                payBtn.setText(getResources().getString(R.string.paying_now)+" ( "+String.format("%.3f",total2)+" ) "+getResources().getString(R.string.kd));
+                if(payment_method_code.equals("cod"))
+                    payBtn.setText(getResources().getString(R.string.pay_on_delivery)+" ( "+String.format("%.3f",total2)+" ) "+getResources().getString(R.string.kd));
+                else
+                    payBtn.setText(getResources().getString(R.string.paying_now)+" ( "+String.format("%.3f",total2)+" ) "+getResources().getString(R.string.kd));
 
             }
         });
@@ -174,6 +177,11 @@ public class PaymentMethod extends AppCompatActivity {
                 int checkedIndex = paymentRG.indexOfChild(checkedButton);
                 payment_method_code = paymentMethods.get(checkedIndex).getCode();
                 payment_method_title = paymentMethods.get(checkedIndex).getTitle();
+                if(payment_method_code.equals("cod"))
+                    payBtn.setText(getResources().getString(R.string.pay_on_delivery)+" ( "+String.format("%.3f",total2)+" ) "+getResources().getString(R.string.kd));
+                else
+                    payBtn.setText(getResources().getString(R.string.paying_now)+" ( "+String.format("%.3f",total2)+" ) "+getResources().getString(R.string.kd));
+
             }
         });
     }
@@ -192,7 +200,7 @@ public class PaymentMethod extends AppCompatActivity {
                     public void accept(JsonElement response) throws Exception {
                         Gson gson = new Gson();
                         String json2 = gson.toJson(response);
-                        if (json2.contains("error")){
+                        if (json2.contains("message")){
                             JSONObject data = new JSONObject(json2);
 
                             String status = data.getString("status");
@@ -245,7 +253,7 @@ public class PaymentMethod extends AppCompatActivity {
                         Gson gson = new Gson();
                         String json2 = gson.toJson(response);
 
-                        if (json2.contains("status")){
+                        if (json2.contains("message")){
                             JSONObject data = new JSONObject(json2);
 
                             String status = data.getString("status");
@@ -308,7 +316,7 @@ public class PaymentMethod extends AppCompatActivity {
     }
 
     @OnClick(R.id.paymentBtn)
-    public void checkout() {
+    public void checkout_() {
 
         if(!TextUtils.isEmpty(payment_method_code)){
             if(!TextUtils.isEmpty(shipping_method_title)){
@@ -359,9 +367,13 @@ public class PaymentMethod extends AppCompatActivity {
                 }
 
 
-                Intent intent = new Intent(this, PaymentPage.class);
-                intent.putExtra("checkout",checkout);
-                startActivity(intent);
+                if(payment_method_code.equals("cod")){
+                    callAPI();
+                }else {
+                    Intent intent = new Intent(this, PaymentPage.class);
+                    intent.putExtra("checkout", checkout);
+                    startActivity(intent);
+                }
 
             }else {
                 Snackbar snackbar = Snackbar.make(rootLayout, R.string.please_enter_shipping_method, Snackbar.LENGTH_LONG);
@@ -371,5 +383,40 @@ public class PaymentMethod extends AppCompatActivity {
             Snackbar snackbar = Snackbar.make(rootLayout, R.string.please_enter_payment_method, Snackbar.LENGTH_LONG);
             snackbar.show();
         }
+    }
+
+
+    private void callAPI() {
+
+        compositeDisposable = new CompositeDisposable();
+
+        progressDialog.show();
+        try {
+            compositeDisposable.add(Common.getAPI().checkoutProductPage(checkout)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<CheckoutProductPage>() {
+                        @Override
+                        public void accept(CheckoutProductPage checkoutProductPage) throws Exception {
+
+                            try{
+
+                                Intent intent = new Intent(PaymentMethod.this, PaymentResult.class);
+                                intent.putExtra("order_id", checkoutProductPage.getOrder_id());
+                                intent.putExtra("total", getIntent().getStringExtra("total"));
+                                startActivity(intent);
+
+                                progressDialog.dismiss();
+
+                            }catch (Exception e){
+                                Log.i("errrr",e.getMessage());
+                            }
+                        }
+                    }));
+
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
+
     }
 }

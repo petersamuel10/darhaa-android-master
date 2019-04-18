@@ -1,11 +1,9 @@
 package com.itsoluation.vavisa.darhaa.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,15 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.Transformation;
 import com.itsoluation.vavisa.darhaa.Interface.RecyclerViewItemClickListener;
-import com.itsoluation.vavisa.darhaa.Product;
 import com.itsoluation.vavisa.darhaa.R;
-import com.itsoluation.vavisa.darhaa.common.CurrentProductDetails;
-import com.itsoluation.vavisa.darhaa.model.category_products.CategoryProductData;
 import com.itsoluation.vavisa.darhaa.model.favorite.Products;
-import com.itsoluation.vavisa.darhaa.model.home.CategoryData;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -67,15 +59,6 @@ public class CategoryProductAdapter extends RecyclerView.Adapter<CategoryProduct
 
         holder.bind(productData.get(position));
 
-       /* if(isRelated)
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    CurrentProductDetails.product_id = productData.get(position).getProduct_id();
-                    CurrentProductDetails.product_name = productData.get(position).getName();
-                    context.startActivity(new Intent(context, Product.class));
-                }
-            });*/
     }
 
     // total number of cells
@@ -86,7 +69,7 @@ public class CategoryProductAdapter extends RecyclerView.Adapter<CategoryProduct
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView product_price, product_name,special_price;
+        TextView product_price, product_name,special_price,item_stock;
         ImageView product_wish;
         ImageView product_image;
 
@@ -97,6 +80,7 @@ public class CategoryProductAdapter extends RecyclerView.Adapter<CategoryProduct
             special_price = itemView.findViewById(R.id.item_price_special);
             product_name = itemView.findViewById(R.id.item_name);
             product_wish = itemView.findViewById(R.id.ic_wish);
+            item_stock = itemView.findViewById(R.id.item_stock);
 
             itemView.setOnClickListener(this);
             product_wish.setOnClickListener(this);
@@ -110,13 +94,15 @@ public class CategoryProductAdapter extends RecyclerView.Adapter<CategoryProduct
                 product_price.setPaintFlags(product_price.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 special_price.setVisibility(View.VISIBLE);
                 special_price.setText(product.getSpecial()+" "+context.getResources().getString(R.string.kd));
-            }
+            }else
+                special_price.setVisibility(View.GONE);
 
             if(!product.getStock()){
-                special_price.setVisibility(View.VISIBLE);
-                special_price.setText(context.getResources().getString(R.string.out_of_stock));
-            }
-            Glide.with(context).load(product.getThumb()).into(product_image);
+                item_stock.setVisibility(View.VISIBLE);
+            }else
+                item_stock.setVisibility(View.GONE);
+
+            Glide.with(context).load(product.getThumb()).placeholder(context.getResources().getDrawable(R.drawable.placeholder)).into(product_image);
 
             if(product.getWishList())
                 product_wish.setImageResource(R.drawable.ic_fav);

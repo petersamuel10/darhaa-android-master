@@ -2,13 +2,10 @@ package com.itsoluation.vavisa.darhaa;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,19 +32,23 @@ public class Login extends AppCompatActivity {
     @BindView(R.id.loginBtn)
     Button login_btn;
 
-    String email_str, password_str,device_id;
+    String email_str, password_str, device_id;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     ProgressDialog progressDialog;
 
     @OnClick(R.id.forget_password)
-    public void forgetPassword(){startActivity(new Intent(Login.this,ForgetPassword.class));}
+    public void forgetPassword() {
+        startActivity(new Intent(Login.this, ForgetPassword.class));
+    }
+
     @OnClick(R.id.dont_have_account)
-    public void registerActivity(){
-        startActivity(new Intent(Login.this,Register.class));
+    public void registerActivity() {
+        startActivity(new Intent(Login.this, Register.class));
         finish();
     }
+
     @OnClick(R.id.loginBtn)
-    public void login(){
+    public void login() {
         loginMethod();
     }
 
@@ -69,7 +70,7 @@ public class Login extends AppCompatActivity {
     private void loginMethod() {
 
         //hide keyboard when click button
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(login_btn.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
 
         email_str = String.valueOf(email_field.getText());
@@ -77,10 +78,10 @@ public class Login extends AppCompatActivity {
 
         /** check if fields are empty **/
         if (email_str.equals("") || password_str.equals("")) {
-            Common.showAlert(this,R.string.error,R.string.fill_fields_to_continue);
+            Common.showAlert(this, R.string.error, R.string.fill_fields_to_continue);
         } else {
-            if(Common.isConnectToTheInternet(this))
-                callLoginApi(email_str,password_str);
+            if (Common.isConnectToTheInternet(this))
+                callLoginApi(email_str, password_str);
             else
                 Common.errorConnectionMess(this);
         }
@@ -91,37 +92,36 @@ public class Login extends AppCompatActivity {
 
         this.progressDialog.setMessage(getString(R.string.loading));
         this.progressDialog.show();
-try {
-        compositeDisposable.add(new Controller().getAPI().login(email,password,device_id)
-                           .subscribeOn(Schedulers.io())
-                           .observeOn(AndroidSchedulers.mainThread())
-                           .subscribe(new Consumer<User>() {
-                               @Override
-                               public void accept(User user) throws Exception {
-                                   progressDialog.dismiss();
-                                   if (user.getStatus().equals("error")) {
-                                       Common.showAlert(Login.this,R.string.error,R.string.login_no_match);
-                                   }else {
-                                       Common.current_user = user;
-                                      // Common.userAccessToken = user.getUserAccessToken();
-                                       Paper.book("DarHaa").write("currentUser", Common.current_user);
+        try {
+            compositeDisposable.add(new Controller().getAPI().login(email, password, device_id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<User>() {
+                        @Override
+                        public void accept(User user) throws Exception {
+                            progressDialog.dismiss();
+                            if (user.getStatus().equals("error")) {
+                                Common.showAlert(Login.this, R.string.error, R.string.login_no_match);
+                            } else {
+                                Common.current_user = user;
+                                // Common.userAccessToken = user.getUserAccessToken();
+                                Paper.book("DarHaa").write("currentUser", Common.current_user);
 
-                                       if(getIntent().hasExtra("first_time")) {
-                                           startActivity(new Intent(Login.this, MainActivity.class));
-                                           progressDialog.dismiss();
-                                           finish();
-                                       }
-                                       else {
-                                           onBackPressed();
-                                           finish();
-                                       }
-                                   }
-                               }
-                           }));
-    } catch (Exception e) {
-        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+                                if (getIntent().hasExtra("first_time")) {
+                                    startActivity(new Intent(Login.this, MainActivity.class));
+                                    progressDialog.dismiss();
+                                    finish();
+                                } else {
+                                    onBackPressed();
+                                    finish();
+                                }
+                            }
+                        }
+                    }));
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
+
     }
-
-}
 
 }

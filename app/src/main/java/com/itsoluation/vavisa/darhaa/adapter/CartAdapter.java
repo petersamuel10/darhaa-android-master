@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +18,7 @@ import com.itsoluation.vavisa.darhaa.Interface.CartInterface;
 import com.itsoluation.vavisa.darhaa.R;
 import com.itsoluation.vavisa.darhaa.model.cartData.Options;
 import com.itsoluation.vavisa.darhaa.model.cartData.Product;
-import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -74,7 +71,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             holder.item_name.setText(productList.get(position).getName());
             holder.item_price.setText(productList.get(position).getTotal());
             try {holder.item_amount.setText(productList.get(position).getQuantity());}catch (Exception e){}
-               Glide.with(context).load(productList.get(position).getThumb()).into(holder.item_image);
+               Glide.with(context).load(productList.get(position).getThumb()).placeholder(R.drawable.placeholder).into(holder.item_image);
 
             //to show item options
             if(productList.get(position).getOption().size()>0){

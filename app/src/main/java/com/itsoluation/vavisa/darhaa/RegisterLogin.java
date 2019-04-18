@@ -1,14 +1,9 @@
 package com.itsoluation.vavisa.darhaa;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.Toast;
+import android.support.v7.app.AppCompatActivity;
 
-import com.itsoluation.vavisa.darhaa.common.Common;
-
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.paperdb.Paper;
@@ -26,23 +21,23 @@ public class RegisterLogin extends AppCompatActivity {
     }
 
     @OnClick(R.id.loginBtn)
-    public void loginActivity(){
-        Intent i = new Intent(RegisterLogin.this,Login.class);
-        i.putExtra("first_time",true);
+    public void loginActivity() {
+        Intent i = new Intent(RegisterLogin.this, Login.class);
+        i.putExtra("first_time", true);
         startActivity(i);
-      //  finish();
+        //  finish();
     }
 
     @OnClick(R.id.registerBtn)
-    public void RegisterActivity(){
-        startActivity(new Intent(RegisterLogin.this,Register.class));
-       // finish();
+    public void RegisterActivity() {
+        startActivity(new Intent(RegisterLogin.this, Register.class));
+        // finish();
     }
 
     @OnClick(R.id.skip)
-    public void skipActivity(){
-        Paper.book("DarHaa").write("isSkip",true);
-        startActivity(new Intent(RegisterLogin.this,MainActivity.class));
-       // finish();
+    public void skipActivity() {
+        Paper.book("DarHaa").write("isSkip", true);
+        startActivity(new Intent(RegisterLogin.this, MainActivity.class));
+        // finish();
     }
 }
