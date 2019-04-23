@@ -22,6 +22,16 @@
             android:paddingBottom="100dp">
 
 
+            <ImageView
+                android:id="@+id/im"
+                android:layout_width="2dp"
+                android:layout_height="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/button_state"
+                android:visibility="gone"/>
+
             <ss.com.bannerslider.Slider
                 android:id="@+id/banner_slider1"
                 android:layout_width="match_parent"
@@ -31,7 +41,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:slider_loopSlides="true" />
+                app:slider_loopSlides="true" >
+
+            </ss.com.bannerslider.Slider>
 
             <TextView
                 android:id="@+id/item_manf"

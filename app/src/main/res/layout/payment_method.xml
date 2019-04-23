@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@drawable/background"
+    android:orientation="vertical"
     tools:context=".payment.PaymentMethod">
 
     <android.support.v7.widget.Toolbar
@@ -35,97 +34,134 @@
 
     </android.support.v7.widget.Toolbar>
 
-    <LinearLayout
-        android:id="@+id/rootLayout"
-        android:layout_below="@+id/toolBar"
-        android:orientation="vertical"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="4dp"
-        android:visibility="gone">
-
-    <LinearLayout
-        android:id="@+id/paymentLN"
-        android:layout_below="@+id/toolBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="8dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:text="@string/please_enter_payment_method"
-            android:textSize = "16sp"
-            android:textStyle = "bold"/>
-
-
-        <RadioGroup
-            android:id="@+id/paymentRG"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"/>
-
-    </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_marginStart="14dp"
-            android:layout_marginEnd="14dp"
-            android:background="@color/blue"/>
+        android:layout_below="@+id/toolBar">
 
         <LinearLayout
-            android:id="@+id/shippingLN"
+            android:id="@+id/rootLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_margin="8dp">
+            android:padding="4dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/shippingLN"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/please_enter_shipping_method"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+
+                <RadioGroup
+                    android:id="@+id/shippingRG"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="14dp"
+                android:background="@color/blue" />
+
+            <LinearLayout
+                android:id="@+id/paymentLN"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/toolBar"
+                android:layout_margin="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/please_enter_payment_method"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+
+                <RadioGroup
+                    android:id="@+id/paymentRG"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="14dp"
+                android:background="@color/blue" />
+
+
+            <CheckBox
+                android:id="@+id/comment_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/gift_message"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:layout_margin="8dp"
+                android:textStyle="bold" />
+
+
+            <EditText
+                android:id="@+id/comment_ed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/border_blue"
+                android:lines="3"
+                android:padding="2dp"
+                android:textColor="@color/black"
+                android:visibility="gone" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="14dp"
+                android:background="@color/blue" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/note"
                 android:textColor="@android:color/black"
-                android:text="@string/please_enter_shipping_method"
-                android:textSize = "16sp"
-                android:textStyle = "bold"/>
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-
-            <RadioGroup
-                android:id="@+id/shippingRG"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/information"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"/>
+                android:layout_marginStart="14dp"
+                android:layout_marginTop="14dp"
+                android:textColor="@android:color/black" />
 
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_marginStart="14dp"
-            android:layout_marginEnd="14dp"
-            android:background="@color/blue"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:text="@string/note"
-            android:textSize = "16sp"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="8dp"
-            android:textStyle = "bold"/>
-
-        <TextView
-            android:id="@+id/information"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:layout_marginStart="14dp"
-            android:textColor="@android:color/black" />
-
-    </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/footer"

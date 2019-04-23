@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".RegisterLogin"
-    android:background="@drawable/background">
+    android:background="@drawable/launchscreen">
 
     <RelativeLayout
         android:layout_width="match_parent"

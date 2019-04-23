@@ -159,7 +159,7 @@
     <string name="verify">تاكيد</string>
     <string name="coupon_successfully">تم الاستخدام بنجاح</string>
     <string name="sub_total">الاجمالي</string>
-    <string name="total"> :الاجمالي النهائي</string>
+    <string name="total"> الاجمالي النهائي</string>
     <string name="you_get_discount">"سوف تحصل على "</string>
     <string name="enter_coupon_code">ادخل كود الكوبون</string>
     <string name="options">"الاضافات: "</string>
@@ -222,5 +222,9 @@
     <string name="pay_on_delivery">الدفع عند التوصيل</string>
     <string name="by">بواسطة:</string>
     <string name="missing_data">لا توجد بيانات</string>
+    <string name="less_total">اقل سعر أجمالي 5 دك</string>
+    <string name="gift_message">إضافة رسالة للهدية</string>
+    <string name="gift_message_">رسالة الهدية</string>
+    <string name="message">: الرسالة</string>
 
 </resources>

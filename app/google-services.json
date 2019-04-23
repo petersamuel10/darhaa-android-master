@@ -8,12 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:820310464690:android:7a943314cd6c4a35",
+        "mobilesdk_app_id": "1:820310464690:android:21560b6f91e19dd3",
         "android_client_info": {
-          "package_name": "com.itsoluation.vavisa.darhaa"
+          "package_name": "com.itsoluations.vavisa.darhaa"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "820310464690-amtdd6drroc6eboea8gp1v1geek2g0ag.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDr1nAYVDunnSDbTFQ16MX9PZzr-x9KWl0"
