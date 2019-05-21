@@ -53,6 +53,9 @@ public class MainActivity extends AppCompatActivity
         titleTxt = findViewById(R.id.title);
         setSupportActionBar(toolbar);
 
+        //for get context to show message when error in connection
+        Common.mActivity = this;
+
         //init paper
         Paper.init(this);
 
@@ -215,6 +218,5 @@ public class MainActivity extends AppCompatActivity
     public boolean onQueryTextChange(String s) {
         return false;
     }
-
 
 }

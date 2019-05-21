@@ -18,33 +18,34 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Controller2 {
 
-    final static String BASE_URL = "http://173.231.196.229/~hvavisa/darhaa/";
+    final static String BASE_URL = "http://173.231.196.229/~hvavisa/darhaa_test/";
     final static String API_TOKEN = "16aac5b8216f1134770e665a8d  ";
     final static String CONTENT_TYPE = "application/x-www-form-urlencoded";
     // static String USER_ACCESS_TOKEN = Common.userAccessToken;
-    static String LANGUAGE  = "en";
+    static String LANGUAGE = "en";
     private ApiInterface apiInterface;
 
     public Controller2(final String userAccess) {
         try {
-            if(Common.isArabic)
+            if (Common.isArabic)
                 LANGUAGE = "ar";
             else
                 LANGUAGE = "en";
 
-            OkHttpClient httpClient =new OkHttpClient.Builder().addInterceptor(new Interceptor() {
+            OkHttpClient httpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
                 @Override
                 public Response intercept(Chain chain) throws IOException {
 
-                    Request original_request =chain.request();
+                    Request original_request = chain.request();
 
                     Request.Builder builder = original_request.newBuilder()
-                            .addHeader("api-token",API_TOKEN)
-                            .addHeader("Content-Type",CONTENT_TYPE)
-                            .addHeader("language",LANGUAGE)
-                            .addHeader("useraccesstoken",userAccess);
+                            .addHeader("api-token", API_TOKEN)
+                            .addHeader("Content-Type", CONTENT_TYPE)
+                            .addHeader("language", LANGUAGE)
+                            .addHeader("useraccesstoken", userAccess);
 
                     Request newRequest = builder.build();
+
 
                     return chain.proceed(newRequest);
                 }
@@ -63,13 +64,12 @@ public class Controller2 {
 
             apiInterface = retrofit.create(ApiInterface.class);
 
-        }catch (Exception e){
-            Log.i("errrr",e.getMessage());
+        } catch (Exception e) {
+            Log.i("errrr", e.getMessage());
         }
     }
 
-    public ApiInterface getAPI()
-    {
+    public ApiInterface getAPI() {
         return apiInterface;
     }
 }

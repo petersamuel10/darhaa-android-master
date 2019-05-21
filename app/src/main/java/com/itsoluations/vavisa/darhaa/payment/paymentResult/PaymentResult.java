@@ -51,7 +51,7 @@ public class PaymentResult extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(Common.isArabic)
+        if (Common.isArabic)
             setLanguage("ar");
         else
             setLanguage("en");
@@ -61,27 +61,27 @@ public class PaymentResult extends AppCompatActivity {
         ButterKnife.bind(this);
         progressDialog = new ProgressDialog(this);
 
-        if(getIntent().getExtras().containsKey("status")){
-        if(getIntent().getStringExtra("status").equals("\"1\"")){
-            order_title.setVisibility(View.GONE);
-            order_id_txt.setVisibility(View.GONE);
-            status_txt.setText(R.string.congratulation);
-            status_txt.setTextColor(getResources().getColor(R.color.blue));
-            message_txt.setText(R.string.your_order_completed_successfuly);
-            payment_id_txt.setText(getIntent().getStringExtra("paymentId"));
-            date_txt.setText(getIntent().getStringExtra("date"));
-            result_txt.setText(getIntent().getStringExtra("result"));
-        }else if(getIntent().getStringExtra("status").equals("\"0\"")){
-            order_title.setVisibility(View.GONE);
-            order_id_txt.setVisibility(View.GONE);
-            status_txt.setText(R.string.order_payment_failed);
-            status_txt.setTextColor(Color.RED);
-            message_txt.setText(R.string.order_payment_failed);
-            payment_id_txt.setText(getIntent().getStringExtra("paymentId"));
-            date_txt.setText(getIntent().getStringExtra("date"));
-            result_txt.setText(getIntent().getStringExtra("result"));
-        }
-    }else if(getIntent().getExtras().containsKey("order_id")){
+        if (getIntent().getExtras().containsKey("status")) {
+            if (getIntent().getStringExtra("status").equals("\"1\"")) {
+                order_title.setVisibility(View.GONE);
+                order_id_txt.setVisibility(View.GONE);
+                status_txt.setText(R.string.congratulation);
+                status_txt.setTextColor(getResources().getColor(R.color.blue));
+                message_txt.setText(R.string.your_order_completed_successfuly);
+                payment_id_txt.setText(getIntent().getStringExtra("paymentId"));
+                date_txt.setText(getIntent().getStringExtra("date"));
+                result_txt.setText(getIntent().getStringExtra("result"));
+            } else if (getIntent().getStringExtra("status").equals("\"0\"")) {
+                order_title.setVisibility(View.GONE);
+                order_id_txt.setVisibility(View.GONE);
+                status_txt.setText(R.string.order_payment_failed);
+                status_txt.setTextColor(Color.RED);
+                message_txt.setText(R.string.order_payment_failed);
+                payment_id_txt.setText(getIntent().getStringExtra("paymentId"));
+                date_txt.setText(getIntent().getStringExtra("date"));
+                result_txt.setText(getIntent().getStringExtra("result"));
+            }
+        } else if (getIntent().getExtras().containsKey("order_id")) {
             knet_info.setVisibility(View.GONE);
             knet_titles.setVisibility(View.GONE);
             order_title.setVisibility(View.VISIBLE);
@@ -91,21 +91,19 @@ public class PaymentResult extends AppCompatActivity {
 
         }
 
-
         total_txt.setText(getIntent().getStringExtra("total"));
     }
 
-    public void setLanguage(String lang)
-    {
+    public void setLanguage(String lang) {
         Locale locale = new Locale(lang);
         Locale.setDefault(locale);
         Configuration config = new Configuration();
-        config.locale= locale;
-        getBaseContext().getResources().updateConfiguration(config,getBaseContext().getResources().getDisplayMetrics());
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
     }
 
     @OnClick(R.id.doneBtn)
-    public void done(){
+    public void done() {
 
         startActivity(new Intent(this, MainActivity.class));
 

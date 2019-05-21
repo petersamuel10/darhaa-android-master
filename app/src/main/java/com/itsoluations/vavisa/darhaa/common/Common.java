@@ -1,5 +1,6 @@
 package com.itsoluations.vavisa.darhaa.common;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.net.NetworkInfo;
 import android.view.View;
 import android.widget.TextView;
 
+import com.itsoluations.vavisa.darhaa.MainActivity;
 import com.itsoluations.vavisa.darhaa.R;
 import com.itsoluations.vavisa.darhaa.model.User;
 import com.itsoluations.vavisa.darhaa.web_service.ApiInterface;
@@ -25,7 +27,7 @@ public class Common {
     public static User current_user;
     public static boolean isEditAddress = false;
     public static boolean showAddrDetails = false;
-
+    public static Activity mActivity;
 
 
     public static Boolean isConnectToTheInternet (Context context) {

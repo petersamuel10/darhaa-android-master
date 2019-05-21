@@ -1,6 +1,7 @@
 package com.itsoluations.vavisa.darhaa.fargments;
 
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,12 +9,26 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.google.gson.JsonElement;
 import com.itsoluations.vavisa.darhaa.R;
+import com.itsoluations.vavisa.darhaa.common.Common;
+import com.itsoluations.vavisa.darhaa.model.favorite.Products;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +36,10 @@ import com.itsoluations.vavisa.darhaa.R;
 public class ContactUS extends Fragment {
 
     LinearLayout call, send_email;
+    String telephone,email;
+
+    private CompositeDisposable compositeDisposable;
+    ProgressDialog progressDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -31,11 +50,16 @@ public class ContactUS extends Fragment {
         call = view.findViewById(R.id.call);
         send_email = view.findViewById(R.id.send_email);
 
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setCancelable(false);
+
+        callApi();
+
         call.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final AlertDialog.Builder builder1 = new AlertDialog.Builder(getContext());
-                builder1.setMessage(getResources().getString(R.string.call_to)+"+96550349994");
+                builder1.setMessage(getResources().getString(R.string.call_to)+" "+telephone);
                 builder1.setPositiveButton(
                         getString(R.string.ok),
                         new DialogInterface.OnClickListener() {
@@ -43,7 +67,7 @@ public class ContactUS extends Fragment {
                             public void onClick(DialogInterface dialog, int id) {
                                 boolean call = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
                                 if(call) {
-                                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + "+96550349994"));
+                                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + telephone));
                                     startActivity(intent);
                                     dialog.cancel();
                                 }
@@ -70,9 +94,7 @@ public class ContactUS extends Fragment {
 
                 Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType("message/rfc822");
-                i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"support@darhaa.com"});
-                i.putExtra(Intent.EXTRA_SUBJECT, "subject of email");
-                i.putExtra(Intent.EXTRA_TEXT   , "body of email");
+                i.putExtra(Intent.EXTRA_EMAIL  , new String[]{email});
                 try {
                     startActivity(i);
                 } catch (android.content.ActivityNotFoundException ex) {
@@ -84,4 +106,28 @@ public class ContactUS extends Fragment {
         return view;
     }
 
+    private void callApi() {
+
+        compositeDisposable = new CompositeDisposable();
+            if (Common.isConnectToTheInternet(getActivity())) {
+                    this.progressDialog.show();
+                    compositeDisposable.add(Common.getAPI().getSettings()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<JsonElement>() {
+                                @Override
+                                public void accept(JsonElement jsonElement) throws Exception {
+                                    progressDialog.dismiss();
+                                    String result = jsonElement.toString();
+                                    JSONObject object = new JSONObject(result);
+
+                                    telephone = object.getString("telephone");
+                                    email = object.getString("email");
+
+                                }
+                            }));
+
+            }else
+                Common.errorConnectionMess(getContext());
+        }
 }

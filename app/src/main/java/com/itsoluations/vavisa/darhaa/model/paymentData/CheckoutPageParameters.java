@@ -66,6 +66,10 @@ public class CheckoutPageParameters implements Parcelable {
     @Expose
     private String comment;
 
+    @SerializedName("onesignalPlayerID")
+    @Expose
+    private String oneSignalPlayerId;
+
     public CheckoutPageParameters() {
     }
 
@@ -137,6 +141,7 @@ public class CheckoutPageParameters implements Parcelable {
         payment_method_title = in.readString();
         coupon_code = in.readString();
         comment = in.readString();
+        oneSignalPlayerId = in.readString();
     }
 
     public static final Creator<CheckoutPageParameters> CREATOR = new Creator<CheckoutPageParameters>() {
@@ -248,11 +253,13 @@ public class CheckoutPageParameters implements Parcelable {
         this.coupon_code = coupon_code;
     }
 
-    public String getComment() {
-        return comment; }
+    public String getComment() { return comment; }
 
-    public void setComment(String comment) {
-        this.comment = comment; }
+    public void setComment(String comment) { this.comment = comment; }
+
+    public String getOneSignalPlayerId() { return oneSignalPlayerId; }
+
+    public void setOneSignalPlayerId(String oneSignalPlayerId) { this.oneSignalPlayerId = oneSignalPlayerId; }
 
     @Override
     public int describeContents() {
@@ -275,6 +282,7 @@ public class CheckoutPageParameters implements Parcelable {
         dest.writeString(payment_method_title);
         dest.writeString(coupon_code);
         dest.writeString(comment);
+        dest.writeString(oneSignalPlayerId);
     }
 
 }

@@ -158,11 +158,10 @@ public interface ApiInterface {
                                                            @Query("price_range") String price_range, @Query("limit") String limit, @Query("page") String page,
                                                            @Query("search") String search, @Query("user_id") String user_id);
 
-    @GET("index.php?route=restapi/product")
-    Observable<CategoryProductData> get_product_search(@Query("category_id") String category_id,@Query("order") String order, @Query("limit") String limit, @Query("page") String page,
-                                                           @Query("search") String search ,@Query("user_id") String user_id);
-
     @FormUrlEncoded
     @POST("index.php?route=restapi/cart/clearCart")
     Observable<Status> clearCart(@Field("user_id") String user_id, @Field("device_id") String device_id);
+
+    @GET("index.php?route=restapi/common/getSettings")
+    Observable<JsonElement> getSettings();
 }

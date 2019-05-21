@@ -8,6 +8,7 @@ import com.itsoluations.vavisa.darhaa.common.Common;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -18,10 +19,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Controller {
 
-    final static String BASE_URL = "http://173.231.196.229/~hvavisa/darhaa/";
+    final static String BASE_URL = "http://173.231.196.229/~hvavisa/darhaa_test/";
     final static String API_TOKEN = "16aac5b8216f1134770e665a8d";
     final static String CONTENT_TYPE = "application/x-www-form-urlencoded";
-    static String LANGUAGE  = "en";
+    static String LANGUAGE = "en";
     private ApiInterface apiInterface;
 
     public Controller() {
@@ -32,22 +33,27 @@ public class Controller {
             else
                 LANGUAGE = "en";
 
-            OkHttpClient httpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
-                @Override
-                public Response intercept(Chain chain) throws IOException {
 
-                    Request original_request = chain.request();
+            final OkHttpClient httpClient = new OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .addInterceptor(new Interceptor() {
+                        @Override
+                        public Response intercept(Chain chain) throws IOException {
 
-                    Request.Builder builder = original_request.newBuilder()
-                            .addHeader("api-token", API_TOKEN)
-                            .addHeader("Content-Type", CONTENT_TYPE)
-                            .addHeader("language", LANGUAGE);
+                            Request original_request = chain.request();
 
-                    Request newRequest = builder.build();
+                            Request.Builder builder = original_request.newBuilder()
+                                    .addHeader("api-token", API_TOKEN)
+                                    .addHeader("Content-Type", CONTENT_TYPE)
+                                    .addHeader("language", LANGUAGE);
 
-                    return chain.proceed(newRequest);
-                }
-            }).build();
+                            Request newRequest = builder.build();
+
+                            return chain.proceed(newRequest);
+                        }
+                    }).build();
+
 
             Gson gson = new GsonBuilder()
                     .setLenient()
@@ -62,13 +68,12 @@ public class Controller {
 
             apiInterface = retrofit.create(ApiInterface.class);
 
-        }catch (Exception e){
-            Log.i("errrr",e.getMessage());
+        } catch (Exception e) {
+            Log.i("errrr", e.getMessage());
         }
     }
 
-    public ApiInterface getAPI()
-    {
+    public ApiInterface getAPI() {
         return apiInterface;
     }
 

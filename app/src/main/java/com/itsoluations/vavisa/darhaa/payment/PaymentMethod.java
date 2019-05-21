@@ -24,6 +24,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.itsoluations.vavisa.darhaa.R;
 import com.itsoluations.vavisa.darhaa.common.Common;
+import com.itsoluations.vavisa.darhaa.model.address.address.Countries;
+import com.itsoluations.vavisa.darhaa.model.cartData.Options;
+import com.itsoluations.vavisa.darhaa.model.cartData.Product;
 import com.itsoluations.vavisa.darhaa.model.paymentData.CheckoutPageParameters;
 import com.itsoluations.vavisa.darhaa.model.paymentData.CheckoutProductPage;
 import com.itsoluations.vavisa.darhaa.model.paymentData.PaymentMethodData;
@@ -39,8 +42,12 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.paperdb.Paper;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -77,11 +84,13 @@ public class PaymentMethod extends AppCompatActivity {
         onBackPressed();
     }
 
-    String  user_id, device_id,addressId,
-            shipping_method_code,shipping_method_title,shipping_method_cost,
-            payment_method_code,payment_method_title,coupon_code;
+    String user_id, device_id, addressId,
+            shipping_method_code, shipping_method_title, shipping_method_cost,
+            payment_method_code, payment_method_title, coupon_code, product_out_of_stock, oneSignalPlayerId;
 
-    double total,total2;
+    JsonElement json;
+
+    double total, total2;
 
     ArrayList<PaymentMethodData> paymentMethods;
     ArrayList<ShippingMethodData> shippingMethods;
@@ -100,12 +109,14 @@ public class PaymentMethod extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
 
-        if (Common.isArabic) {back_arrow.setRotation(180); }
+        if (Common.isArabic) {
+            back_arrow.setRotation(180);
+        }
 
         commentCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked)
+                if (isChecked)
                     comment_ed.setVisibility(View.VISIBLE);
                 else {
                     comment_ed.setText("");
@@ -132,10 +143,10 @@ public class PaymentMethod extends AppCompatActivity {
         total = Double.parseDouble(getIntent().getStringExtra("total"));
         total2 = total;
 
-        payBtn.setText(getResources().getString(R.string.paying_now)+" ( "+String.valueOf(total2)+" ) "+getResources().getString(R.string.kd));
+        payBtn.setText(getResources().getString(R.string.paying_now) + " ( " + String.valueOf(total2) + " ) " + getResources().getString(R.string.kd));
 
         // gust
-        if(user_id == "0"){
+        if (user_id == "0") {
             try {
 
                 // if use same address for billing and shipping
@@ -147,9 +158,9 @@ public class PaymentMethod extends AppCompatActivity {
                     payment1 = getIntent().getExtras().getParcelable("billing_address");
                     payment2 = getIntent().getExtras().getParcelable("shipping_address");
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
 
-                Common.showAlert(this,R.string.error,R.string.missing_data);
+                Common.showAlert(this, R.string.error, R.string.missing_data);
 
             }
 
@@ -157,16 +168,16 @@ public class PaymentMethod extends AppCompatActivity {
         // user
         else {
             addressId = getIntent().getStringExtra("address_id");
-            payment1 = new UserSendData(device_id,user_id,addressId);
-            payment2 = new UserSendData(device_id,user_id,addressId);
+            payment1 = new UserSendData(device_id, user_id, addressId);
+            payment2 = new UserSendData(device_id, user_id, addressId);
         }
 
 
-        if(Common.isConnectToTheInternet(this)) {
+        if (Common.isConnectToTheInternet(this)) {
             callPaymentMethod();
             callShippingMethod();
             callInformationAPI();
-        }else
+        } else
             Common.errorConnectionMess(this);
 
         shippingRG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -179,11 +190,11 @@ public class PaymentMethod extends AppCompatActivity {
                 shipping_method_title = shippingMethods.get(checkedIndex).getTitle();
                 shipping_method_cost = shippingMethods.get(checkedIndex).getCost();
 
-                total2= total+Double.parseDouble(shipping_method_cost);
-                if(payment_method_code.equals("cod"))
-                    payBtn.setText(getResources().getString(R.string.pay_on_delivery)+" ( "+String.format("%.3f",total2)+" ) "+getResources().getString(R.string.kd));
+                total2 = total + Double.parseDouble(shipping_method_cost);
+                if (payment_method_code.equals("cod"))
+                    payBtn.setText(getResources().getString(R.string.pay_on_delivery) + " ( " + String.format("%.3f", total2) + " ) " + getResources().getString(R.string.kd));
                 else
-                    payBtn.setText(getResources().getString(R.string.paying_now)+" ( "+String.format("%.3f",total2)+" ) "+getResources().getString(R.string.kd));
+                    payBtn.setText(getResources().getString(R.string.paying_now) + " ( " + String.format("%.3f", total2) + " ) " + getResources().getString(R.string.kd));
 
             }
         });
@@ -196,10 +207,10 @@ public class PaymentMethod extends AppCompatActivity {
                 int checkedIndex = paymentRG.indexOfChild(checkedButton);
                 payment_method_code = paymentMethods.get(checkedIndex).getCode();
                 payment_method_title = paymentMethods.get(checkedIndex).getTitle();
-                if(payment_method_code.equals("cod"))
-                    payBtn.setText(getResources().getString(R.string.pay_on_delivery)+" ( "+String.format("%.3f",total2)+" ) "+getResources().getString(R.string.kd));
+                if (payment_method_code.equals("cod"))
+                    payBtn.setText(getResources().getString(R.string.pay_on_delivery) + " ( " + String.format("%.3f", total2) + " ) " + getResources().getString(R.string.kd));
                 else
-                    payBtn.setText(getResources().getString(R.string.paying_now)+" ( "+String.format("%.3f",total2)+" ) "+getResources().getString(R.string.kd));
+                    payBtn.setText(getResources().getString(R.string.paying_now) + " ( " + String.format("%.3f", total2) + " ) " + getResources().getString(R.string.kd));
 
             }
         });
@@ -209,105 +220,184 @@ public class PaymentMethod extends AppCompatActivity {
 
         progressDialog.show();
         try {
-        compositeDisposable = new CompositeDisposable();
-        compositeDisposable.add(Common.getAPI().paymentMethod(payment1)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<JsonElement>() {
-                    @Override
-                    public void accept(JsonElement response) throws Exception {
-                        Gson gson = new Gson();
-                        String json2 = gson.toJson(response);
-                        if (json2.contains("message")){
-                            JSONObject data = new JSONObject(json2);
+            compositeDisposable = new CompositeDisposable();
+            compositeDisposable.add(Common.getAPI().paymentMethod(payment1)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<JsonElement>() {
+                        @Override
+                        public void accept(JsonElement response) throws Exception {
+                            Gson gson = new Gson();
+                            String json2 = gson.toJson(response);
+                            if (json2.contains("message")) {
+                                JSONObject data = new JSONObject(json2);
 
-                            String status = data.getString("status");
-                            String message = data.getString("message");
-                            Common.showAlert2(PaymentMethod.this,status,message);
+                                String status = data.getString("status");
+                                String message = data.getString("message");
+                                Common.showAlert2(PaymentMethod.this, status, message);
 
-                        }else {
+                            } else {
                                 paymentLN.setVisibility(View.VISIBLE);
                                 JSONArray dataArray = new JSONArray(json2);
-                            for (int i = 0; i < dataArray.length(); i++) {
-                                JSONObject object1 = dataArray.getJSONObject(i);
-                                PaymentMethodData paymentMethod = new PaymentMethodData();
-                                paymentMethod.setCode(object1.getString("code"));
-                                paymentMethod.setTitle(object1.getString("title"));
-                                paymentMethod.setTerms(object1.getString("terms"));
-                                paymentMethods.add(paymentMethod);
+                                for (int i = 0; i < dataArray.length(); i++) {
+                                    JSONObject object1 = dataArray.getJSONObject(i);
+                                    PaymentMethodData paymentMethod = new PaymentMethodData();
+                                    paymentMethod.setCode(object1.getString("code"));
+                                    paymentMethod.setTitle(object1.getString("title"));
+                                    paymentMethod.setTerms(object1.getString("terms"));
+                                    paymentMethods.add(paymentMethod);
+                                }
+                            }
+
+
+                            for (PaymentMethodData paymentMethod : paymentMethods) {
+                                Log.i("nnnnn", "ufuigui");
+                                RadioButton radioButton = new RadioButton(PaymentMethod.this);
+                                radioButton.setTextColor(getResources().getColor(R.color.black));
+                                radioButton.setText(paymentMethod.getTitle());
+                                paymentRG.addView(radioButton);
                             }
                         }
+                    }));
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
 
-
-                        for (PaymentMethodData paymentMethod: paymentMethods) {
-                            Log.i("nnnnn","ufuigui");
-                            RadioButton radioButton = new RadioButton(PaymentMethod.this);
-                            radioButton.setTextColor(getResources().getColor(R.color.black));
-                            radioButton.setText(paymentMethod.getTitle());
-                            paymentRG.addView(radioButton);
-                        }
-                    }
-                }));
-    } catch (Exception e) {
-        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
-    }
-
-        progressDialog.dismiss();
+        //   progressDialog.dismiss();
 
     }
 
     private void callShippingMethod() {
         progressDialog.show();
 
-        compositeDisposable = new CompositeDisposable();
-        compositeDisposable.add(Common.getAPI().shippingMethod(payment2)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<JsonElement>() {
-                    @Override
-                    public void accept(JsonElement response) throws Exception {
-                        progressDialog.dismiss();
+        try {
 
-                        Gson gson = new Gson();
-                        String json2 = gson.toJson(response);
+            Observable<JsonElement> getApi = Common.getAPI().shippingMethod(payment2).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+            getApi.subscribe(new Observer<JsonElement>() {
+                @Override
+                public void onSubscribe(Disposable d) {
 
-                        if (json2.contains("message")){
+                }
+
+                @Override
+                public void onNext(JsonElement jsonElement) {
+                   json = jsonElement;
+                }
+
+                @Override
+                public void onError(Throwable e) {
+
+                    Common.showAlert2(PaymentMethod.this,getString(R.string.error),getString(R.string.error_connection));
+                }
+
+                @Override
+                public void onComplete() {
+                    progressDialog.dismiss();
+
+                    Gson gson = new Gson();
+                    String json2 = gson.toJson(json);
+
+                    if (json2.contains("message")) {
+                        try {
+
                             JSONObject data = new JSONObject(json2);
 
                             String status = data.getString("status");
                             String message = data.getString("message");
-                            Common.showAlert2(PaymentMethod.this,status,message);
+                            Common.showAlert2(PaymentMethod.this, status, message);
 
-                        }else {
-                            shippingLN.setVisibility(View.VISIBLE);
-                            JSONArray dataArray = new JSONArray(json2);
-                            for (int i = 0; i < dataArray.length(); i++) {
-                                JSONObject object = dataArray.getJSONObject(i);
-                                JSONArray methodData = object.getJSONArray("quote");
-                                for (int x = 0; i < methodData.length(); i++) {
-                                    JSONObject object1 = methodData.getJSONObject(x);
+                        }catch (Exception e){}
+                    } else {
+                        shippingLN.setVisibility(View.VISIBLE);
 
-                                    ShippingMethodData shippingMethod = new ShippingMethodData();
-                                    shippingMethod.setCode(object1.getString("code"));
-                                    shippingMethod.setTitle(object1.getString("title"));
-                                    shippingMethod.setError(object1.getString("error"));
-                                    shippingMethod.setCost(object1.getString("cost"));
-                                    shippingMethods.add(shippingMethod);
+                        try {
+                        JSONArray dataArray = new JSONArray(json2);
+                        for (int i = 0; i < dataArray.length(); i++) {
+                            JSONObject object = dataArray.getJSONObject(i);
+                            JSONArray methodData = object.getJSONArray("quote");
+                            for (int x = 0; i < methodData.length(); i++) {
+                                JSONObject object1 = methodData.getJSONObject(x);
 
-                                }
+                                ShippingMethodData shippingMethod = new ShippingMethodData();
+                                shippingMethod.setCode(object1.getString("code"));
+                                shippingMethod.setTitle(object1.getString("title"));
+                                shippingMethod.setError(object1.getString("error"));
+                                shippingMethod.setCost(object1.getString("cost"));
+                                shippingMethods.add(shippingMethod);
+
                             }
+                        }
+                    }catch(Exception e){
 
-                        }
-                        //bind data
-                        for (ShippingMethodData paymentMethod: shippingMethods) {
-                            rootLayout.setVisibility(View.VISIBLE);
-                            RadioButton radioButton = new RadioButton(PaymentMethod.this);
-                            radioButton.setTextColor(getResources().getColor(R.color.black));
-                            radioButton.setText(paymentMethod.getTitle()+"( "+paymentMethod.getCost()+getResources().getString(R.string.kd)+" )");
-                            shippingRG.addView(radioButton);
-                        }
                     }
-                }));
+
+                    }
+                    //bind data
+                    for (ShippingMethodData paymentMethod : shippingMethods) {
+                        rootLayout.setVisibility(View.VISIBLE);
+                        RadioButton radioButton = new RadioButton(PaymentMethod.this);
+                        radioButton.setTextColor(getResources().getColor(R.color.black));
+                        radioButton.setText(paymentMethod.getTitle() + "( " + paymentMethod.getCost() + getResources().getString(R.string.kd) + " )");
+                        shippingRG.addView(radioButton);
+                    }
+                }
+            });
+
+
+
+          /*  compositeDisposable = new CompositeDisposable();
+            compositeDisposable.add(Common.getAPI().shippingMethod(payment2)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new <JsonElement>() {
+                        @Override
+                        public void accept(JsonElement response) throws Exception {
+                            progressDialog.dismiss();
+
+                            Gson gson = new Gson();
+                            String json2 = gson.toJson(response);
+
+                            if (json2.contains("message")) {
+                                JSONObject data = new JSONObject(json2);
+
+                                String status = data.getString("status");
+                                String message = data.getString("message");
+                                Common.showAlert2(PaymentMethod.this, status, message);
+
+                            } else {
+                                shippingLN.setVisibility(View.VISIBLE);
+                                JSONArray dataArray = new JSONArray(json2);
+                                for (int i = 0; i < dataArray.length(); i++) {
+                                    JSONObject object = dataArray.getJSONObject(i);
+                                    JSONArray methodData = object.getJSONArray("quote");
+                                    for (int x = 0; i < methodData.length(); i++) {
+                                        JSONObject object1 = methodData.getJSONObject(x);
+
+                                        ShippingMethodData shippingMethod = new ShippingMethodData();
+                                        shippingMethod.setCode(object1.getString("code"));
+                                        shippingMethod.setTitle(object1.getString("title"));
+                                        shippingMethod.setError(object1.getString("error"));
+                                        shippingMethod.setCost(object1.getString("cost"));
+                                        shippingMethods.add(shippingMethod);
+
+                                    }
+                                }
+
+                            }
+                            //bind data
+                            for (ShippingMethodData paymentMethod : shippingMethods) {
+                                rootLayout.setVisibility(View.VISIBLE);
+                                RadioButton radioButton = new RadioButton(PaymentMethod.this);
+                                radioButton.setTextColor(getResources().getColor(R.color.black));
+                                radioButton.setText(paymentMethod.getTitle() + "( " + paymentMethod.getCost() + getResources().getString(R.string.kd) + " )");
+                                shippingRG.addView(radioButton);
+                            }
+                        }
+                    }));*/
+        }catch (Exception e){
+            Common.showAlert2(PaymentMethod.this, getString(R.string.error), e.getMessage());
+        }
     }
 
     private void callInformationAPI() {
@@ -324,10 +414,10 @@ public class PaymentMethod extends AppCompatActivity {
                         if (!result.contains("error")) {
                             JSONObject object = new JSONObject(result);
                             String description = object.getString("description");
-                            information_txt.setText( Html.fromHtml(description).toString());
-                        }else{
+                            information_txt.setText(Html.fromHtml(description).toString());
+                        } else {
                             JSONObject object = new JSONObject(result);
-                            Common.showAlert2(PaymentMethod.this,object.getString("status"),object.getString("message"));
+                            Common.showAlert2(PaymentMethod.this, object.getString("status"), object.getString("message"));
                         }
                     }
                 }));
@@ -336,18 +426,18 @@ public class PaymentMethod extends AppCompatActivity {
     @OnClick(R.id.paymentBtn)
     public void checkout_() {
 
-        if(!TextUtils.isEmpty(payment_method_code)){
-            if(!TextUtils.isEmpty(shipping_method_title)){
+        if (!TextUtils.isEmpty(payment_method_code)) {
+            if (!TextUtils.isEmpty(shipping_method_title)) {
 
                 String comment = comment_ed.getText().toString();
 
                 if (user_id != "0") {
                     addressId = getIntent().getStringExtra("address_id");
-                    if(getIntent().hasExtra("couponCode")) {
+                    if (getIntent().hasExtra("couponCode")) {
                         coupon_code = getIntent().getStringExtra("couponCode");
                         checkout = new CheckoutPageParameters(addressId, addressId, user_id, device_id, shipping_method_code,
                                 shipping_method_title, shipping_method_cost, payment_method_code, payment_method_title, coupon_code);
-                    }else {
+                    } else {
 
                         checkout = new CheckoutPageParameters(addressId, addressId, user_id, device_id, shipping_method_code,
                                 shipping_method_title, shipping_method_cost, payment_method_code, payment_method_title, "");
@@ -356,49 +446,45 @@ public class PaymentMethod extends AppCompatActivity {
                 } else {
                     if (getIntent().hasExtra("address2")) {
                         UserSendData address = getIntent().getExtras().getParcelable("address2");
-                        if(getIntent().hasExtra("couponCode")){
+                        if (getIntent().hasExtra("couponCode")) {
                             coupon_code = getIntent().getStringExtra("couponCode");
 
                             checkout = new CheckoutPageParameters(address.getAddress(), address.getAddress(), user_id, device_id, shipping_method_code,
                                     shipping_method_title, shipping_method_cost, payment_method_code, payment_method_title, coupon_code);
 
-                        }else {
+                        } else {
 
                             checkout = new CheckoutPageParameters(address.getAddress(), address.getAddress(), user_id, device_id, shipping_method_code,
                                     shipping_method_title, shipping_method_cost, payment_method_code, payment_method_title, "");
                         }
 
-                    }else {
+                    } else {
                         UserSendData payment_address = getIntent().getExtras().getParcelable("billing_address");
                         UserSendData shipping_address = getIntent().getExtras().getParcelable("shipping_address");
-                        if(getIntent().hasExtra("couponCode")) {
+                        if (getIntent().hasExtra("couponCode")) {
                             coupon_code = getIntent().getStringExtra("couponCode");
 
                             checkout = new CheckoutPageParameters(payment_address.getAddress(), shipping_address.getAddress(), user_id, device_id, shipping_method_code,
                                     shipping_method_title, shipping_method_cost, payment_method_code, payment_method_title, coupon_code);
-                        }else {
+                        } else {
 
                             checkout = new CheckoutPageParameters(payment_address.getAddress(), shipping_address.getAddress(), user_id, device_id, shipping_method_code,
-                                    shipping_method_title, shipping_method_cost, payment_method_code, payment_method_title,"");
+                                    shipping_method_title, shipping_method_cost, payment_method_code, payment_method_title, "");
                         }
                     }
                 }
 
+                oneSignalPlayerId = Paper.book("DarHaa").read("oneSignalPlayerId");
+                checkout.setOneSignalPlayerId(oneSignalPlayerId);
                 checkout.setComment(comment);
 
-                if(payment_method_code.equals("cod")){
-                    callAPI();
-                }else {
-                    Intent intent = new Intent(this, PaymentPage.class);
-                    intent.putExtra("checkout", checkout);
-                    startActivity(intent);
-                }
+                callAPI();
 
-            }else {
+            } else {
                 Snackbar snackbar = Snackbar.make(rootLayout, R.string.please_enter_shipping_method, Snackbar.LENGTH_LONG);
                 snackbar.show();
             }
-        }else{
+        } else {
             Snackbar snackbar = Snackbar.make(rootLayout, R.string.please_enter_payment_method, Snackbar.LENGTH_LONG);
             snackbar.show();
         }
@@ -417,24 +503,59 @@ public class PaymentMethod extends AppCompatActivity {
                         @Override
                         public void accept(CheckoutProductPage checkoutProductPage) throws Exception {
 
-                            try{
+                            progressDialog.dismiss();
+                            try {
 
-                                Intent intent = new Intent(PaymentMethod.this, PaymentResult.class);
-                                intent.putExtra("order_id", checkoutProductPage.getOrder_id());
-                                intent.putExtra("total", getIntent().getStringExtra("total"));
-                                startActivity(intent);
+                                product_out_of_stock = "";
 
-                                progressDialog.dismiss();
+                                if (outOfStock(checkoutProductPage.getProducts())) {
+                                    Common.showAlert2(PaymentMethod.this, getString(R.string.warning), product_out_of_stock);
+                                } else {
 
-                            }catch (Exception e){
-                                Log.i("errrr",e.getMessage());
+                                    if (payment_method_code.equals("cod")) {
+                                        Intent intent = new Intent(PaymentMethod.this, PaymentResult.class);
+                                        intent.putExtra("order_id", checkoutProductPage.getOrder_id());
+                                        intent.putExtra("total", getIntent().getStringExtra("total"));
+                                        startActivity(intent);
+                                    } else {
+                                        Intent intent = new Intent(PaymentMethod.this, PaymentPage.class);
+                                        intent.putExtra("paymentLink", checkoutProductPage.getPayment());
+                                        startActivity(intent);
+                                    }
+
+
+                                }
+
+                            } catch (Exception e) {
+                                Common.showAlert2(PaymentMethod.this, getString(R.string.error), e.getMessage());
                             }
                         }
                     }));
 
         } catch (Exception e) {
             Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+            progressDialog.dismiss();
         }
 
+    }
+
+    private boolean outOfStock(ArrayList<Product> products) {
+
+        for (Product product : products) {
+            if (!product.getStock()) {
+                product_out_of_stock += "\n \u25CF" + product.getName();
+                for(Options option : product.getOption()){
+                    if(!TextUtils.isEmpty(option.getValue())){
+                        product_out_of_stock += "\n    \u25CF" + option.getName() + ": "+option.getValue();
+                    }
+                }
+            }
+        }
+        if (TextUtils.isEmpty(product_out_of_stock))
+            return false;
+        else {
+            product_out_of_stock = getString(R.string.these_items_out_of_stock) + product_out_of_stock;
+            return true;
+        }
     }
 }
