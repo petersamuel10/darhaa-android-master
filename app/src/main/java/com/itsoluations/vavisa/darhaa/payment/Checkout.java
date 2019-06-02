@@ -2,7 +2,6 @@ package com.itsoluations.vavisa.darhaa.payment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +21,6 @@ import com.itsoluations.vavisa.darhaa.model.cartData.CartData;
 import com.itsoluations.vavisa.darhaa.model.cartData.Options;
 import com.itsoluations.vavisa.darhaa.model.cartData.Product;
 import com.itsoluations.vavisa.darhaa.model.cartData.Total;
-import com.itsoluations.vavisa.darhaa.model.favorite.Products;
 import com.itsoluations.vavisa.darhaa.profile_fragments.Addresses;
 
 import butterknife.BindView;
@@ -80,7 +78,6 @@ public class Checkout extends AppCompatActivity {
         setupRecyclerView();
 
     }
-
 
     @Override
     protected void onStart() {
@@ -190,9 +187,9 @@ public class Checkout extends AppCompatActivity {
         for (Product product : cartData.getProducts()) {
             if (!product.getStock()) {
                 product_out_of_stock += "\n \u25CF" + product.getName();
-                for(Options option : product.getOption()){
-                    if(!TextUtils.isEmpty(option.getValue())){
-                        product_out_of_stock += "\n    \u25CF" + option.getName() + ": "+option.getValue();
+                for (Options option : product.getOption()) {
+                    if (!TextUtils.isEmpty(option.getValue())) {
+                        product_out_of_stock += "\n    \u25CF" + option.getName() + ": " + option.getValue();
                     }
                 }
             }
@@ -200,7 +197,7 @@ public class Checkout extends AppCompatActivity {
         if (TextUtils.isEmpty(product_out_of_stock))
             return false;
         else {
-            product_out_of_stock = getString(R.string.these_items_out_of_stock)+product_out_of_stock;
+            product_out_of_stock = getString(R.string.these_items_out_of_stock) + product_out_of_stock;
             return true;
         }
     }

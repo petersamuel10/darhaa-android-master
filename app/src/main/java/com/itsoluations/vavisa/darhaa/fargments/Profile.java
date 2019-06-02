@@ -4,6 +4,7 @@ package com.itsoluations.vavisa.darhaa.fargments;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -31,6 +32,8 @@ import com.itsoluations.vavisa.darhaa.profile_fragments.Language;
 import com.itsoluations.vavisa.darhaa.profile_fragments.Orders;
 import com.itsoluations.vavisa.darhaa.profile_fragments.Terms;
 import com.itsoluations.vavisa.darhaa.web_service.Controller2;
+
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -105,7 +108,6 @@ public class Profile extends Fragment implements View.OnClickListener {
     ProgressDialog progressDialog;
     String first_name,email,phone;
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -135,13 +137,17 @@ public class Profile extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
+        if (Common.isArabic)
+            setLanguage("ar");
+        else
+            setLanguage("en");
+
         if(Paper.book("DarHaa").contains("currentUser")) {
             name_txt.setText(Common.current_user.getCustomerInfo().getFirstname());
             email_txt.setText(Common.current_user.getCustomerInfo().getEmail());
             phone_txt.setText(Common.current_user.getCustomerInfo().getTelephone());
             setCharacters();
         }
-
     }
 
     private void requestData() {
@@ -175,7 +181,6 @@ public class Profile extends Fragment implements View.OnClickListener {
                                 name_txt.setText(first_name);
                                 email_txt.setText(email);
                                 phone_txt.setText(phone);
-
 
                                setCharacters();
                             }
@@ -282,4 +287,13 @@ public class Profile extends Fragment implements View.OnClickListener {
         changePasswordLN.setVisibility(View.VISIBLE);
         loginLN.setVisibility(View.GONE);
     }
+
+    public void setLanguage(String lang) {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getContext().getResources().updateConfiguration(config, getContext().getResources().getDisplayMetrics());
+    }
+
 }

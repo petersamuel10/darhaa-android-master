@@ -15,7 +15,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -125,7 +124,7 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
 
 
         user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : "0";
-        title.setText(Html.fromHtml(CurrentCategoryDetails.category_name).toString());
+        title.setText(CurrentCategoryDetails.category_name);
 
         productsArrayList = new ArrayList<>();
         categoryProductData = new CategoryProductData();
@@ -215,8 +214,8 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
                             public void accept(CategoryProductData categoryProducts) throws Exception {
 
                                 if (categoryProducts.getStatus() != null) {
-
-                                    progressDialog.dismiss();
+                                    if (progressDialog.isShowing() && progressDialog != null)
+                                        progressDialog.dismiss();
                                     Common.showAlert2(CategoryProducts.this, categoryProducts.getStatus(), categoryProducts.getMessage());
                                 } else {
                                     // that's to save first page list to display when empty search
@@ -230,7 +229,8 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
                                     if (categoryProducts.getProducts().size() == 0) {
                                         productsArrayList.clear();
                                         adapter.clearList();
-                                        progressDialog.dismiss();
+                                        if (progressDialog.isShowing() && progressDialog != null)
+                                            progressDialog.dismiss();
                                     } else {
 
                                         if (load) {
@@ -259,17 +259,21 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
                                             adapter.notifyDataSetChanged();
 
                                         progressBar.setVisibility(View.GONE);
-                                        progressDialog.dismiss();
+                                        if (progressDialog.isShowing() && progressDialog != null)
+                                            progressDialog.dismiss();
                                     }
                                 }
                             }
                         }));
             } catch (Exception e) {
+                if (progressDialog.isShowing() && progressDialog != null)
+                    progressDialog.dismiss();
                 Common.showAlert2(this, getString(R.string.warning), e.getMessage());
             }
 
         } else {
-            progressDialog.dismiss();
+            if (progressDialog.isShowing() && progressDialog != null)
+                progressDialog.dismiss();
             Common.errorConnectionMess(this);
         }
     }

@@ -461,6 +461,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/t3"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
+
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/products"
                 android:layout_width="match_parent"
@@ -481,8 +482,8 @@
                     android:orientation="vertical"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintWidth_percent="0.4">
-
 
                 </LinearLayout>
 
@@ -491,14 +492,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="@+id/product_info_title"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/product_info_title"
                     app:layout_constraintTop_toTopOf="@+id/product_info_title"
                     app:layout_constraintWidth_percent="0.6">
-
-
                 </LinearLayout>
+
             </android.support.constraint.ConstraintLayout>
 
             <LinearLayout

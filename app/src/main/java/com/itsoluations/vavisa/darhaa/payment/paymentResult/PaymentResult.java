@@ -44,11 +44,6 @@ public class PaymentResult extends AppCompatActivity {
     @BindView(R.id.order_id)
     TextView order_id_txt;
 
-
-    private CompositeDisposable compositeDisposable;
-    ProgressDialog progressDialog;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (Common.isArabic)
@@ -59,7 +54,6 @@ public class PaymentResult extends AppCompatActivity {
         setContentView(R.layout.payment_result);
 
         ButterKnife.bind(this);
-        progressDialog = new ProgressDialog(this);
 
         if (getIntent().getExtras().containsKey("status")) {
             if (getIntent().getStringExtra("status").equals("\"1\"")) {

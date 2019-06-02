@@ -522,13 +522,16 @@ public class PaymentMethod extends AppCompatActivity {
                                         intent.putExtra("paymentLink", checkoutProductPage.getPayment());
                                         startActivity(intent);
                                     }
-
-
                                 }
 
                             } catch (Exception e) {
                                 Common.showAlert2(PaymentMethod.this, getString(R.string.error), e.getMessage());
                             }
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            Common.showAlert2(PaymentMethod.this, getString(R.string.warning), getString(R.string.error_occur));
                         }
                     }));
 

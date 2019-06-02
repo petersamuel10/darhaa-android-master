@@ -21,7 +21,6 @@ public class Controller2 {
     final static String BASE_URL = "http://173.231.196.229/~hvavisa/darhaa_test/";
     final static String API_TOKEN = "16aac5b8216f1134770e665a8d  ";
     final static String CONTENT_TYPE = "application/x-www-form-urlencoded";
-    // static String USER_ACCESS_TOKEN = Common.userAccessToken;
     static String LANGUAGE = "en";
     private ApiInterface apiInterface;
 
@@ -45,7 +44,6 @@ public class Controller2 {
                             .addHeader("useraccesstoken", userAccess);
 
                     Request newRequest = builder.build();
-
 
                     return chain.proceed(newRequest);
                 }

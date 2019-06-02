@@ -70,7 +70,9 @@ public class BillingAddress extends AppCompatActivity implements AdapterView.OnI
     ImageView back_arrow;
 
     @OnClick(R.id.back_arrow)
-    public void setBack() { onBackPressed(); }
+    public void setBack() {
+        onBackPressed();
+    }
 
     ArrayList<Countries> countryArrayList;
     ArrayList<Area> areasArrayList;
@@ -80,8 +82,8 @@ public class BillingAddress extends AppCompatActivity implements AdapterView.OnI
     List<String> cities_name_list;
 
     CompositeDisposable compositeDisposable;
-    String user_name,email,postcode,phone,company_name,address_details,city_name,
-            country_id,zone_id,device_id,country_,zone;
+    String user_name, email, postcode, phone, company_name, address_details, city_name,
+            country_id, zone_id, device_id, country_, zone;
 
     ProgressDialog progressDialog;
 
@@ -94,7 +96,9 @@ public class BillingAddress extends AppCompatActivity implements AdapterView.OnI
         progressDialog = new ProgressDialog(BillingAddress.this);
         progressDialog.setCancelable(false);
 
-        if (Common.isArabic) { back_arrow.setRotation(180); }
+        if (Common.isArabic) {
+            back_arrow.setRotation(180);
+        }
 
         country_spinner.setOnItemSelectedListener(this);
         area_spinner.setOnItemSelectedListener(this);
@@ -120,60 +124,59 @@ public class BillingAddress extends AppCompatActivity implements AdapterView.OnI
         countryArrayList = new ArrayList<>();
         country_name_list = new ArrayList<>();
 
-try {
-        Observable<ArrayList<Countries>> apiCountry = Common.getAPI().getCountries().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-        apiCountry.subscribe(new Observer<ArrayList<Countries>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
+        try {
+            Observable<ArrayList<Countries>> apiCountry = Common.getAPI().getCountries().subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+            apiCountry.subscribe(new Observer<ArrayList<Countries>>() {
+                @Override
+                public void onSubscribe(Disposable d) {
 
-            }
-
-            @Override
-            public void onNext(ArrayList<Countries> countries) {
-                countryArrayList.addAll(countries);
-                for (Countries country : countries) {
-                    country_name_list.add(country.getName());
                 }
-            }
 
-            @Override
-            public void onError(Throwable e) {
-             Common.showAlert2(BillingAddress.this,getResources().getString(R.string.error),e.getMessage());
-            }
-
-            @Override
-            public void onComplete() {
-                progressDialog.dismiss();
-                List<String> countries_name_list = new ArrayList<>();
-                for (Countries country : countryArrayList) {
-                    countries_name_list.add(country.getName());
+                @Override
+                public void onNext(ArrayList<Countries> countries) {
+                    countryArrayList.addAll(countries);
+                    for (Countries country : countries) {
+                        country_name_list.add(country.getName());
+                    }
                 }
-                ArrayAdapter<String> country_adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_item, countries_name_list);
-                country_adapter.setDropDownViewResource(R.layout.spinner_item);
-                country_adapter.notifyDataSetChanged();
-                country_spinner.setAdapter(country_adapter);
-            }
-        });
-    } catch (Exception e) {
-        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
-    }
+
+                @Override
+                public void onError(Throwable e) {
+                    Common.showAlert2(BillingAddress.this, getResources().getString(R.string.error), e.getMessage());
+                }
+
+                @Override
+                public void onComplete() {
+                    progressDialog.dismiss();
+                    List<String> countries_name_list = new ArrayList<>();
+                    for (Countries country : countryArrayList) {
+                        countries_name_list.add(country.getName());
+                    }
+                    ArrayAdapter<String> country_adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_item, countries_name_list);
+                    country_adapter.setDropDownViewResource(R.layout.spinner_item);
+                    country_adapter.notifyDataSetChanged();
+                    country_spinner.setAdapter(country_adapter);
+                }
+            });
+        } catch (Exception e) {
+            Common.showAlert2(this, getString(R.string.warning), e.getMessage());
+        }
     }
 
     private void getArea(String country_id, String country_code) {
-       // progressDialog.show();
+        // progressDialog.show();
         area_name_list = new ArrayList<>();
         cities_name_list = new ArrayList<>();
         areasArrayList = new ArrayList<>();
         cityArrayList = new ArrayList<>();
-        try {
             compositeDisposable.add(Common.getAPI().getAreaAndCities(country_id, country_code)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<AreaAndCities>() {
                         @Override
                         public void accept(AreaAndCities areaAndCities) throws Exception {
-                     //       progressDialog.dismiss();
+                            //       progressDialog.dismiss();
                             areasArrayList.addAll(areaAndCities.getAreas());
                             cityArrayList.addAll(areaAndCities.getCities());
                             for (Area area : areasArrayList) {
@@ -193,11 +196,12 @@ try {
                             city_spinner.setAdapter(city_adapter);
 
                         }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            Common.showAlert2(BillingAddress.this, "", getString(R.string.error_occur));
+                        }
                     }));
-        } catch (Exception e) {
-            Log.i("error", e.getMessage());
-        }
-
     }
 
     @Override
@@ -229,7 +233,7 @@ try {
     }
 
     @OnClick(R.id.save_billing_bn)
-    public void billing_address(){
+    public void billing_address() {
 
         user_name = user_name_ed.getText().toString();
         email = email_ed.getText().toString();
@@ -242,32 +246,34 @@ try {
         AddressAdd billingAddress;
         Intent intent;
 
-        if(validation(user_name,company_name,email,phone,postcode,address_details)){
+        if (validation(user_name, company_name, email, phone, postcode, address_details)) {
 
-            billingAddress = new AddressAdd(user_name,address_details,city_name,country_id,postcode,zone_id,company_name,zone,country_,"");
+            billingAddress = new AddressAdd(user_name, address_details, city_name, country_id, postcode, zone_id, company_name, zone, country_, "");
+            billingAddress.setEmail(email);
+            billingAddress.setTelephone(phone);
 
-            userSendData = new UserSendData(device_id,"0",billingAddress);
+            userSendData = new UserSendData(device_id, "0", billingAddress);
 
             // if use billing address for shipping also
-            if(default_address_ck.isChecked()){
+            if (default_address_ck.isChecked()) {
                 intent = new Intent(BillingAddress.this, PaymentMethod.class);
-                intent.putExtra("address2",userSendData);
-                intent.putExtra("total",getIntent().getStringExtra("total"));
-                if(getIntent().hasExtra("couponCode"))
-                    intent.putExtra("couponCode",getIntent().getStringExtra("couponCode"));
-            }else{
+                intent.putExtra("address2", userSendData);
+                intent.putExtra("total", getIntent().getStringExtra("total"));
+                if (getIntent().hasExtra("couponCode"))
+                    intent.putExtra("couponCode", getIntent().getStringExtra("couponCode"));
+            } else {
                 intent = new Intent(BillingAddress.this, ShippingAddress.class);
-                intent.putExtra("billing_address",userSendData);
-                intent.putExtra("total",getIntent().getStringExtra("total"));
-                if(getIntent().hasExtra("couponCode"))
-                    intent.putExtra("couponCode",getIntent().getStringExtra("couponCode"));
+                intent.putExtra("billing_address", userSendData);
+                intent.putExtra("total", getIntent().getStringExtra("total"));
+                if (getIntent().hasExtra("couponCode"))
+                    intent.putExtra("couponCode", getIntent().getStringExtra("couponCode"));
             }
 
-           startActivity(intent);
+            startActivity(intent);
         }
     }
 
-    private boolean validation(String user_name,String company_name_,String email,String phone, String postcode_, String address_desc) {
+    private boolean validation(String user_name, String company_name_, String email, String phone, String postcode_, String address_desc) {
 
         if (TextUtils.isEmpty(user_name)) {
             Snackbar snackbar = Snackbar.make(rootLayout, R.string.enter_user_name, Snackbar.LENGTH_LONG);
@@ -275,7 +281,7 @@ try {
             return false;
         }
         if (TextUtils.isEmpty(company_name_)) {
-           company_name = "";
+            company_name = "";
         }
 
         if (TextUtils.isEmpty(email)) {

@@ -33,7 +33,6 @@ public class Controller {
             else
                 LANGUAGE = "en";
 
-
             final OkHttpClient httpClient = new OkHttpClient.Builder()
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
@@ -53,7 +52,6 @@ public class Controller {
                             return chain.proceed(newRequest);
                         }
                     }).build();
-
 
             Gson gson = new GsonBuilder()
                     .setLenient()

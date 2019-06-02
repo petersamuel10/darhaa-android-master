@@ -7,22 +7,6 @@
     android:background="@drawable/corner_blue">
 
     <TextView
-        android:id="@+id/alert_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:padding="8dp"
-        android:layout_marginStart="8dp"
-        android:textSize="16sp"
-        android:text="@string/login"
-        android:gravity="start|center_vertical"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.2dp"
-        android:background="@color/grey"/>
-
-    <TextView
         android:id="@+id/alert_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

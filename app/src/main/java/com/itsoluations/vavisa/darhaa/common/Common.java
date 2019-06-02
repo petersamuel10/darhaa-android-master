@@ -103,11 +103,9 @@ public class Common {
 
         // set the custom dialog components - text, image and button
 
-        TextView title_ =  dialog.findViewById(R.id.alert_title);
         TextView message_ = dialog.findViewById(R.id.alert_message);
         TextView cancel =  dialog.findViewById(R.id.cancel_alert);
 
-        title_.setText(context.getText(R.string.error));
         message_.setText(context.getText(R.string.error_connection));
 
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -129,11 +127,9 @@ public class Common {
 
         // set the custom dialog components - text, image and button
 
-        TextView title_ =  dialog.findViewById(R.id.alert_title);
         TextView message_ = dialog.findViewById(R.id.alert_message);
         TextView cancel =  dialog.findViewById(R.id.cancel_alert);
 
-        title_.setText(context.getText(title));
         message_.setText(context.getText(msg));
 
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -155,11 +151,9 @@ public class Common {
 
         // set the custom dialog components - text, image and button
 
-        TextView title_ =  dialog.findViewById(R.id.alert_title);
         TextView message_ = dialog.findViewById(R.id.alert_message);
         TextView cancel =  dialog.findViewById(R.id.cancel_alert);
 
-        title_.setText(title);
         message_.setText(msg);
 
         cancel.setOnClickListener(new View.OnClickListener() {

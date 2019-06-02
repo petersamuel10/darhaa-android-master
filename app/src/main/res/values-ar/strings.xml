@@ -227,5 +227,6 @@
     <string name="gift_message_">رسالة الهدية</string>
     <string name="message">: الرسالة</string>
     <string name="these_items_out_of_stock">لقد نفذت كمية هذه المنتجات :</string>
+    <string name="error_occur">حدث خطأ</string>
 
 </resources>

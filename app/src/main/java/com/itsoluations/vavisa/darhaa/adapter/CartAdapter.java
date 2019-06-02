@@ -88,7 +88,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
         // that's for items in the checkout activity
         if(isCheckout) {
-            holder.item_price.setText(context.getResources().getString(R.string.price)+productList.get(position).getTotal());
+            holder.item_price.setText(context.getResources().getString(R.string.price)+productList.get(position).getTotal()+" "+context.getString(R.string.kd));
             holder.item_quantity.setText(context.getResources().getString(R.string.quantity)+productList.get(position).getQuantity());
         }
 
@@ -109,7 +109,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         else
             return productList.size()+1;
     }
-
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 

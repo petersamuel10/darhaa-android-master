@@ -153,10 +153,6 @@
     <!-- AsyncTask related strings -->
     <string name="content_type" translatable="false">application/x-www-form-urlencoded</string>
     <string name="api_token" translatable="false">16aac5b8216f1134770e665a8d</string>
-    <!--  <string name="register_api" translatable="false">http://darhaa.com/darhaa_application/index.php?route=restapi/register</string>
-      <string name="login_api" translatable="false">http://darhaa.com/darhaa_application/index.php?route=restapi/login</string>
-      <string name="home_items_api" translatable="false">http://darhaa.com/darhaa_application/index.php?route=restapi/home</string>
-      <string name="category_products_api" translatable="false">http://darhaa.com/darhaa_application/index.php?route=restapi/product</string>-->
     <string name="category_items_api" translatable="false">http://173.231.196.229/~hvavisa/darhaa_test/index.php?route=restapi/category</string>
     <string name="product_details_api" translatable="false">http://173.231.196.229/~hvavisa/darhaa_test/index.php?route=restapi/product/productdetails</string>
 
@@ -257,4 +253,5 @@
     <string name="gift_message_">Gift message</string>
     <string name="message">Message : </string>
     <string name="these_items_out_of_stock">These items are out of stock:</string>
+    <string name="error_occur">Error occur</string>
 </resources>

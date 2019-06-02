@@ -147,7 +147,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener, 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     ProgressDialog progressDialog;
 
-    String product_id, minimum;
+    String product_id, minimum, maximum;
     String user_id;
     Boolean wishList;
     Double price, totalPrice;
@@ -386,7 +386,6 @@ public class Product extends AppCompatActivity implements View.OnClickListener, 
         return uri;
     }
 
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -400,14 +399,18 @@ public class Product extends AppCompatActivity implements View.OnClickListener, 
                 share();
                 break;
             case R.id.ic_add:
-                amount++;
-                totalPrice += price;
-                if (special_price.getVisibility() == View.VISIBLE) {
-                    special_price.setText(String.format(Locale.US, "%.3f", totalPrice));
-                    item_amount.setText(String.valueOf(amount));
+                if (amount == Integer.parseInt(maximum)) {
+                    Common.showAlert(this, R.string.warning, R.string.max_number);
                 } else {
-                    item_price.setText(String.format(Locale.US, "%.3f", totalPrice));
-                    item_amount.setText(String.valueOf(amount));
+                    amount++;
+                    totalPrice += price;
+                    if (special_price.getVisibility() == View.VISIBLE) {
+                        special_price.setText(String.format(Locale.US, "%.3f", totalPrice));
+                        item_amount.setText(String.valueOf(amount));
+                    } else {
+                        item_price.setText(String.format(Locale.US, "%.3f", totalPrice));
+                        item_amount.setText(String.valueOf(amount));
+                    }
                 }
                 break;
             case R.id.ic_remove:
@@ -665,6 +668,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener, 
                     Boolean stock = firstJsonObject.getBoolean("stock");
                     mainImage = firstJsonObject.getString("mainImage");
                     JSONArray images = firstJsonObject.getJSONArray("images");
+                    maximum = firstJsonObject.getString("quantity");
                     minimum = firstJsonObject.getString("minimum");
                     wishList = firstJsonObject.getBoolean("wishList");
                     price = Double.parseDouble(firstJsonObject.getString("price"));
@@ -1068,7 +1072,6 @@ public class Product extends AppCompatActivity implements View.OnClickListener, 
             listView.requestLayout();
 
         }
-
     }
 
     public void setLanguage(String lang) {

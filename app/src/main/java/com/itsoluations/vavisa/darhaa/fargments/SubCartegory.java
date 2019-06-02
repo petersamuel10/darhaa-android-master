@@ -60,7 +60,7 @@ public class SubCartegory extends AppCompatActivity {
         if(Common.isArabic){back_arrow.setRotation(180); }
 
 
-        title.setText(Html.fromHtml(CurrentCategoryDetails.category_name).toString());
+        title.setText(CurrentCategoryDetails.category_name);
 
         categoryList = new ArrayList<>();
         compositeDisposable = new CompositeDisposable();
@@ -91,7 +91,8 @@ public class SubCartegory extends AppCompatActivity {
                             JSONArray firstJsonArray = null;
                             try {
                                 firstJsonArray = new JSONArray(result);
-                                progressDialog.dismiss();
+                                if(progressDialog.isShowing() && progressDialog != null)
+                                    progressDialog.dismiss();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -119,7 +120,8 @@ public class SubCartegory extends AppCompatActivity {
         }
         }else {
             Common.errorConnectionMess(this);
-            progressDialog.dismiss();
+            if(progressDialog.isShowing() && progressDialog != null)
+                progressDialog.dismiss();
         }
     }
 

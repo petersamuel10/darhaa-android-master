@@ -99,7 +99,6 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
         onCartListener = this;
         setupRecyclerView();
 
-
         /*user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : "0";*/
         device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 

@@ -27,12 +27,10 @@ public class ForgetPassword extends AppCompatActivity {
     EditText email_field;
     @BindView(R.id.forgetBtn)
     Button forget_btn;
-
     @OnClick(R.id.forgetBtn)
     public void forget_() {
         forgetPassword();
     }
-
 
     String email_str;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();

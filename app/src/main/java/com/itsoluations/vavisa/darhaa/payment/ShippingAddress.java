@@ -8,7 +8,6 @@ import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.itsoluations.vavisa.darhaa.R;
 import com.itsoluations.vavisa.darhaa.common.Common;
@@ -61,8 +61,11 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
     EditText address_desc_ed;
     @BindView(R.id.back_arrow)
     ImageView back_arrow;
+
     @OnClick(R.id.back_arrow)
-    public void setBack() { onBackPressed(); }
+    public void setBack() {
+        onBackPressed();
+    }
 
     ArrayList<Countries> countryArrayList;
     ArrayList<Area> areasArrayList;
@@ -71,9 +74,9 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
     List<String> area_name_list;
     List<String> cities_name_list;
 
-    CompositeDisposable compositeDisposable ;
-    String user_name,postcode,company_name,address_details,city_name,
-            country_id,zone_id,device_id,country_,zone;
+    CompositeDisposable compositeDisposable;
+    String user_name, postcode, company_name, address_details, city_name,
+            country_id, zone_id, device_id, country_, zone;
 
     ProgressDialog progressDialog;
 
@@ -86,7 +89,9 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
         progressDialog = new ProgressDialog(ShippingAddress.this);
         progressDialog.setCancelable(false);
 
-        if (Common.isArabic) { back_arrow.setRotation(180); }
+        if (Common.isArabic) {
+            back_arrow.setRotation(180);
+        }
 
         country_spinner.setOnItemSelectedListener(this);
         area_spinner.setOnItemSelectedListener(this);
@@ -114,7 +119,6 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
         countryArrayList = new ArrayList<>();
         country_name_list = new ArrayList<>();
 
-        try {
         Observable<ArrayList<Countries>> apiCountry = Common.getAPI().getCountries().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
         apiCountry.subscribe(new Observer<ArrayList<Countries>>() {
@@ -133,12 +137,15 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
 
             @Override
             public void onError(Throwable e) {
-               Common.showAlert2(ShippingAddress.this,getResources().getString(R.string.error),e.getMessage());
+                if (progressDialog != null && progressDialog.isShowing())
+                    progressDialog.dismiss();
+                Common.showAlert2(ShippingAddress.this, getResources().getString(R.string.error), e.getMessage());
             }
 
             @Override
             public void onComplete() {
-                progressDialog.dismiss();
+                if (progressDialog != null && progressDialog.isShowing())
+                    progressDialog.dismiss();
                 List<String> countries_name_list = new ArrayList<>();
                 for (Countries country : countryArrayList) {
                     countries_name_list.add(country.getName());
@@ -149,50 +156,47 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
                 country_spinner.setAdapter(country_adapter);
             }
         });
-    } catch (Exception e) {
-        Common.showAlert2(this, getString(R.string.warning), e.getMessage());
     }
 
-}
-
     private void getArea(String country_id, String country_code) {
-     //   progressDialog.show();
+        //   progressDialog.show();
         area_name_list = new ArrayList<>();
         cities_name_list = new ArrayList<>();
         areasArrayList = new ArrayList<>();
         cityArrayList = new ArrayList<>();
-        try {
-            compositeDisposable.add(Common.getAPI().getAreaAndCities(country_id, country_code)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<AreaAndCities>() {
-                        @Override
-                        public void accept(AreaAndCities areaAndCities) throws Exception {
-                       //     progressDialog.dismiss();
-                            areasArrayList.addAll(areaAndCities.getAreas());
-                            cityArrayList.addAll(areaAndCities.getCities());
-                            for (Area area : areasArrayList) {
-                                area_name_list.add(area.getName());
-                            }
-                            for (City city : cityArrayList) {
-                                cities_name_list.add(city.getCityName());
-                            }
-                            ArrayAdapter<String> area_adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_item, area_name_list);
-                            area_adapter.setDropDownViewResource(R.layout.spinner_item);
-                            area_adapter.notifyDataSetChanged();
-                            area_spinner.setAdapter(area_adapter);
-
-                            ArrayAdapter<String> city_adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_item, cities_name_list);
-                            city_adapter.setDropDownViewResource(R.layout.spinner_item);
-                            city_adapter.notifyDataSetChanged();
-                            city_spinner.setAdapter(city_adapter);
-
-
+        compositeDisposable.add(Common.getAPI().getAreaAndCities(country_id, country_code)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<AreaAndCities>() {
+                    @Override
+                    public void accept(AreaAndCities areaAndCities) throws Exception {
+                        //     progressDialog.dismiss();
+                        areasArrayList.addAll(areaAndCities.getAreas());
+                        cityArrayList.addAll(areaAndCities.getCities());
+                        for (Area area : areasArrayList) {
+                            area_name_list.add(area.getName());
                         }
-                    }));
-        } catch (Exception e) {
-            Log.i("error", e.getMessage());
-        }
+                        for (City city : cityArrayList) {
+                            cities_name_list.add(city.getCityName());
+                        }
+                        ArrayAdapter<String> area_adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_item, area_name_list);
+                        area_adapter.setDropDownViewResource(R.layout.spinner_item);
+                        area_adapter.notifyDataSetChanged();
+                        area_spinner.setAdapter(area_adapter);
+
+                        ArrayAdapter<String> city_adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_item, cities_name_list);
+                        city_adapter.setDropDownViewResource(R.layout.spinner_item);
+                        city_adapter.notifyDataSetChanged();
+                        city_spinner.setAdapter(city_adapter);
+
+
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Toast.makeText(ShippingAddress.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }));
 
     }
 
@@ -220,10 +224,11 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) { }
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
 
     @OnClick(R.id.save_shipping_bn)
-    public void saveAddress(){
+    public void saveAddress() {
 
         user_name = user_name_ed.getText().toString();
         company_name = company_name_ed.getText().toString();
@@ -238,22 +243,22 @@ public class ShippingAddress extends AppCompatActivity implements AdapterView.On
         billingData = getIntent().getExtras().getParcelable("billing_address");
         Intent intent;
 
-        if(validation(user_name,company_name,postcode,address_details)){
-            shippingAddress = new AddressAdd(user_name,address_details,city_name,country_id,postcode,zone_id,company_name,zone,country_,"");
-            shippingData = new UserSendData(device_id,"0",shippingAddress);
+        if (validation(user_name, company_name, postcode, address_details)) {
+            shippingAddress = new AddressAdd(user_name, address_details, city_name, country_id, postcode, zone_id, company_name, zone, country_, "");
+            shippingData = new UserSendData(device_id, "0", shippingAddress);
 
-                intent = new Intent(ShippingAddress.this, PaymentMethod.class);
-                intent.putExtra("billing_address",billingData);
-                intent.putExtra("shipping_address",shippingData);
-                intent.putExtra("total",getIntent().getStringExtra("total"));
-                if(getIntent().hasExtra("couponCode"))
-                    intent.putExtra("couponCode",getIntent().getStringExtra("couponCode"));
-                startActivity(intent);
+            intent = new Intent(ShippingAddress.this, PaymentMethod.class);
+            intent.putExtra("billing_address", billingData);
+            intent.putExtra("shipping_address", shippingData);
+            intent.putExtra("total", getIntent().getStringExtra("total"));
+            if (getIntent().hasExtra("couponCode"))
+                intent.putExtra("couponCode", getIntent().getStringExtra("couponCode"));
+            startActivity(intent);
         }
 
     }
 
-    private boolean validation(String user_name,String company_name_,String postcode_, String address_desc) {
+    private boolean validation(String user_name, String company_name_, String postcode_, String address_desc) {
 
         if (TextUtils.isEmpty(user_name)) {
             Snackbar snackbar = Snackbar.make(rootLayout, R.string.enter_user_name, Snackbar.LENGTH_LONG);

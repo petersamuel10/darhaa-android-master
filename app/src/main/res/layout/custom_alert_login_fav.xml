@@ -24,7 +24,6 @@
         android:layout_height="0.2dp"
         android:background="@color/grey"/>
 
-
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -61,7 +60,5 @@
 
 
     </LinearLayout>
-
-
 
 </LinearLayout>

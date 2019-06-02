@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.itsoluations.vavisa.darhaa.R;
 import com.itsoluations.vavisa.darhaa.common.Common;
@@ -154,8 +155,8 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
                 .subscribe(new Consumer<AddressDetails>() {
                     @Override
                     public void accept(AddressDetails addressDetails) throws Exception {
-                        if(addressDetails.getStatus() !=null) {
-                            Common.showAlert2(AddAddress.this,addressDetails.getStatus(),addressDetails.getMessage());
+                        if (addressDetails.getStatus() != null) {
+                            Common.showAlert2(AddAddress.this, addressDetails.getStatus(), addressDetails.getMessage());
                         } else {
                             title_ed.setText(addressDetails.getTitle());
                             postcode_ed.setText(addressDetails.getPostcode());
@@ -165,6 +166,11 @@ public class AddAddress extends AppCompatActivity implements AdapterView.OnItemS
                             area_ed.setText(addressDetails.getZone());
                             city_ed.setText(addressDetails.getCity());
                         }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Toast.makeText(AddAddress.this, getString(R.string.error_occur), Toast.LENGTH_SHORT).show();
                     }
                 }));
         } catch (Exception e) {
@@ -245,7 +251,7 @@ try {
                         .subscribe(new Consumer<AreaAndCities>() {
                             @Override
                             public void accept(AreaAndCities areaAndCities) throws Exception {
-                                if(!Common.isEditAddress)
+                                if (!Common.isEditAddress)
                                     progressDialog.dismiss();
                                 areasArrayList.addAll(areaAndCities.getAreas());
                                 cityArrayList.addAll(areaAndCities.getCities());
@@ -269,12 +275,17 @@ try {
                                     Common.isEditAddress = false;
                                     setAddressData();
                                 }
-                                if(set_area_for_edit){
+                                if (set_area_for_edit) {
                                     set_area_for_edit = false;
                                     city_spinner.setSelection(cities_name_list.indexOf(currentAddress.getCity()));
                                     area_spinner.setSelection(area_name_list.indexOf(currentAddress.getZone()));
                                 }
 
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) throws Exception {
+                                Toast.makeText(AddAddress.this, getString(R.string.error_occur), Toast.LENGTH_SHORT).show();
                             }
                         }));
             }else
@@ -295,8 +306,8 @@ try {
                 .subscribe(new Consumer<AddressDetails>() {
                     @Override
                     public void accept(AddressDetails addressDetails) throws Exception {
-                        if(addressDetails.getStatus() !=null) {
-                            Common.showAlert2(AddAddress.this,addressDetails.getStatus(),addressDetails.getMessage());
+                        if (addressDetails.getStatus() != null) {
+                            Common.showAlert2(AddAddress.this, addressDetails.getStatus(), addressDetails.getMessage());
                         } else {
                             currentAddress = addressDetails;
                             title_ed.setText(currentAddress.getTitle());
@@ -310,6 +321,11 @@ try {
                             set_area_for_edit = true;
                             save.setText(R.string.update);
                         }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Toast.makeText(AddAddress.this, getString(R.string.error_occur), Toast.LENGTH_SHORT).show();
                     }
                 }));
     } catch (Exception e) {
@@ -346,6 +362,11 @@ try {
                                     else
                                         onBackPressed();
                                 }
+                            }, new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable throwable) throws Exception {
+                                    Toast.makeText(AddAddress.this, getString(R.string.error_occur), Toast.LENGTH_SHORT).show();
+                                }
                             }));
                 }else
                     Common.errorConnectionMess(this);
@@ -358,10 +379,15 @@ try {
                             .subscribe(new Consumer<Status>() {
                                 @Override
                                 public void accept(Status status) throws Exception {
-                                   if(status.getStatus() == "error")
-                                       Common.showAlert2(AddAddress.this,status.getStatus(),status.getMessage());
-                                   else
-                                       finish();
+                                    if (status.getStatus() == "error")
+                                        Common.showAlert2(AddAddress.this, status.getStatus(), status.getMessage());
+                                    else
+                                        finish();
+                                }
+                            }, new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable throwable) throws Exception {
+                                    Toast.makeText(AddAddress.this, getString(R.string.error_occur), Toast.LENGTH_SHORT).show();
                                 }
                             }));
 

@@ -8,6 +8,14 @@ import com.google.gson.annotations.SerializedName;
 
 public class AddressAdd implements Parcelable {
 
+    @SerializedName("email")
+    @Expose
+    private String email;
+
+    @SerializedName("telephone")
+    @Expose
+    private String telephone;
+
     @SerializedName("user_id")
     @Expose
     private Integer user_id;
@@ -61,11 +69,6 @@ public class AddressAdd implements Parcelable {
     private String address_2;
 
 
-
-
-    public AddressAdd() {
-    }
-
     public AddressAdd(Integer user_id, String firstname, String address_1, String city, String country_id, String postcode, String zone_id, String title, String default_) {
         this.user_id = user_id;
         this.firstname = firstname;
@@ -110,6 +113,8 @@ public class AddressAdd implements Parcelable {
         } else {
             user_id = in.readInt();
         }
+        email = in.readString();
+        telephone = in.readString();
         firstname = in.readString();
         address_1 = in.readString();
         city = in.readString();
@@ -135,6 +140,22 @@ public class AddressAdd implements Parcelable {
             return new AddressAdd[size];
         }
     };
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
 
     public Integer getUser_id() {
         return user_id;
@@ -253,6 +274,8 @@ public class AddressAdd implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(user_id);
         }
+        dest.writeString(email);
+        dest.writeString(telephone);
         dest.writeString(firstname);
         dest.writeString(address_1);
         dest.writeString(city);

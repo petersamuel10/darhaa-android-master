@@ -251,7 +251,6 @@ public class OrderDetails extends AppCompatActivity {
             // products info
             JSONArray products_info = object.getJSONArray("products");
             for (int i = 0; i < products_info.length(); i++) {
-
                 JSONObject product_info = products_info.getJSONObject(i);
 
                 TextView name = createText(product_info.getString("name"));
@@ -263,12 +262,15 @@ public class OrderDetails extends AppCompatActivity {
                 name_title.setTextColor(getResources().getColor(R.color.brownLight));
                 name_title.setTypeface(name.getTypeface(), Typeface.BOLD);
                 product_info_title.addView(name_title);
+                product_Ln.addView(name);
+
 
                 TextView model = createText(product_info.getString("model"));
                 TextView model_title = createText(getResources().getString(R.string.model));
                 model_title.setTextColor(getResources().getColor(R.color.brownLight));
                 model_title.setTypeface(name.getTypeface(), Typeface.BOLD);
                 product_info_title.addView(model_title);
+                product_Ln.addView(model);
 
                 TextView quantity = createText(product_info.getString("quantity")+" "+getResources().getString(R.string.items));
                 TextView quantity_title = createText(getResources().getString(R.string.quantity));
@@ -287,25 +289,6 @@ public class OrderDetails extends AppCompatActivity {
                 price_title.setTypeface(price_title.getTypeface(), Typeface.BOLD);
                 product_info_title.addView(price_title);
 
-                ArrayList<Options> options = new Gson().fromJson((product_info.getJSONArray("option")).toString(), new TypeToken<List<Options>>(){}.getType());
-
-                product_Ln.addView(name);
-                product_Ln.addView(model);
-
-                //to show item options
-                if(options.size()>0){
-                    TextView options_txt = createText("");
-                    options_txt.setText(getResources().getString(R.string.options));
-
-                    String options_str;
-                    for (Options option:options) {
-                        options_str =  options_txt.getText().toString();
-                        options_txt.setText(options_str+"\n \u25CF"+option.getName()+": "+option.getValue());
-                    }
-                    product_Ln.addView(options_txt);
-                    product_info_title.addView(options_txt);
-                }
-
                 product_Ln.addView(quantity);
                 product_Ln.addView(price);
 
@@ -314,10 +297,32 @@ public class OrderDetails extends AppCompatActivity {
                     product_info_title.addView(sku_title);
                 }
 
+
+                ArrayList<Options> options = new Gson().fromJson((product_info.getJSONArray("option")).toString(),
+                        new TypeToken<List<Options>>() {
+                        }.getType());
+
+                //to show item options
+                if (options.size() > 0) {
+                    TextView option_title = createText(getResources().getString(R.string.options));
+                    option_title.setTextColor(getResources().getColor(R.color.brownLight));
+                    option_title.setTypeface(option_title.getTypeface(), Typeface.BOLD);
+                    TextView options_txt = createText("");
+                    String options_str;
+                    for (Options option : options) {
+                        options_str = options_txt.getText().toString();
+                        options_txt.setText(options_str + "\u25CF" + option.getName() + ": " + option.getValue()+"\n");
+                        option_title.setText(option_title.getText().toString()+"\n");
+                    }
+                    product_Ln.addView(options_txt);
+                    product_info_title.addView(option_title);
+                }
+
                 if(i<products_info.length()-1) {
                     product_Ln.addView(createView());
                     product_info_title.addView(createView());
                 }
+
             }
 
 
@@ -379,6 +384,7 @@ public class OrderDetails extends AppCompatActivity {
             }
 
         } catch (JSONException e) {
+            Log.d("error99",e.getMessage());
             e.printStackTrace();
         }
 
@@ -405,7 +411,7 @@ public class OrderDetails extends AppCompatActivity {
         v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,1));
         v.setBackgroundColor(getResources().getColor(R.color.grey));
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)v.getLayoutParams();
-        params.setMargins(0, 2, 0, 4);
+        params.setMargins(0, 2, 0, 8);
         v.setLayoutParams(params);
         return v;
     };
