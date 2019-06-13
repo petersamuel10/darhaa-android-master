@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.google.gson.JsonElement;
 import com.itsoluations.vavisa.darhaa.Interface.RecyclerItemTouchHelperListner;
 import com.itsoluations.vavisa.darhaa.Login;
+import com.itsoluations.vavisa.darhaa.MainActivity;
 import com.itsoluations.vavisa.darhaa.R;
 import com.itsoluations.vavisa.darhaa.adapter.FavoritesAdapter;
 import com.itsoluations.vavisa.darhaa.common.Common;
@@ -99,6 +100,16 @@ public class Favourite extends Fragment implements RecyclerItemTouchHelperListne
         } else
             loginLN.setVisibility(View.VISIBLE);
 
+        try {
+
+            if (Integer.valueOf(Common.cart_count) > 0) {
+                ((MainActivity) getActivity()).cart_count.setVisibility(View.VISIBLE);
+                ((MainActivity) getActivity()).cart_count.setText(Common.cart_count);
+            } else
+                ((MainActivity) getActivity()).cart_count.setVisibility(View.GONE);
+
+        } catch (Exception e) {
+        }
 
     }
 

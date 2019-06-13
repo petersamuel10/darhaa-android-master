@@ -241,6 +241,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener, 
                                 if (status.getStatus().equals("error"))
                                     Common.showAlert2(Product.this, status.getStatus(), status.getMessage());
                                 else {
+                                    Common.cart_count = status.getTotalCartItems();
                                     Snackbar snackbar = Snackbar.make(rootLayout, status.getMessage(), Snackbar.LENGTH_LONG);
                                     snackbar.show();
                                 }
@@ -353,13 +354,11 @@ public class Product extends AppCompatActivity implements View.OnClickListener, 
     }
 
     private void share() {
-
-
         try {
-
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, current_product.getName());
+            sendIntent.putExtra(Intent.EXTRA_TEXT, current_product.getName()+"\n\n"+
+                    "https://play.google.com/store/apps/details?id=com.itsoluations.vavisa.darhaa&hl=en");
             sendIntent.putExtra(Intent.EXTRA_STREAM, saveImageExternal(imageBtm));
             sendIntent.setType("image/*");
             startActivity(sendIntent);
@@ -605,6 +604,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener, 
                 httpURLConnection.setRequestMethod("GET");
                 httpURLConnection.setRequestProperty("api-token", getString(R.string.api_token));
                 httpURLConnection.setRequestProperty("Content-Type", getString(R.string.content_type));
+                httpURLConnection.setRequestProperty("App-version",Common.App_version);
                 httpURLConnection.setConnectTimeout(7000);
                 httpURLConnection.setReadTimeout(7000);
 

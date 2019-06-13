@@ -2,6 +2,7 @@ package com.itsoluations.vavisa.darhaa.fargments;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.itsoluations.vavisa.darhaa.MainActivity;
 import com.itsoluations.vavisa.darhaa.R;
 import com.itsoluations.vavisa.darhaa.adapter.HomeAdapter;
 import com.itsoluations.vavisa.darhaa.common.Common;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.paperdb.Paper;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
@@ -34,6 +37,7 @@ public class Home extends Fragment {
     RecyclerView home_rec;
 
     HomeAdapter homeAdapter;
+    String user_id, device_id;
 
     public ArrayList<CategoryData> categories;
 
@@ -45,7 +49,10 @@ public class Home extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        Paper.init(getContext());
 
+        user_id = Paper.book("DarHaa").contains("currentUser") ? Common.current_user.getCustomerInfo().getCustomer_id().toString() : "0";
+        device_id = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setCancelable(false);
 
@@ -60,12 +67,29 @@ public class Home extends Fragment {
         return view;
     }
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        try {
+
+            if (Integer.valueOf(Common.cart_count) > 0) {
+                ((MainActivity) getActivity()).cart_count.setVisibility(View.VISIBLE);
+                ((MainActivity) getActivity()).cart_count.setText(Common.cart_count);
+            } else
+                ((MainActivity) getActivity()).cart_count.setVisibility(View.GONE);
+
+        } catch (Exception e) {
+        }
+    }
+
     private void requestData() {
         if(Common.isConnectToTheInternet(getActivity())) {
             progressDialog.setMessage(getString(R.string.loading));
             progressDialog.show();
             try {
-            compositeDisposable.add(Common.getAPI().home()
+            compositeDisposable.add(Common.getAPI().home(user_id,device_id)
                                .subscribeOn(Schedulers.io())
                                .observeOn(AndroidSchedulers.mainThread())
                                .subscribe(new Consumer<HomeData>() {
@@ -82,6 +106,13 @@ public class Home extends Fragment {
                                            homeAdapter.addHomeList(categories);
                                            homeAdapter.notifyDataSetChanged();
                                            progressDialog.dismiss();
+
+                                           Common.cart_count = home.getTotalCartItems();
+                                           if (Integer.valueOf(Common.cart_count) > 0) {
+                                               ((MainActivity) getActivity()).cart_count.setVisibility(View.VISIBLE);
+                                               ((MainActivity) getActivity()).cart_count.setText(home.getTotalCartItems());
+                                           } else
+                                               ((MainActivity) getActivity()).cart_count.setVisibility(View.GONE);
                                        }
                                    }
                                }));

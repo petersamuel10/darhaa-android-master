@@ -28,6 +28,8 @@ public class Common {
     public static boolean isEditAddress = false;
     public static boolean showAddrDetails = false;
     public static Activity mActivity;
+    public static String App_version = "Android-1.0.4";
+    public static String cart_count = "0";
 
 
     public static Boolean isConnectToTheInternet (Context context) {

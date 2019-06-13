@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.google.gson.JsonElement;
+import com.itsoluations.vavisa.darhaa.MainActivity;
 import com.itsoluations.vavisa.darhaa.R;
 import com.itsoluations.vavisa.darhaa.common.Common;
 import com.itsoluations.vavisa.darhaa.model.favorite.Products;
@@ -104,6 +105,21 @@ public class ContactUS extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        try {
+
+            if (Integer.valueOf(Common.cart_count) > 0) {
+                ((MainActivity) getActivity()).cart_count.setVisibility(View.VISIBLE);
+                ((MainActivity) getActivity()).cart_count.setText(Common.cart_count);
+            } else
+                ((MainActivity) getActivity()).cart_count.setVisibility(View.GONE);
+
+        } catch (Exception e) {
+        }
     }
 
     private void callApi() {

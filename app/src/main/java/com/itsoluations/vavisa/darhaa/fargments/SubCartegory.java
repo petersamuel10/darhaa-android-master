@@ -60,7 +60,7 @@ public class SubCartegory extends AppCompatActivity {
         if(Common.isArabic){back_arrow.setRotation(180); }
 
 
-        title.setText(CurrentCategoryDetails.category_name);
+        title.setText(Html.fromHtml(CurrentCategoryDetails.category_name));
 
         categoryList = new ArrayList<>();
         compositeDisposable = new CompositeDisposable();

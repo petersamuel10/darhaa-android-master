@@ -49,7 +49,7 @@ public interface ApiInterface {
     Observable<User> forgotten(@Field("email") String email);
 
     @GET("index.php?route=restapi/home")
-    Observable<HomeData> home();
+    Observable<HomeData> home(@Query("user_id") String user_id, @Query("device_id") String device_id);
 
     @GET("index.php?route=restapi/category")
     Observable<JsonElement> getSubCat(@Query("category_id") String category_id);

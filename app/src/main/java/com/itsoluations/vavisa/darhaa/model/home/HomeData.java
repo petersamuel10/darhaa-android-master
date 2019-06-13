@@ -23,6 +23,10 @@ public class HomeData {
     @Expose
     private ArrayList<CategoryData> categories;
 
+    @SerializedName("totalCartItems")
+    @Expose
+    private String totalCartItems;
+
     public HomeData() {
     }
 
@@ -62,5 +66,13 @@ public class HomeData {
 
     public void setCategories(ArrayList<CategoryData> categories) {
         this.categories = categories;
+    }
+
+    public String getTotalCartItems() {
+        return totalCartItems;
+    }
+
+    public void setTotalCartItems(String totalCartItems) {
+        this.totalCartItems = totalCartItems;
     }
 }

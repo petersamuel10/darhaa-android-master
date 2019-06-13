@@ -6,18 +6,16 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.itsoluations.vavisa.darhaa.MainActivity;
 import com.itsoluations.vavisa.darhaa.R;
 import com.itsoluations.vavisa.darhaa.adapter.CategoryAdapter;
 import com.itsoluations.vavisa.darhaa.common.Common;
@@ -46,8 +44,8 @@ public class Category extends Fragment {
     SwipeRefreshLayout sl;
     @BindView(R.id.recyclerView)
     RecyclerView category_rec;
-    private MenuItem mSearchAction;
-    private SearchView searchView;
+    MenuItem mSearch;
+    SearchView searchView;
 
     ProgressDialog progressDialog;
 
@@ -70,23 +68,7 @@ public class Category extends Fragment {
         //setup recycler
         setupRecyclerView();
 
-        setHasOptionsMenu(true);
-
-        if (Common.isConnectToTheInternet(getActivity()))
-            new GetCategoryItemsBackgroundTask(getActivity()).execute();
-        else
-            Common.errorConnectionMess(getContext());
-
-        return view;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        mSearchAction = menu.findItem(R.id.action_search);
-
-        mSearchAction.setVisible(true);
-        searchView = (SearchView) mSearchAction.getActionView();
-
+        searchView = (SearchView) (((MainActivity) getActivity()).mSearch).getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -116,8 +98,29 @@ public class Category extends Fragment {
             }
         });
 
-        super.onCreateOptionsMenu(menu, inflater);
+
+        if (Common.isConnectToTheInternet(getActivity()))
+            new GetCategoryItemsBackgroundTask(getActivity()).execute();
+        else
+            Common.errorConnectionMess(getContext());
+
+        return view;
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        try {
+            if (Integer.valueOf(Common.cart_count) > 0) {
+                ((MainActivity) getActivity()).cart_count.setVisibility(View.VISIBLE);
+                ((MainActivity) getActivity()).cart_count.setText(Common.cart_count);
+            } else
+                ((MainActivity) getActivity()).cart_count.setVisibility(View.GONE);
+
+        } catch (Exception e) {
+        }
+    }
+
 
     private void setupRecyclerView() {
 
@@ -133,8 +136,6 @@ public class Category extends Fragment {
         sl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-
-                MenuItemCompat.collapseActionView(mSearchAction);
 
                 if (Common.isConnectToTheInternet(getActivity()))
                     new GetCategoryItemsBackgroundTask(getActivity()).execute();
@@ -171,6 +172,7 @@ public class Category extends Fragment {
                 httpURLConnection.setRequestMethod("GET");
                 httpURLConnection.setRequestProperty("api-token", getString(R.string.api_token));
                 httpURLConnection.setRequestProperty("Content-Type", getString(R.string.content_type));
+                httpURLConnection.setRequestProperty("App-version", Common.App_version);
                 httpURLConnection.setConnectTimeout(7000);
                 httpURLConnection.setReadTimeout(7000);
 
@@ -207,7 +209,7 @@ public class Category extends Fragment {
                 dialog.dismiss();
 
 
-            if(result.contains("error")){
+            if (result.contains("error")) {
                 try {
                     JSONObject jsonObject = new JSONObject(result);
                     String message = jsonObject.getString("message");
@@ -217,7 +219,7 @@ public class Category extends Fragment {
                 }
 
 
-            }else {
+            } else {
                 JSONArray firstJsonArray = null;
                 try {
                     firstJsonArray = new JSONArray(result);

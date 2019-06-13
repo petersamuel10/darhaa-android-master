@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.itsoluations.vavisa.darhaa.Login;
+import com.itsoluations.vavisa.darhaa.MainActivity;
 import com.itsoluations.vavisa.darhaa.R;
 import com.itsoluations.vavisa.darhaa.common.Common;
 import com.itsoluations.vavisa.darhaa.model.ProfileData;
@@ -147,6 +148,17 @@ public class Profile extends Fragment implements View.OnClickListener {
             email_txt.setText(Common.current_user.getCustomerInfo().getEmail());
             phone_txt.setText(Common.current_user.getCustomerInfo().getTelephone());
             setCharacters();
+        }
+
+        try {
+
+            if (Integer.valueOf(Common.cart_count) > 0) {
+                ((MainActivity) getActivity()).cart_count.setVisibility(View.VISIBLE);
+                ((MainActivity) getActivity()).cart_count.setText(Common.cart_count);
+            } else
+                ((MainActivity) getActivity()).cart_count.setVisibility(View.GONE);
+
+        } catch (Exception e) {
         }
     }
 

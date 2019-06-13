@@ -96,6 +96,7 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
     public final static int REQUEST_FILTER = 2;
     String search_str = "";
     MenuItem mSearch;
+    TextView cart_count;
     boolean isFirstCall = false;
 
     @Override
@@ -166,6 +167,14 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
 
         // get user_id after come from login activity
         user_id = (Common.current_user != null) ? String.valueOf(Common.current_user.getCustomerInfo().getCustomer_id()) : "0";
+
+        try {
+            if (Integer.valueOf(Common.cart_count) > 0) {
+                cart_count.setVisibility(View.VISIBLE);
+                cart_count.setText(Common.cart_count);
+            }else
+                cart_count.setVisibility(View.GONE);
+        }catch (Exception e){}
     }
 
     public void setup_for_call_api() {
@@ -280,9 +289,26 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu4products, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
+        final MenuItem menuItem = menu.findItem(R.id.action_cart);
         mSearch = menu.findItem(R.id.action_search);
+        View cartItem = menu.findItem(R.id.action_cart).getActionView();
+        mSearch = menu.findItem(R.id.action_search);
+        cart_count = cartItem.findViewById(R.id.cart_count);
+        mSearch.setVisible(true);
+
+        if (Integer.valueOf(Common.cart_count) > 0) {
+            cart_count.setVisibility(View.VISIBLE);
+            cart_count.setText(Common.cart_count);
+        }else
+            cart_count.setVisibility(View.GONE);
+
+        cartItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(menuItem);
+            }
+        });
 
         SearchView mSearchView = (SearchView) mSearch.getActionView();
         mSearchView.setQueryHint("Search");
@@ -311,6 +337,22 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
             }
         });
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the HomeData/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_cart) {
+            startActivity(new Intent(this, Cart.class));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -420,17 +462,6 @@ public class CategoryProducts extends AppCompatActivity implements RecyclerViewI
         });
 
         dialog.show();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_cart) {
-            startActivity(new Intent(this, Cart.class));
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     // This is used when the current activity is waiting until the next activity is finished to do something

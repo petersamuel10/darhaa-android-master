@@ -295,7 +295,7 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
                         progressDialog.dismiss();
                         cartData.getProducts().remove(position);
                         adapter.notifyItemRemoved(position);
-
+                        Common.cart_count = String.valueOf(Integer.valueOf(Common.cart_count) - 1);
 
                         if (adapter.getItemCount() == 1) {
                             cart_rec.setVisibility(View.GONE);

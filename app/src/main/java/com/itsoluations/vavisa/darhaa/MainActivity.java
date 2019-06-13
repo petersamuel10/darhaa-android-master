@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.itsoluations.vavisa.darhaa.common.Common;
@@ -39,7 +40,8 @@ public class MainActivity extends AppCompatActivity
 
     Fragment fragment = null;
     TextView titleTxt;
-    MenuItem mSearch, mCart;
+    public TextView cart_count;
+    public MenuItem mSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,13 +136,20 @@ public class MainActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
 
+        final MenuItem menuItem = menu.findItem(R.id.action_cart);
+        View cartItem = menu.findItem(R.id.action_cart).getActionView();
         mSearch = menu.findItem(R.id.action_search);
-
-        mCart = menu.findItem(R.id.action_cart);
-
+        mSearch.setVisible(false);
+        cart_count = cartItem.findViewById(R.id.cart_count);
         SearchView mSearchView = (SearchView) mSearch.getActionView();
         mSearchView.setQueryHint("Search");
-        //mSearchView.setOnQueryTextListener(this);
+
+        cartItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(menuItem);
+            }
+        });
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -169,23 +178,23 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_home) {
             fragment = new Home();
-            //  mSearch.setVisible(false);
+              mSearch.setVisible(false);
             titleTxt.setPaddingRelative(0, 0, 24, 0);
         } else if (id == R.id.nav_category) {
             fragment = new Category();
-            // mSearch.setVisible(true);
+             mSearch.setVisible(true);
             titleTxt.setPaddingRelative(8, 0, 0, 0);
         } else if (id == R.id.nav_favourite) {
             fragment = new Favourite();
-            //  mSearch.setVisible(false);
+              mSearch.setVisible(false);
             titleTxt.setPaddingRelative(0, 0, 24, 0);
         } else if (id == R.id.nav_profile) {
             fragment = new Profile();
-            //mSearch.setVisible(false);
+            mSearch.setVisible(false);
             titleTxt.setPaddingRelative(0, 0, 24, 0);
         } else if (id == R.id.nav_support) {
             fragment = new ContactUS();
-            // mSearch.setVisible(false);
+             mSearch.setVisible(false);
             titleTxt.setPaddingRelative(0, 0, 24, 0);
         }
 
