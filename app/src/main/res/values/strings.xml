@@ -153,10 +153,7 @@
     <!-- AsyncTask related strings -->
     <string name="content_type" translatable="false">application/x-www-form-urlencoded</string>
     <string name="api_token" translatable="false">16aac5b8216f1134770e665a8d</string>
-    <string name="category_items_api" translatable="false">https://darhaa.com/darhaa_test/index.php?route=restapi/category</string>
-    <string name="product_details_api" translatable="false">https://darhaa.com/darhaa_test/index.php?route=restapi/product/productdetails</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="login_no_match">No match for E-Mail Address and/or Password.</string>
     <string name="no_product_details_found" translatable="false">No details found. Please choose another product.</string>
@@ -254,4 +251,5 @@
     <string name="message">Message : </string>
     <string name="these_items_out_of_stock">These items are out of stock:</string>
     <string name="error_occur">Error occur</string>
+    <string name="update_app">update the app</string>
 </resources>

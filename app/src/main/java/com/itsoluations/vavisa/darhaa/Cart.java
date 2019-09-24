@@ -132,7 +132,7 @@ public class Cart extends AppCompatActivity implements CartInterface, RecyclerIt
                             progressDialog.dismiss();
                             if (cartList.getStatus() != null) {
                                 if (cartList.getStatus().contains("error")) {
-                                    //Common.showAlert2(Cart.this, cartList.getStatus(), cartList.getMessage());
+                                    Common.showAlert2(Cart.this, cartList.getStatus(), cartList.getMessage());
                                     no_item_txt.setVisibility(View.VISIBLE);
                                 } else
                                     no_item_txt.setVisibility(View.VISIBLE);

@@ -42,7 +42,6 @@ public class PaymentPage extends AppCompatActivity {
         WebSettings webSettings = wb_payment.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
-
         wb_payment.loadUrl(url);
 
 

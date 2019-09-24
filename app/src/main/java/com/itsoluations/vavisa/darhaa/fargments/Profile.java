@@ -269,6 +269,8 @@ public class Profile extends Fragment implements View.OnClickListener {
                                 snackbar.show();
                                 Paper.book("DarHaa").delete("currentUser");
                                 Common.current_user = null;
+                                Common.cart_count = "0";
+                                ((MainActivity) getActivity()).cart_count.setVisibility(View.GONE);
                                 hideView();
                             }
                         }

@@ -165,7 +165,7 @@ public class Category extends Fragment {
 
         @Override
         protected String doInBackground(String... params) {
-            String get_category_url = getString(R.string.category_items_api);
+            String get_category_url = Common.URL+"index.php?route=restapi/category";
             try {
                 URL url = new URL(get_category_url);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();

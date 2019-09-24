@@ -155,7 +155,7 @@
     <string name="password_less">كلمة المرور قصيره.</string>
     <string name="max_number">الكمية غير متوفره.</string>
     <string name="please_enter">"من فضلك ادخل "</string>
-    <string name="sku">رمز البريد</string>
+    <string name="sku">رمز المنتج</string>
     <string name="verify">تاكيد</string>
     <string name="coupon_successfully">تم الاستخدام بنجاح</string>
     <string name="sub_total">الاجمالي</string>
@@ -228,5 +228,6 @@
     <string name="message">: الرسالة</string>
     <string name="these_items_out_of_stock">لقد نفذت كمية هذه المنتجات :</string>
     <string name="error_occur">حدث خطأ</string>
+    <string name="update_app">تحديث التطبيق</string>
 
 </resources>

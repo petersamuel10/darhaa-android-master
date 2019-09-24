@@ -24,7 +24,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.itsoluations.vavisa.darhaa.R;
 import com.itsoluations.vavisa.darhaa.common.Common;
-import com.itsoluations.vavisa.darhaa.model.address.address.Countries;
 import com.itsoluations.vavisa.darhaa.model.cartData.Options;
 import com.itsoluations.vavisa.darhaa.model.cartData.Product;
 import com.itsoluations.vavisa.darhaa.model.paymentData.CheckoutPageParameters;
@@ -219,6 +218,9 @@ public class PaymentMethod extends AppCompatActivity {
     private void callPaymentMethod() {
 
         progressDialog.show();
+        Gson gson = new Gson();
+        String personString = gson.toJson(payment1);
+        Log.d("payment_string", personString);
         try {
             compositeDisposable = new CompositeDisposable();
             compositeDisposable.add(Common.getAPI().paymentMethod(payment1)
@@ -282,13 +284,13 @@ public class PaymentMethod extends AppCompatActivity {
 
                 @Override
                 public void onNext(JsonElement jsonElement) {
-                   json = jsonElement;
+                    json = jsonElement;
                 }
 
                 @Override
                 public void onError(Throwable e) {
 
-                    Common.showAlert2(PaymentMethod.this,getString(R.string.error),getString(R.string.error_connection));
+                    Common.showAlert2(PaymentMethod.this, getString(R.string.error), getString(R.string.error_connection));
                 }
 
                 @Override
@@ -307,30 +309,31 @@ public class PaymentMethod extends AppCompatActivity {
                             String message = data.getString("message");
                             Common.showAlert2(PaymentMethod.this, status, message);
 
-                        }catch (Exception e){}
+                        } catch (Exception e) {
+                        }
                     } else {
                         shippingLN.setVisibility(View.VISIBLE);
 
                         try {
-                        JSONArray dataArray = new JSONArray(json2);
-                        for (int i = 0; i < dataArray.length(); i++) {
-                            JSONObject object = dataArray.getJSONObject(i);
-                            JSONArray methodData = object.getJSONArray("quote");
-                            for (int x = 0; i < methodData.length(); i++) {
-                                JSONObject object1 = methodData.getJSONObject(x);
+                            JSONArray dataArray = new JSONArray(json2);
+                            for (int i = 0; i < dataArray.length(); i++) {
+                                JSONObject object = dataArray.getJSONObject(i);
+                                JSONArray methodData = object.getJSONArray("quote");
+                                for (int x = 0; i < methodData.length(); i++) {
+                                    JSONObject object1 = methodData.getJSONObject(x);
 
-                                ShippingMethodData shippingMethod = new ShippingMethodData();
-                                shippingMethod.setCode(object1.getString("code"));
-                                shippingMethod.setTitle(object1.getString("title"));
-                                shippingMethod.setError(object1.getString("error"));
-                                shippingMethod.setCost(object1.getString("cost"));
-                                shippingMethods.add(shippingMethod);
+                                    ShippingMethodData shippingMethod = new ShippingMethodData();
+                                    shippingMethod.setCode(object1.getString("code"));
+                                    shippingMethod.setTitle(object1.getString("title"));
+                                    shippingMethod.setError(object1.getString("error"));
+                                    shippingMethod.setCost(object1.getString("cost"));
+                                    shippingMethods.add(shippingMethod);
 
+                                }
                             }
-                        }
-                    }catch(Exception e){
+                        } catch (Exception e) {
 
-                    }
+                        }
 
                     }
                     //bind data
@@ -395,7 +398,7 @@ public class PaymentMethod extends AppCompatActivity {
                             }
                         }
                     }));*/
-        }catch (Exception e){
+        } catch (Exception e) {
             Common.showAlert2(PaymentMethod.this, getString(R.string.error), e.getMessage());
         }
     }
@@ -515,7 +518,7 @@ public class PaymentMethod extends AppCompatActivity {
                                     if (payment_method_code.equals("cod")) {
                                         Intent intent = new Intent(PaymentMethod.this, PaymentResult.class);
                                         intent.putExtra("order_id", checkoutProductPage.getOrder_id());
-                                        intent.putExtra("total", getIntent().getStringExtra("total"));
+                                        intent.putExtra("total", payBtn.getText().toString());
                                         startActivity(intent);
                                     } else {
                                         Intent intent = new Intent(PaymentMethod.this, PaymentPage.class);
@@ -547,9 +550,9 @@ public class PaymentMethod extends AppCompatActivity {
         for (Product product : products) {
             if (!product.getStock()) {
                 product_out_of_stock += "\n \u25CF" + product.getName();
-                for(Options option : product.getOption()){
-                    if(!TextUtils.isEmpty(option.getValue())){
-                        product_out_of_stock += "\n    \u25CF" + option.getName() + ": "+option.getValue();
+                for (Options option : product.getOption()) {
+                    if (!TextUtils.isEmpty(option.getValue())) {
+                        product_out_of_stock += "\n    \u25CF" + option.getName() + ": " + option.getValue();
                     }
                 }
             }

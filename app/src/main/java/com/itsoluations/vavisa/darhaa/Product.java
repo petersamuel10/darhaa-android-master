@@ -357,7 +357,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener, 
         try {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, current_product.getName()+"\n\n"+
+            sendIntent.putExtra(Intent.EXTRA_TEXT, current_product.getName() + "\n\n" +
                     "https://play.google.com/store/apps/details?id=com.itsoluations.vavisa.darhaa&hl=en");
             sendIntent.putExtra(Intent.EXTRA_STREAM, saveImageExternal(imageBtm));
             sendIntent.setType("image/*");
@@ -593,10 +593,10 @@ public class Product extends AppCompatActivity implements View.OnClickListener, 
             Integer user_id = null;
             if (Common.current_user != null) {
                 user_id = Common.current_user.getCustomerInfo().getCustomer_id();
-                get_product_details_url = getString(R.string.product_details_api) + "&product_id=" + product_id + "&user_id=" + user_id;
+                get_product_details_url = Common.URL + "index.php?route=restapi/product/productdetails&product_id=" + product_id + "&user_id=" + user_id;
 
             } else
-                get_product_details_url = getString(R.string.product_details_api) + "&product_id=" + product_id;
+                get_product_details_url = Common.URL + "index.php?route=restapi/product/productdetails&product_id=" + product_id;
 
             try {
                 URL url = new URL(get_product_details_url);
@@ -604,7 +604,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener, 
                 httpURLConnection.setRequestMethod("GET");
                 httpURLConnection.setRequestProperty("api-token", getString(R.string.api_token));
                 httpURLConnection.setRequestProperty("Content-Type", getString(R.string.content_type));
-                httpURLConnection.setRequestProperty("App-version",Common.App_version);
+                httpURLConnection.setRequestProperty("App-version", Common.App_version);
                 httpURLConnection.setConnectTimeout(7000);
                 httpURLConnection.setReadTimeout(7000);
 
@@ -1037,8 +1037,7 @@ public class Product extends AppCompatActivity implements View.OnClickListener, 
 
         }
 
-        private void setListViewHeight(ExpandableListView listView,
-                                       int group) {
+        private void setListViewHeight(ExpandableListView listView, int group) {
             ExpandableListAdapter listAdapter = (ExpandableListAdapter) listView.getExpandableListAdapter();
             int totalHeight = 0;
             int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(),

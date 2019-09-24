@@ -200,7 +200,6 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="8dp"
-                    android:text="37.00 kd"
                     android:textColor="@color/grey"
                     android:textSize="16sp"
                     android:visibility="gone" />

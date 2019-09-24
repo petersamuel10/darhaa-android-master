@@ -3,10 +3,12 @@ package com.itsoluations.vavisa.darhaa.common;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.view.View;
 import android.widget.TextView;
 
@@ -23,12 +25,13 @@ import java.net.URL;
 
 public class Common {
 
+    public static String URL = "https://darhaa.com/darhaa_application/";
     public static boolean isArabic = false;
     public static User current_user;
     public static boolean isEditAddress = false;
     public static boolean showAddrDetails = false;
     public static Activity mActivity;
-    public static String App_version = "Android-1.0.4";
+    public static String App_version;
     public static String cart_count = "0";
 
 
@@ -144,7 +147,7 @@ public class Common {
         dialog.show();
     }
 
-    public static void showAlert2(Context context, String title, String msg) {
+    public static void showAlert2(final Context context, String title, String msg) {
 
         final Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.custom_alert_error);
@@ -157,13 +160,26 @@ public class Common {
         TextView cancel =  dialog.findViewById(R.id.cancel_alert);
 
         message_.setText(msg);
+        if(msg.contains(context.getString(R.string.update_app))){
+            cancel.setText(context.getString(R.string.update));
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-        cancel.setOnClickListener(new View.OnClickListener() {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.itsoluations.vavisa.darhaa&hl=en"));
+                    context.startActivity(intent);
+                }
+            });
+        }else
+            cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
             }
         });
+
+
 
         dialog.show();
     }

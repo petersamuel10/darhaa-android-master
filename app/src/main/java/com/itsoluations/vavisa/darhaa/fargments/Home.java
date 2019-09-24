@@ -107,7 +107,7 @@ public class Home extends Fragment {
                                            homeAdapter.notifyDataSetChanged();
                                            progressDialog.dismiss();
 
-                                           Common.cart_count = home.getTotalCartItems();
+                                           Common.cart_count = (home.getTotalCartItems() == null)? "0" : home.getTotalCartItems();
                                            if (Integer.valueOf(Common.cart_count) > 0) {
                                                ((MainActivity) getActivity()).cart_count.setVisibility(View.VISIBLE);
                                                ((MainActivity) getActivity()).cart_count.setText(home.getTotalCartItems());
